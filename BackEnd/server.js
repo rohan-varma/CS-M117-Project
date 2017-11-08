@@ -11,5 +11,5 @@ app.get('/', (req, res) =>
 // Launch the server on port 3000
     const server = app.listen(3000, () => {
 	    const { address, port } = server.address();
-	    console.log('Listening at http://${address}:${port}');
+	    console.log('Listening at http://$127.0.0.1:3000');
 	});
