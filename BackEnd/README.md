@@ -1,4 +1,4 @@
 # Bluetooth Assassin Backend API
 Use:
-> node index.js
+`node index.js`
 to run the server locally.
