@@ -12,10 +12,13 @@ Overview:
 
 ### Instructions for running front-end: 
 
-1) Clone the repository and navigate into the front-end directory and run `npm install`
-2) Once that is finished, you should be able to run the command `react-native run-ios` (mac only) which will launch the front end in an iPhone simulator.
+1) brew install nodejs
+   brew install watchman
+   npm install -g react-native-cli
+2) Clone the repository and navigate into the front-end directory and run `npm install`
+3) Once that is finished, you should be able to run the command `react-native run-ios` (mac only) which will launch the front end in an iPhone simulator.
 
-Please see README in frontend folder for backend instructions.
+Please see README in frontend folder for frontend instructions.
 
 ### Instructions for running back-end: 
 
