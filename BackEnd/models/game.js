@@ -6,8 +6,8 @@ var gameSchema = new Schema({
 	unique: true,
     },
     organizer-name: String,
-    central-safe-zone: { type: Schema.Types.ObjectId, ref: 'safe-zone'},
-    players: [{ type: Schema.Types.ObjectId, ref: 'player'}],
+    central-safe-zone: { type: Schema.Types.ObjectId, ref: 'safe-zone' },
+    players: [{ type: Schema.Types.ObjectId, ref: 'player' }],
 });
 
 export default mongoose.model('game', gameSchema);
