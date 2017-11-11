@@ -7,7 +7,8 @@ var gameSchema = new Schema({
     },
     organizer-name: String,
     central-safe-zone: { type: Schema.Types.ObjectId, ref: 'safe-zone' },
-    players: [{ type: Schema.Types.ObjectId, ref: 'player' }],
+    alive-players: [{ type: Schema.Types.ObjectId, ref: 'player' }],
+    dead-players: [{ type: Schema.Types.ObjectId, ref: 'player' }],
 });
 
 export default mongoose.model('game', gameSchema);
