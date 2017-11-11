@@ -10,6 +10,7 @@ var playerSchema = new Schema({
     game: [{ type: Schema.Types.ObjectId, ref: 'game' }],
     my-safe-zone: { type Schema.Types.ObjectId, ref: 'safe-zone' },
     target: { type Schema.Types.ObjectId, ref: 'player' },
+    alliance: { type Schema.Types.ObjectId, ref: 'alliance' },
     location: {
 	type: "Point",
 	coordinates: [x, y]
