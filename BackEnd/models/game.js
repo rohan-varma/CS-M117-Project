@@ -6,7 +6,7 @@ var gameSchema = new Schema({
 	unique: true,
     },
     organizer-name: String,
-    central-safe-zone: { type: Schema.Types.ObjectId, ref: 'safe-zone' },
+    central-safe-zone: { type: Schema.Types.ObjectId, ref: 'safezone' },
     alive-players: [{ type: Schema.Types.ObjectId, ref: 'player' }],
     dead-players: [{ type: Schema.Types.ObjectId, ref: 'player' }],
 });
