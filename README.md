@@ -22,6 +22,6 @@ Please see README in frontend folder for frontend instructions.
 
 ### Instructions for running back-end: 
 
-1) Clone the repository and navigate into the back-end directory and run `node index.js`
+1) Clone the repository and navigate into the back-end directory and run `npm start`
 
 Please see README in backend folder for backend instructions.
