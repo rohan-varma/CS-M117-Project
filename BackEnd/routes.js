@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
 import Safezone from './models/safezone';
+
 const _  = require('lodash')
 const router = express.Router();
 
@@ -238,6 +239,43 @@ router.get('/getTargetLocation', (req, res) => {
 	    res.send(obj.location);
 	}
     });
+
+router.post('/createAlliance', (req, res) => {
+	var jsonRequestBody = req.body;
+
+	var allianceFields = {};
+	allianceFields.allies = jsonRequestBody.allies;
+	allianceFields.targets = jsonRequestBody.targets;
+
+	var alliance = new Alliance(allianceFields);
+	var allianceId = alliance.id;
+	var allies = JSON.parse(jsonRequestBody.allies);
+
+	alliance.save(function(err) {
+		if (err) {
+			console.log("Failed to create alliance - Error: " + err.message);
+			return;
+		}
+	});
+
+	// Update users with their alliance ID
+	for (int i = 0; i < allies.length; i++) {
+		Player.findOneAndUpdate({
+			// Condition
+			id : allies[i].id,
+		}, {
+			// Update
+			alliance : allianceId,
+		}, {
+			// Options - new: return the modified document rather than the original
+			new : true,
+		}, function(err, doc) {
+			if (err) {
+				console.log("Failed to add users to a new alliance - Error: " + err.message);
+				return;
+			}
+		});
+	}
 });
 
 router.get('/players', (req, res) => {
