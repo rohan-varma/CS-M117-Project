@@ -2,6 +2,7 @@ import express from 'express';
 import config from './config';
 import mongoose from 'mongoose';
 import Player from './models/player';
+import Game from './models/game';
 
 const router = express.Router();
 
@@ -45,6 +46,20 @@ router.get('/getTargetLocation', (req, res) => {
 	    res.send(obj.location);
 	}
     });
+});
+
+router.post('/createGame', (req, res) => {
+	var game = new Game(req.body);
+	// Assuming this is from a POST request and the body of the
+	// request contained the JSON of the new "todo" item to be saved
+	game.save((err, createdGameObject) => {  
+    if (err) {
+        res.status(500).send(err);
+    }
+    // This createdTodoObject is the same one we saved, but after Mongo
+    // added its additional properties like _id.
+    res.status(200).send(createdGameObject);
+});
 });
 
 module.exports = router;
