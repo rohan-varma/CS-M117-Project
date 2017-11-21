@@ -19,7 +19,7 @@ export default class App extends React.Component {
         <Text>This is the best CS M117 project ever!</Text>
         <Text>Changes you make will automatically reload.</Text>
         <Text>Shake your phone to open the developer menu.</Text>
-        <Greeting name='rohan' />
+        <Greeting name='rohan varma' />
       </View>
     );
   }
