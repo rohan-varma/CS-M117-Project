@@ -5,7 +5,24 @@ import mongoose from 'mongoose';
 import routes from './routes';
 
 const app = express();
+// //Import the mongoose module
+// var mongoose = require('mongoose');
 
+// //Set up default mongoose connection
+// var mongoDB = 'mongodb://127.0.0.1/';
+// mongoose.connect(mongoDB, {
+//   useMongoClient: true
+// });
+
+// //Get the default connection
+// var db = mongoose.connection;
+
+// //Bind connection to error event (to get notification of connection errors)
+// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// mongoose.connect('mongodb://localhost/test_db', function (err) {
+// if (err) throw err;
+// });
 // Middleware
 app.use(logger('dev'));
 app.use(bodyParser.json());
