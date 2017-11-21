@@ -26,6 +26,20 @@ router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
+router.post('/addUser', (req, res) => {
+	var player = new Player(req.body);
+	// Assuming this is from a POST request and the body of the
+	// request contained the JSON of the new "todo" item to be saved
+	player.save((err, createdPlayerObject) => {  
+    if (err) {
+        res.status(500).send(err);
+    }
+    // This createdTodoObject is the same one we saved, but after Mongo
+    // added its additional properties like _id.
+    res.status(200).send(createdPlayerObject);
+});
+});
+
 router.post('/updateLocation', (req, res) => {
     Player.findOneAndUpdate({ username: req.body.username },
 			    { $set: { location: [req.body.x, req.body.y] } },
