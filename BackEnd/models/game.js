@@ -5,6 +5,7 @@ var gameSchema = new Schema({
 	type: String,
 	unique: true,
     },
+    started: Boolean,
     organizerName: String,
     centralSafeZone: { type: Schema.Types.ObjectId, ref: 'safezone' },
     alivePlayers: [{ type: Schema.Types.ObjectId, ref: 'player' }],
