@@ -29,7 +29,7 @@ router.get('/config', (req, res, next) => {
 });
 
 router.post('/createGame', (req, res) => {
-    if (req.body.loginCode == null || req.body.orgName == null) {
+    if (req.body.loginCode == null || req.body.orgName == null ){//|| req.body.xCoord == null || req.body.yCoord == null || req.body.radius == null) {
 	res.sendStatus(400);
 	return;
     }
@@ -37,7 +37,7 @@ router.post('/createGame', (req, res) => {
 	if (game)
 	    res.sendStatus(400);
 	else {
-		var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
+		var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
 			radius: req.body.radius});
 		
 	    var newGame = new Game({ gameCode: req.body.loginCode,
