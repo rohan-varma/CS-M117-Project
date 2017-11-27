@@ -3,6 +3,7 @@ import config from './config';
 import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
+import Safezone from './models/safezone';
 
 const router = express.Router();
 
@@ -36,14 +37,24 @@ router.post('/createGame', (req, res) => {
 	if (game)
 	    res.sendStatus(400);
 	else {
+		var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
+			radius: req.body.radius});
+		
 	    var newGame = new Game({ gameCode: req.body.loginCode,
 				     started: false,
-				     organizerName: req.body.orgName});
+				     organizerName: req.body.orgName,
+				     centralSafeZone: newSafezone._id});
+	    newSafezone.game = newGame._id;
 	    newGame.save((err) => {
 		if (err)
 		    res.sendStatus(500);
-		else
+		else {
+			newSafezone.save((err => {
+				if (err)
+					res.sendStatus(500)
+			}));
 		    res.sendStatus(200);
+		}
 	    });
 	}
     });
@@ -63,11 +74,16 @@ router.post('/addUser', (req, res) => {
 		if(!game)
 		    res.sendStatus(400);
 		else {
+			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
+			radius: req.body.radius});
+		
 		    var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
 						 macAddress: req.body.mac,
 						 game: game._id,
+						 mySafeZone: newSafezone._id,
 						 location: [req.body.x, req.body.y] });
+		    newSafezone.game = game._id;
 		    newPlayer.save((err, player) => {
 			if (err)
 			    res.sendStatus(500);
@@ -76,8 +92,13 @@ router.post('/addUser', (req, res) => {
 			    game.save((err) => {
 				if (err)
 				    res.sendStatus(500);
-				else
+				else {
+					newSafezone.save((err) => {
+						if (err)
+							res.sendStatus(500);
+					});
 				    res.status(200).send(player._id);
+				}
 			    });
 			}
 		    });
