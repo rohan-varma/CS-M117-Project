@@ -29,16 +29,21 @@ router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
+const validateGameRequest = request => {
+	const body = request.body
+	return body && body.loginCode !== null 
+		&& body.orgName !== null 
+		&& body.xCoord !== null 
+		&& body.yCoord !== null;
+}
 router.post('/createGame', (req, res) => {
-
-    if (req.body.loginCode == null || req.body.orgName == null ){//|| req.body.xCoord == null || req.body.yCoord == null || req.body.radius == null) {
-		console.log('HERE!')
+	if (!validateGameRequest(req)) {
+		console.log('did not validate')
 		res.status(400).json({
 			error: 'Must have both logic code and orgName specified',
-		})
+		});
 		return;
-    }
-
+	}
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
     	if (game) {
     		res.status(400).send({
