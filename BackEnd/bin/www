@@ -24,6 +24,7 @@ var config = require('../config.js');
  * Get port from environment and store in Express.
  */
 
+
 var port = normalizePort(process.env.PORT || config.expressPort);
 app.set('port', port);
 
@@ -100,3 +101,5 @@ function onListening() {
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }
+
+module.exports = server;

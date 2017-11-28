@@ -21,7 +21,8 @@ router.get('/', (req, res, next) => {
 	"AppName": "Bluetooth Assassin",
 	"Version": 1.0
     }
-    res.json(test);
+    console.log('here')
+    res.status(200).json(test);
 });
 
 router.get('/config', (req, res, next) => {
@@ -29,36 +30,53 @@ router.get('/config', (req, res, next) => {
 });
 
 router.post('/createGame', (req, res) => {
+
     if (req.body.loginCode == null || req.body.orgName == null ){//|| req.body.xCoord == null || req.body.yCoord == null || req.body.radius == null) {
-	res.sendStatus(400);
-	return;
+		console.log('HERE!')
+		res.status(400).json({
+			error: 'Must have both logic code and orgName specified',
+		})
+		return;
     }
+
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
-	if (game)
-	    res.sendStatus(400);
-	else {
-		var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
-			radius: req.body.radius});
-		
-	    var newGame = new Game({ gameCode: req.body.loginCode,
-				     started: false,
-				     organizerName: req.body.orgName,
-				     centralSafeZone: newSafezone._id});
-	    newSafezone.game = newGame._id;
-	    newGame.save((err) => {
-		if (err)
-		    res.sendStatus(500);
+    	if (game) {
+    		res.status(400).send({
+    			error: "Game with login code " + req.body.loginCode + " already exists!",
+    		});
+    	}
 		else {
-			newSafezone.save((err => {
-				if (err)
-					res.sendStatus(500);
-				else 
-					res.sendStatus(200);
-			}));
+			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
+				radius: req.body.radius});
+	    	var newGame = new Game({ gameCode: req.body.loginCode,
+					     started: false,
+					     organizerName: req.body.orgName,
+					     centralSafeZone: newSafezone._id});
+	    	newSafezone.game = newGame._id;
+	    	newGame.save((err) => {
+	    		if (err) {
+	    			res.status(500).json({
+	    				error: 'there was an error with newGame',
+	    			})
+	    		}
+			else {
+				newSafezone.save((err => {
+					if (err) {
+						console.log(err);
+						res.status(500).json({
+							error: 'error with SafeZone',
+						})
+					}
+					else {
+						res.status(200).json({
+							message: 'success',
+						})
+					}
+				}));
+			}
+	    	});
 		}
-	    });
-	}
-    });
+    	});
 });
 
 router.post('/addUser', (req, res) => {
