@@ -51,9 +51,10 @@ router.post('/createGame', (req, res) => {
 		else {
 			newSafezone.save((err => {
 				if (err)
-					res.sendStatus(500)
+					res.sendStatus(500);
+				else 
+					res.sendStatus(200);
 			}));
-		    res.sendStatus(200);
 		}
 	    });
 	}
