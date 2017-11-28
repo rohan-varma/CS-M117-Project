@@ -35,6 +35,8 @@ Please see README in frontend folder for frontend i
 
 ### Testing the BackEnd
 
+- `npm test` will test the APIs for the routes defined in `routes.js`. 
+- The test file is located in `tests/tests.js`
 - There is a script `test.py` that is in use to test the backend API calls. 
 
 ### Mongo Stuff
