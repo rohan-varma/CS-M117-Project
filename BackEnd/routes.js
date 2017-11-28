@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
 import Safezone from './models/safezone';
-
+const _  = require('lodash')
 const router = express.Router();
 
 var mongoDB = config.client.mongodb.defaultUri + '/' + config.client.mongodb.defaultDatabase;
@@ -30,18 +30,20 @@ router.get('/config', (req, res, next) => {
 
 const validateGameRequest = request => {
 	const body = request.body
-	return body && body.loginCode !== null 
-		&& body.orgName !== null 
-		&& body.xCoord !== null 
-		&& body.yCoord !== null;
+	return _.has(body, 'loginCode') 
+		&& _.has(body, 'orgName') 
+		&& _.has(body, 'xCoord')
+		&& _.has(body, 'yCoord')
 }
 router.post('/createGame', (req, res) => {
 	if (!validateGameRequest(req)) {
+		console.log('failed to validate')
 		res.status(400).json({
 			error: 'Must have both login code and orgName specified',
 		});
 		return;
 	}
+	console.log('request validated')
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
     	if (game) {
     		res.status(400).send({

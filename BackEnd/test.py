@@ -17,6 +17,12 @@ def testCreateGame ():
 	assert res.status_code == 400
 	assert 'error' in res.json().keys()
 
+	# if a game is created without coords it should error
+	res = requests.post("http://localhost:3000/BluA/createGame",
+		data = {x: data[x] for x in data if x not in ['xCoord', 'yCoord']})
+	assert res.status_code == 400
+	assert 'error' in res.json().keys()
+
 	# a game should successfully be created with a new login code (generate randomly)
 	res = requests.post("http://localhost:3000/BluA/createGame",
 		data = data)
