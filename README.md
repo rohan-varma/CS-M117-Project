@@ -10,21 +10,40 @@ Overview:
 3) Have people review your pull request and make comments/changes.
 4) Once the pull request has been reviewed/approved, merge it to master. 
 
-### Instructions for running front-end: 
 
-1) brew install nodejs
+### Setup Instructions
 
-   brew install watchman
+1) Clone the repository
+2) Navigate into the `FrontEnd` directory and run `npm i` to install all required dependencies
+3) Navigate into the `BackEnd` directoyr and run `npm i` to install all required dependencies
 
-   npm install -g react-native-cli
-   
-2) Clone the repository and navigate into the front-end directory and run `npm install`
-3) Once that is finished, you should be able to run the command `react-native run-ios` (mac only) which will launch the front end in an iPhone simulator.
+### Running the front-end
 
-Please see README in frontend folder for frontend instructions.
+Navigate into the Front-End directory
 
-### Instructions for running back-end: 
+First, if you don't have node, run `brew install nodejs`
 
-1) Clone the repository and navigate into the back-end directory and run `npm start`
+1) `brew install watchman`
+2) `npm install -g react-native-cli`
+3) `react-native run-ios` will launch the simulator
 
-Please see README in backend folder for backend instructions.
+Please see README in frontend folder for frontend i
+
+### Running the backend
+
+1) Navigate into the BackEnd directory and run `npm start`. This will start the app listening on the port localhost:3000/BluA
+
+### Testing the BackEnd
+
+- There is a script `test.py` that is in use to test the backend API calls. 
+
+### Mongo Stuff
+- Run mongo in a separate terminal with the command `mongod`
+- To enter the mongoshell create a new terminal instance and run `mongo`. The default DB we are using is `BluA`, so inside the shell run the command `use BluA` to switch to this DB. 
+
+As of now the DB has the following collections: 
+
+games
+players
+
+To drop the database, run `mongo BluA --eval "db.dropDatabase()"`
