@@ -15,7 +15,7 @@ Overview:
 
 1) Clone the repository
 2) Navigate into the `FrontEnd` directory and run `npm i` to install all required dependencies
-3) Navigate into the `BackEnd` directoyr and run `npm i` to install all required dependencies
+3) Navigate into the `BackEnd` directory and run `npm i` to install all required dependencies
 
 ### Running the front-end
 
@@ -31,7 +31,7 @@ Please see README in frontend folder for frontend i
 
 ### Running the backend
 
-1) Navigate into the BackEnd directory and run `npm start`. This will start the app listening on the port localhost:3000/BluA
+1) Navigate into the BackEnd directory and run `npm start`. This will start the app listening on the port `localhost:3000/BluA`
 
 ### Testing the BackEnd
 
@@ -44,6 +44,7 @@ Please see README in frontend folder for frontend i
 As of now the DB has the following collections: 
 
 games
+
 players
 
 To drop the database, run `mongo BluA --eval "db.dropDatabase()"`
