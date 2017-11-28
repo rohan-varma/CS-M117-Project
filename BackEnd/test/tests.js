@@ -24,10 +24,7 @@ describe('/createGame', () => {
 	it('body has errors when required params not specified', cb => {
 		chai.request(server)
 		.post('/BluA/createGame')
-		.send({
-			// loginCode: 'rohan1',
-			// orgName: 'rohan',
-		})
+		.send({})
 		.end((err, res) => {
 			expect(err).to.eql(null);
 			const body = res.body
