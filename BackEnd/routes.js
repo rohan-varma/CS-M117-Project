@@ -21,7 +21,6 @@ router.get('/', (req, res, next) => {
 	"AppName": "Bluetooth Assassin",
 	"Version": 1.0
     }
-    console.log('here')
     res.status(200).json(test);
 });
 
@@ -38,9 +37,8 @@ const validateGameRequest = request => {
 }
 router.post('/createGame', (req, res) => {
 	if (!validateGameRequest(req)) {
-		console.log('did not validate')
 		res.status(400).json({
-			error: 'Must have both logic code and orgName specified',
+			error: 'Must have both login code and orgName specified',
 		});
 		return;
 	}
