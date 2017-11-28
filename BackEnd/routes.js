@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
 import Safezone from './models/safezone';
-
+const _  = require('lodash')
 const router = express.Router();
 
 var mongoDB = config.client.mongodb.defaultUri + '/' + config.client.mongodb.defaultDatabase;
@@ -21,44 +21,67 @@ router.get('/', (req, res, next) => {
 	"AppName": "Bluetooth Assassin",
 	"Version": 1.0
     }
-    res.json(test);
+    res.status(200).json(test);
 });
 
 router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
+const validateGameRequest = request => {
+	const body = request.body
+	return _.has(body, 'loginCode') 
+		&& _.has(body, 'orgName') 
+		&& _.has(body, 'xCoord')
+		&& _.has(body, 'yCoord')
+}
 router.post('/createGame', (req, res) => {
-    if (req.body.loginCode == null || req.body.orgName == null ){//|| req.body.xCoord == null || req.body.yCoord == null || req.body.radius == null) {
-	res.sendStatus(400);
-	return;
-    }
-    Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
-	if (game)
-	    res.sendStatus(400);
-	else {
-		var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
-			radius: req.body.radius});
-		
-	    var newGame = new Game({ gameCode: req.body.loginCode,
-				     started: false,
-				     organizerName: req.body.orgName,
-				     centralSafeZone: newSafezone._id});
-	    newSafezone.game = newGame._id;
-	    newGame.save((err) => {
-		if (err)
-		    res.sendStatus(500);
-		else {
-			newSafezone.save((err => {
-				if (err)
-					res.sendStatus(500);
-				else 
-					res.sendStatus(200);
-			}));
-		}
-	    });
+	if (!validateGameRequest(req)) {
+		console.log('failed to validate')
+		res.status(400).json({
+			error: 'Must have both login code and orgName specified',
+		});
+		return;
 	}
-    });
+	console.log('request validated')
+    Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
+    	if (game) {
+    		res.status(400).send({
+    			error: "Game with login code " + req.body.loginCode + " already exists!",
+    		});
+    	}
+		else {
+			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
+				radius: req.body.radius});
+	    	var newGame = new Game({ gameCode: req.body.loginCode,
+					     started: false,
+					     organizerName: req.body.orgName,
+					     centralSafeZone: newSafezone._id});
+	    	newSafezone.game = newGame._id;
+	    	newGame.save((err) => {
+	    		if (err) {
+	    			res.status(500).json({
+	    				error: 'there was an error with newGame',
+	    			})
+	    		}
+			else {
+				newSafezone.save((err => {
+					if (err) {
+						console.log(err);
+						res.status(500).json({
+							error: 'error with SafeZone',
+						})
+					}
+					else {
+						res.status(200).json({
+							message: 'success',
+						})
+					}
+				}));
+			}
+	    	});
+		}
+    	});
 });
 
 router.post('/addUser', (req, res) => {
