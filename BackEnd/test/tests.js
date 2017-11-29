@@ -51,3 +51,18 @@ describe('/createGame', () => {
 		});
 	});
 });
+
+describe('addUser', () => {
+	it('body has error when required params not specified', cb => {
+		chai.request(server)
+		.post('/BluA/addUser')
+		.send({})
+		.end((err, res) => {
+			expect(err).to.eql(null);
+			const body = res.body
+			expect(body).to.have.keys(['error'])
+			console.log(body.error);
+			cb();
+		});
+	});
+});
