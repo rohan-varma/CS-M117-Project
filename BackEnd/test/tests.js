@@ -19,6 +19,7 @@ describe('/config', () => {
 	})
 });
 
+
 describe('/createGame', () => {
 
 	it('body has errors when required params not specified', cb => {
@@ -53,9 +54,13 @@ describe('/createGame', () => {
 });
 
 describe('addUser', () => {
+
+	const startRequest = () => {
+		return chai.request(server).post('/BluA/addUser')
+	}
+
 	it('body has error when required params not specified', cb => {
-		chai.request(server)
-		.post('/BluA/addUser')
+		startRequest()
 		.send({})
 		.end((err, res) => {
 			expect(err).to.eql(null);
@@ -65,4 +70,35 @@ describe('addUser', () => {
 			cb();
 		});
 	});
+
+	it.only('adds  user', cb => {
+		// first create a game
+		const code = Math.random().toString(36).substring(15);
+		console.log('HERE')
+		chai.request(server)
+		.post('/BluA/createGame')
+		.send({
+			loginCode: code,
+			orgName: 'something',
+			xCoord: 2,
+			yCoord: 2,
+		})
+		.end((err, res) => {})
+		console.log('HERE')
+		startRequest()
+		.send({
+			username: Math.random().toString(36).substring(15),
+			loginCode: code,
+			mac: '100',
+			x: 2,
+			y: 2,
+		})
+		.end((err, res) => {
+			expect(err).to.eql(null)
+			const body = res.body
+			console.log(JSON.stringify(body, null, 2))
+			cb();
+		})
+	})
+
 });

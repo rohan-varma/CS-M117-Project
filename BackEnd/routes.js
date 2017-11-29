@@ -98,45 +98,59 @@ router.post('/addUser', (req, res) => {
 			error: 'Request object must contain username loginCode mac x and y',
 		});
 	}
+	console.log('HERE IN ADD USER')
     Player.findOne({ username: req.body.username }, (err, obj) => {
-	if (obj)
-	    res.sendStatus(400);
-	else {
-	    Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
-		if(!game)
-		    res.sendStatus(400);
+    	if(obj) {
+    		res.status(400).json({
+    			error: 'Player with username ' + req.body.username + ' already exists',
+    		});
+    	}
 		else {
-			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
-			radius: req.body.radius});
-		
-		    var newPlayer = new Player({ username: req.body.username,
+	    	Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
+	    		if(!game) {
+	    			res.status(400).json({
+	    				error: 'Did not find game with login code ' + req.body.loginCode,
+	    			})
+	    		}
+			else {
+				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
+				radius: req.body.radius});
+		    	var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
 						 macAddress: req.body.mac,
 						 game: game._id,
 						 mySafeZone: newSafezone._id,
 						 location: [req.body.x, req.body.y] });
-		    newSafezone.game = game._id;
-		    newPlayer.save((err, player) => {
-			if (err)
-			    res.sendStatus(500);
-			else {
-			    game.alivePlayers.push(player._id);
-			    game.save((err) => {
+		    	newSafezone.game = game._id;
+		    	newPlayer.save((err, player) => {
 				if (err)
-				    res.sendStatus(500);
-				else {
-					newSafezone.save((err) => {
-						if (err)
-							res.sendStatus(500);
+					res.status(500).json({
+						error: 'error with player',
 					});
-				    res.status(200).send(player._id);
-				}
+				else {
+			    	game.alivePlayers.push(player._id);
+			    	game.save(err => {
+					if (err)
+						res.status(500).json({
+							error: 'error with saving game',
+						});
+					else {
+						newSafezone.save((err) => {
+							if (err)
+								res.status(500).json({
+									error: 'error with safezone',
+								})
+						});
+						res.status(200).json({
+							id: player._id,
+						});
+					}
 			    });
-			}
+				}
 		    });
-		}
+			}
 	    });
-	}
+		}
     });
 });
 
