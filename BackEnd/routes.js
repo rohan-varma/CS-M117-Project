@@ -84,12 +84,20 @@ router.post('/createGame', (req, res) => {
     	});
 });
 
+const validateUserRequest = request => {
+	const body = request.body
+	return _.has(body, 'username')
+		&& _.has(body, 'loginCode')
+		&& _.has(body, 'mac')
+		&& _.has(body, 'x')
+		&& _.has(body, 'y')
+}
 router.post('/addUser', (req, res) => {
-    if(req.body.username == null || req.body.loginCode == null || req.body.mac == null
-       || req.body.x == null || req.body.y == null) {
-	res.sendStatus(400);
-	return;
-    }
+	if (!validateUserRequest(req)) {
+		res.status(400).json({
+			error: 'Request object must contain username loginCode mac x and y',
+		});
+	}
     Player.findOne({ username: req.body.username }, (err, obj) => {
 	if (obj)
 	    res.sendStatus(400);
