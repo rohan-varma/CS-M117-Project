@@ -27,7 +27,7 @@ First, if you don't have node, run `brew install nodejs`
 2) `npm install -g react-native-cli`
 3) `react-native run-ios` will launch the simulator
 
-Please see README in frontend folder for frontend i
+Please see README in frontend folder for frontend instructions
 
 ### Running the backend
 
