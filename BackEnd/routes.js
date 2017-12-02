@@ -28,6 +28,47 @@ router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
+const validateKillRequest = request => {
+	const body = request.body
+	return _.has(body, 'username') 
+		&& _.has(body, 'x') 
+		&& _.has(body, 'y') 
+		&& _.has(body, 'xCoord')
+		&& _.has(body, 'yCoord')
+}
+
+router.post('/killTarget', (req, res) => {
+	if (!validateGameRequest(req)) {
+		console.log('failed to validate')
+		res.status(400).json({
+			error: 'Must have both login code and orgName specified',
+		});
+		return;
+	}
+	console.log('request validated')
+    Player.findOne({ username: req.body.username }, (err, obj) => {
+	if (!obj)
+	    res.status(400).json({
+			error: 'Player does not exist',
+		});
+	else {
+		Player.findOne(obj.target, (err, obj) => {
+		if(!obj)
+		    res.status(400).json({
+			error: 'Player\'s target does not exist',
+		});
+		else {
+			//check coordinate distance and safezones
+			//kill target if necessary, send notifications
+			//update with new target
+			//alliance checks
+			
+		}
+	    });
+	}
+    });
+});
+
 const validateGameRequest = request => {
 	const body = request.body
 	console.log('the body keys');
