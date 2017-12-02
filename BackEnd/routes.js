@@ -30,10 +30,10 @@ router.get('/config', (req, res, next) => {
 
 const validateGameRequest = request => {
 	const body = request.body
+	console.log('the body keys');
+	console.log(_.keys(body));
 	return _.has(body, 'loginCode') 
 		&& _.has(body, 'orgName') 
-		&& _.has(body, 'xCoord')
-		&& _.has(body, 'yCoord')
 }
 router.post('/createGame', (req, res) => {
 	if (!validateGameRequest(req)) {
@@ -51,6 +51,9 @@ router.post('/createGame', (req, res) => {
     		});
     	}
 		else {
+			//create default x and yCoords if the req.body does not have them
+			req.body.xCoord = req.body.xCoord || 2;
+			req.body.yCoord = req.body.yCoord || 2;
 			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
 				radius: req.body.radius});
 	    	var newGame = new Game({ gameCode: req.body.loginCode,
