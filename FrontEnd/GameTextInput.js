@@ -1,24 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput } from 'react-native';
+const { createGame, addUserToGame } = require('./requestors');
 const _ = require('lodash');
-
-const createGame = body => fetch('http://localhost:3000/BluA/createGame', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: body,
-  }).then(res => res.json())
-
-const addUserToGame = body => fetch('http://localhost:3000/BluA/addUser', {
-  method: 'POST',
-  headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: body,
-}).then(res => res.json())
 
 class GameTextInput extends Component {
 
