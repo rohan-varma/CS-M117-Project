@@ -125,32 +125,34 @@ router.post('/addUser', (req, res) => {
 						 mySafeZone: newSafezone._id,
 						 location: [req.body.x, req.body.y] });
 		    	newSafezone.game = game._id;
+		    	let playerId;
+		    	console.log('calling new player.save');
+		    	//this code is wrong, but seems to work.
 		    	newPlayer.save((err, player) => {
-				if (err)
-					res.status(500).json({
-						error: 'error with player',
-					});
-				else {
-			    	game.alivePlayers.push(player._id);
-			    	game.save(err => {
-					if (err)
-						res.status(500).json({
-							error: 'error with saving game',
-						});
-					else {
-						newSafezone.save((err) => {
-							if (err)
-								res.status(500).json({
-									error: 'error with safezone',
-								})
-						});
-						res.status(200).json({
-							id: player._id,
-						});
-					}
-			    });
-				}
-		    });
+		    		playerId = player._id;
+		    		if (err) {
+		    			res.status(500).json({
+		    				error: 'error with player',
+		    			});
+		    		}
+		    		console.log('had no error')
+		    	}).then(player => {
+		    		console.log(player)
+		    		console.log('in this thingy')
+		    		game.alivePlayers.push(player._id);
+		    		game.save(err => {
+		    			if (err) {
+		    				res.status(500).json({
+		    					error: 'error saving game',
+		    				});
+		    			}
+		    			else {
+		    				res.status(200).json({
+		    					id: player._id,
+		    				});
+		    			}
+		    		});
+		    	});
 			}
 	    });
 		}

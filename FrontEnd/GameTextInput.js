@@ -2,7 +2,32 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput } from 'react-native';
 const _ = require('lodash');
 
+const createGame = body => fetch('http://localhost:3000/BluA/createGame', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  }).then(res => res.json())
+
+const addUserToGame = body => fetch('http://localhost:3000/BluA/addUser', {
+  method: 'POST',
+  headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+}).then(res => res.json())
+
 class GameTextInput extends Component {
+
+  handleUserInput = usernameText => {
+    this.setState({
+      usernameText,
+    });
+  }
+
   handleLoginInput = text => {
     this.setState({
       text,
@@ -10,18 +35,11 @@ class GameTextInput extends Component {
     });
       if (text.length === 5) {
         console.log('about to send it to the backend');
-        fetch('http://localhost:3000/BluA/createGame', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+        const requestBody = JSON.stringify({
             loginCode: text,
             orgName: "defaultOrg",
-          }),
-        })
-        .then(res => res.json())
+          });
+        createGame(requestBody)
         .then(res => {
           console.log('result message');
           //if res has key message then the result is success
@@ -47,6 +65,27 @@ class GameTextInput extends Component {
           }
           }
         })
+        .then(() => {
+          //create a game
+          console.log('creating a user')
+          const userRequestBody = JSON.stringify({
+            username: this.state.usernameText,
+            loginCode: text,
+            mac: 'address', //default, change this?
+            //defaults
+            x: 2,
+            y: 2,
+          });
+          addUserToGame(userRequestBody)
+          .then(res => {
+            console.log('result of adding user');
+            console.log(res);
+          })
+          .catch(err => {
+            console.log('error adding user');
+            console.log(err);
+          })
+        })
         .catch(err => {
           console.log('request failed');
           console.log(err);
@@ -60,12 +99,21 @@ class GameTextInput extends Component {
     super(props);
     this.state = {
       text: '',
+      usernameText: '',
       gameCreated: false,
       errorWithGameCreationText: '',
     };
   }
   render() {
     return (
+      <View style={{flex: 1, padding: 10}}>
+      <View style={{padding: 10}}>
+        <TextInput
+          style={{height: 40}}
+          placeholder="Please enter a username"
+          onChangeText={usernameText => this.handleUserInput(usernameText)}
+        />
+      </View>
       <View style={{padding: 10}}>
         <TextInput
           style={{height: 40}}
@@ -74,6 +122,7 @@ class GameTextInput extends Component {
         />
       <Text> Game created: {this.state.gameCreated ? 'Yes': 'No'} </Text>
       <Text>{this.state.errorWithGameCreationText} </Text>
+      </View>
       </View>
     );
   }
