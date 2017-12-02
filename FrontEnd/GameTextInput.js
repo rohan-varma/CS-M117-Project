@@ -49,7 +49,7 @@ class GameTextInput extends Component {
           }
         })
         .then(() => {
-          //create a game
+          //create a user
           console.log('creating a user')
           const userRequestBody = JSON.stringify({
             username: this.state.usernameText,
