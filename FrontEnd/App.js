@@ -1,31 +1,20 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Navigator, AppRegistry } from 'react-native';
-import Movies from './src/Movies'
+import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput } from 'react-native';
+import GameTextInput  from './GameTextInput';
 
-
-
-class Greeting extends Component {
-  render() {
-    return (
-      <Text> Hello {this.props.name}! </Text>
-      );
-  }
-}
+const _ = require('lodash');
 
 export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>This is the best CS M117 project ever!</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <Text>Shake your phone to open the developer menu.</Text>
-        <Greeting name='rohan varma' />
+        <Text style={{padding:40}}>Hi! Please enter a game code.</Text>
+        <Text> Or, enter a code to create a new game. </Text>
+        <GameTextInput />
       </View>
     );
   }
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
