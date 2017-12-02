@@ -14,11 +14,10 @@ class Greeting extends Component {
 
 class GameTextInput extends Component {
   handleLoginInput = text => {
-    //should actually merge these 2 together to not have to do 2 state updates
-      this.setState({text});
-      this.setState({
-        errorWithGameCreationText: '',
-      })
+    this.setState({
+      text,
+      errorWithGameCreationText: '',
+    });
       if (text.length === 5) {
         console.log('about to send it to the backend');
         fetch('http://localhost:3000/BluA/createGame', {
@@ -49,9 +48,6 @@ class GameTextInput extends Component {
               errorWithGameCreationText: 'err: ' + res.error,
             });
           }
-          this.setState({
-            gameCreated: true,
-          });
         })
         .catch(err => {
           console.log('request failed');
