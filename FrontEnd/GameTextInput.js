@@ -35,7 +35,7 @@ class GameTextInput extends Component {
           else if (_.has(res, 'error')) {
             console.log(res.error);
             if(res.error.includes('Game with login code')) {
-              console.log('already exsting game found, adding user to this game');
+              console.log('already existing game found, adding user to this game');
               this.setState({
                 errorWithGameCreationText: 'You entered an existing game code, logging you into that',
               });
