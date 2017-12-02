@@ -27,16 +27,10 @@ def createUserData(login_code):
 
 # for now until we have a cleanup for games in the DB, must change loginCode before each run
 # Formula: test, test1, test2, test3, ... 
-def testCreateGame (login_code, data):
+def testCreateGame (data):
 	# if a game is created without loginCode or orgName it should error
 	res = requests.post("http://localhost:3000/BluA/createGame",
 		data = {})
-	assert res.status_code == 400
-	assert 'error' in res.json().keys()
-
-	# if a game is created without coords it should error
-	res = requests.post("http://localhost:3000/BluA/createGame",
-		data = {x: data[x] for x in data if x not in ['xCoord', 'yCoord']})
 	assert res.status_code == 400
 	assert 'error' in res.json().keys()
 
@@ -74,15 +68,15 @@ def main():
 	user3_data = createUserData(test_data[0])
 	user4_data = createUserData(test_data[0])
 	#create a game with the above data
-	testCreateGame(test_data[0],test_data[1])
+	testCreateGame(test_data[1])
 	#add users with the above data
 	testAddUser(user1_data)
-	# testAddUser(user2_data)
-	# testAddUser(user3_data)
-	# testAddUser(user4_data)
-	# #start game
-	# testStartGame(test_data[0])
-	# #update the player's locations to outside the safezone
+	testAddUser(user2_data)
+	testAddUser(user3_data)
+	testAddUser(user4_data)
+	#start game
+	testStartGame(test_data[1])
+	#update the player's locations to outside the safezone
 	
 	# #attempt to kill the target
 	# testKillTarget(test_data[0],test_data[1])
