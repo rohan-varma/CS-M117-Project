@@ -46,6 +46,6 @@ hooks:
 # During the ApplicationInstall deployment lifecycle event, run the commands 
 #   in the script specified in "location".
   ApplicationStart:
-    - location: BackEndscripts/npm-start.sh
+    - location: BackEnd/scripts/npm-start.sh
       runas: root
       timeout: 60
