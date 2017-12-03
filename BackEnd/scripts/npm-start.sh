@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /var/backend
+cd /var/backend/BackEnd
 npm start
