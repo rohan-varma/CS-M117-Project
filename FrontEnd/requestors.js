@@ -1,8 +1,8 @@
-
-const createGameURL = 'http://localhost:3000/BluA/createGame';
-const addUserURL = 'http://localhost:3000/BluA/addUser';
-const startGameURL = 'http://localhost:3000/BluA/startGame';
-const updateLocationURL = 'http://localhost:3000/BluA/updateLocation';
+const ServerURL = 'http://ec2-34-207-84-67.compute-1.amazonaws.com'
+const createGameURL = ServerURL + '/createGame';
+const addUserURL = ServerURL + '/addUser';
+const startGameURL = ServerURL + '/startGame';
+const updateLocationURL = ServerURL + '/updateLocation';
 
 //these are the functions that interface with the backend. Import and use them wherever in the fronted its needed.
 const createGame = body => fetch(createGameURL, {

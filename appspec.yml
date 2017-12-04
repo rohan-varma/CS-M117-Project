@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/backend/
+hooks:
+  AfterInstall:
+    - location: BackEnd/scripts/npm-install.sh
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: BackEnd/scripts/npm-start.sh
+      timeout: 300
+      runas: root
