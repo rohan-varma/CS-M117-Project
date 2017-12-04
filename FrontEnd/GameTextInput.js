@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, TouchableOpacity } from 'react-native';
 const { createGame, addUserToGame } = require('./requestors');
 const _ = require('lodash');
 
@@ -89,26 +89,39 @@ class GameTextInput extends Component {
   }
   render() {
     return (
-      <View style={{flex: 1, padding: 10}}>
-      <View style={{padding: 10}}>
+      <View style={styles.formContainer}>
         <TextInput
-          style={{height: 40}}
-          placeholder="Please enter a username"
+         style={styles.textInput} 
+          placeholder="Username"
           onChangeText={usernameText => this.handleUserInput(usernameText)}
         />
-      </View>
-      <View style={{padding: 10}}>
         <TextInput
-          style={{height: 40}}
-          placeholder="Please enter game code"
+          style={styles.textInput}
+          placeholder="Game code"
           onChangeText={text => this.handleLoginInput(text)}
         />
       <Text> Game created: {this.state.gameCreated ? 'Yes': 'No'} </Text>
       <Text>{this.state.errorWithGameCreationText} </Text>
       </View>
-      </View>
+    
     );
   }
 }
 
 export default GameTextInput;
+
+const styles = StyleSheet.create({
+    formContainer: {
+      alignSelf:'stretch',
+      paddingLeft:20,
+      paddingRight:20,  
+      paddingTop: 50
+    },
+    textInput: {
+      alignSelf: 'stretch',
+      padding: 20,
+      backgroundColor:'rgba(255,255,255,0.85)',
+      marginBottom:15,
+    }
+
+});
