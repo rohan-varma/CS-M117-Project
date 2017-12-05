@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button}   from 'react-native';
 import { Actions } from 'react-native-router-flux';
-import GameTextInput  from '../GameTextInput';
+import GameTextInput  from '../components/GameTextInput';
 const { createGame, addUserToGame } = require('../requestors');
 const _ = require('lodash');
 

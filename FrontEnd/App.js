@@ -6,8 +6,8 @@ import { StyleSheet, Text, View,
   ImageBackground,
   KeyboardAvoidingView
  } from 'react-native';
-import gamePage  from './src/gamePage';
-import Form from './src/form';
+import gamePage  from './screens/gamePage';
+import Form from './components/form';
 import home from './screens/home';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn'

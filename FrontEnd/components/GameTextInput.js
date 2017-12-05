@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, TouchableOpacity } from 'react-native';
 import { Actions } from 'react-native-router-flux';
-const { createGame, addUserToGame } = require('./requestors');
+const { createGame, addUserToGame } = require('../requestors');
 const _ = require('lodash');
 
 export default class GameTextInput extends Component {

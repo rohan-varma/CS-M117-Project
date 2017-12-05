@@ -8,7 +8,7 @@ import {
 
  } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
-import GameTextInput  from '../GameTextInput';
+import GameTextInput  from '../components/GameTextInput';
 import GameCreate from './GameCreate'
 import GameLogIn from './GameLogIn'
 import { Actions } from 'react-native-router-flux';
