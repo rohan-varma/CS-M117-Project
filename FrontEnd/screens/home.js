@@ -2,14 +2,16 @@ import React, { Component } from 'react';
 import { 
   StyleSheet, 
   Text, View, 
-  AppRegistry, 
-  TextInput,
   TouchableOpacity,
   ImageBackground,
   KeyboardAvoidingView
 
  } from 'react-native';
+import { Button, Divider } from 'react-native-elements';
 import GameTextInput  from '../GameTextInput';
+import GameCreate from './GameCreate'
+import GameLogIn from './GameLogIn'
+import { Actions } from 'react-native-router-flux';
 
 
 export default class Form extends Component {
@@ -21,7 +23,23 @@ export default class Form extends Component {
           <Text style={styles.header}> Bluetooth </Text> 
           <Text style={styles.header}> Assassin </Text> 
             <View style={styles.formContainer}> 
-                <GameTextInput/> 
+                <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ flex: 1 }} >
+                <Button
+                    backgroundColor='#E36588'
+                    title="Login to Existing Game"
+                     onPress= {Actions.GameLogIn}
+                    
+                />
+            </View>
+            <View style={{ flex: 1 }} >
+                <Button
+                    backgroundColor='#9AC4F8'
+                    title="Create New Game"
+                    onPress= {Actions.GameCreate}
+                />
+            </View>
+        </View>
             </View>
         </ImageBackground>
       </KeyboardAvoidingView>

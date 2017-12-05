@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, TouchableOpacity } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 const { createGame, addUserToGame } = require('./requestors');
 const _ = require('lodash');
 
-class GameTextInput extends Component {
-
+export default class GameTextInput extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,7 +37,7 @@ class GameTextInput extends Component {
           //else the res should have key error, which will say why the game wasn't created
           console.log(res);
           if (_.has(res, 'message')) {
-            alert('game created');
+            
             this.setState({
               gameCreated: true,
             });
@@ -45,7 +45,7 @@ class GameTextInput extends Component {
           else if (_.has(res, 'error')) {
             console.log(res.error);
             if(res.error.includes('Game with login code')) {
-              alert("game exist");
+              
               this.setState({
                 errorWithGameCreationText: 'You entered an existing game code, logging you into that',
               });
@@ -85,6 +85,8 @@ class GameTextInput extends Component {
             errorWithGameCreationText: 'There was an error with game creation: ' + err,
           });
         });
+
+    Actions.gamePage({username: this.state.username});
   }
   render() {
     return (
@@ -108,7 +110,6 @@ class GameTextInput extends Component {
   }
 }
 
-export default GameTextInput;
 
 const styles = StyleSheet.create({
     formContainer: {
