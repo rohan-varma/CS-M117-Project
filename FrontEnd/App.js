@@ -6,15 +6,22 @@ import { StyleSheet, Text, View, Navigator,
   ImageBackground,
   KeyboardAvoidingView
  } from 'react-native';
-import GameTextInput  from './GameTextInput';
+import gamePage  from './src/gamePage';
 import Form from './src/form';
+import {Scene, Router} from 'react-native-router-flux';
 
 const _ = require('lodash');
 
 export default class App extends React.Component {
   render() {
     return (
-           <Form />
+          <Router>
+            <Scene key="root">
+              <Scene key="login" component={Form} initial={true}/>
+              <Scene key="gamePage" component={gamePage} title = "My Game"/>
+            </Scene>
+          </Router>
+
     );
   }
 }

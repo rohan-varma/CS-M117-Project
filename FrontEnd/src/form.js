@@ -12,7 +12,8 @@ import {
 import GameTextInput  from '../GameTextInput';
 
 
-export default class App extends Component {
+export default class Form extends Component {
+  static navigationOptions = { title: 'Welcome',header: null };
   render() {
     return (
       <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
