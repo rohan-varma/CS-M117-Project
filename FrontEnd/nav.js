@@ -3,6 +3,7 @@ import { StyleSheet, View, Text } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import { StackNavigator } from 'react-navigation'; // 1.0.0-beta.14
 import GameInput from './GameInput'
+import GameCreate from './GameCreate'
 
 const HomeScreen = ({ navigation }) => (
     <View style={{flex: 1}}>
@@ -22,7 +23,7 @@ const HomeScreen = ({ navigation }) => (
             <View style={{ flex: 1 }} >
                 <Button
                     backgroundColor='#9AC4F8'
-                    onPress={() => navigation.navigate('Details')}
+                    onPress={() => navigation.navigate('CreateGame')}
                     large raised
                     title="Create New Game"
                 />
@@ -43,6 +44,12 @@ const LoginScreen = ({navigation}) => (
     </View>
 );
 
+const CreateGameScreen = ({navigation}) => (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <GameCreate nav={navigation} />
+    </View>
+);
+
 const RootNavigator = StackNavigator({
   Home: {
     screen: HomeScreen,
@@ -60,6 +67,12 @@ const RootNavigator = StackNavigator({
     screen: LoginScreen,
     navigationOptions: {
       headerTitle: 'LoginScreen',
+    },
+  },
+  CreateGame: {
+    screen: CreateGameScreen,
+    navigationOptions: {
+      headerTitle: 'CreateGameScreen',
     },
   },
 });
