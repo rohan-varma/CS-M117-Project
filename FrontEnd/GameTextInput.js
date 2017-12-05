@@ -17,6 +17,7 @@ class GameTextInput extends Component {
       errorWithGameCreationText: '',
     };
   }
+
   enterGame = () => {
     console.log('the props of this')
     console.log(this.props)
@@ -89,6 +90,7 @@ class GameTextInput extends Component {
           });
         });
   }
+
   render() {
     return (
       <View style={styles.formContainer}>
@@ -97,11 +99,13 @@ class GameTextInput extends Component {
           placeholder="Username"
           onChangeText={ (username) => this.setState({username})}
         />
+
         <TextInput
           style={styles.textInput}
           placeholder="Game code"
           onChangeText={gameCode => this.setState({gameCode})}
         />
+
         <TouchableOpacity style= {styles.button} >
             <Text style={styles.buttonText} onPress={this.enterGame}> Enter Game </Text>
         </TouchableOpacity>
@@ -109,6 +113,7 @@ class GameTextInput extends Component {
     
     );
   }
+
 }
 
 export default GameTextInput;
