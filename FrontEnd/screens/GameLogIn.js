@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { GameCreate } from './GameCreate'
-const { createGame, addUserToGame } = require('../requestors');
+const { gameExists, createGame, addUserToGame } = require('../requestors');
 const _ = require('lodash');
 
 class GameInput extends Component {
@@ -30,20 +30,15 @@ class GameInput extends Component {
         });
 
         createGame(requestBody).then( res => {
-            // try to create a new game
-            if (_.has(res, 'message')) {
-                this.setState({
-                    gameCreated: true,
-                });
+            // if game doesn't exist, go to create game first
+            if (_.has(res, '') {
+                // If the game hasn't been created yet
+                Actions.GameCreate();
             }
-            // if game already exists
-            else if (_.has(res, 'error'))
         }).then( () => {
         }).catch( err => {
         });
 
-        // If the game hasn't been created yet
-        Actions.GameCreate();
     }
 
     render() {
