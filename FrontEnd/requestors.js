@@ -1,4 +1,4 @@
-const ServerURL = 'http://34.193.126.39'
+const ServerURL = 'http://35.225.245.61/BluA'
 const createGameURL = ServerURL + '/createGame';
 const addUserURL = ServerURL + '/addUser';
 const startGameURL = ServerURL + '/startGame';

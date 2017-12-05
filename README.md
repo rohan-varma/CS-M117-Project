@@ -52,27 +52,11 @@ players
 To drop the database, run `mongo BluA --eval "db.dropDatabase()"`
 
 
-### Backend / EC2 Stuff
-After updating backend code, if you want the EC2 instance that's running the backend to reflect the code changes, ssh into it and manually restart the backend. You should test your code locally beforehand to make sure it works (if you want to test locally, change the SERVER\_URL in FrontEnd/requestors.js to localhost).
+### Backend / Google Cloud Computer
+After updating backend code, if you want the Google VM instance that's running the backend to reflect the code changes, ssh into it and manually restart the backend. You should test your code locally beforehand to make sure it works (if you want to test locally, change the SERVER\_URL in FrontEnd/requestors.js to localhost).
 
-To SSH into the EC2 instance:
-```bash
-chmod 400 mongo117.pem
-ssh -i "mongo117.pem" ec2-user@34.193.126.39
+The instance is hosted here:
 ```
-
-Then in the EC2 instance, run the following commands to start the Backend
-```bash
-sudo su
-cd /home/ec2-user/CS-M117-Project/
-git pull -f
-npm install
-npm start
+http://35.225.245.61
 ```
-
-If you want to restart nginx (webserver) or mongod, you can use the commands:
-```bash
-sudo su
-service nginx restart
-service mongod restart
-```
+Bug Rohan or Wenlong to update your code for you.
