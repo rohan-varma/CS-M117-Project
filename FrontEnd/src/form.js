@@ -4,7 +4,9 @@ import {
   Text, View, 
   AppRegistry, 
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  ImageBackground,
+  KeyboardAvoidingView
 
  } from 'react-native';
 import GameTextInput  from '../GameTextInput';
@@ -13,19 +15,46 @@ import GameTextInput  from '../GameTextInput';
 export default class App extends Component {
   render() {
     return (
-      <View style={styles.formContainer}> 
-        <GameTextInput/> 
-        <TouchableOpacity style= {styles.button}>
-          <Text style={styles.buttonText}> Enter </Text>
-        </TouchableOpacity>
-      </View>
+      <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
+        <ImageBackground style={styles.container} source={require('../img/ninja.jpg')}>
+          <Text style={styles.header}> Bluetooth </Text> 
+          <Text style={styles.header}> Assissan </Text> 
+            <View style={styles.formContainer}> 
+                <GameTextInput/> 
+               
+            </View>
+        </ImageBackground>
+      </KeyboardAvoidingView>
+     
+
 
 
     );
+
   }
+
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+      flex:1,
+    },
+    container: {
+      flex: 1,
+      alignSelf: 'stretch',
+      width: null,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    header: {
+     
+      fontSize: 38,
+      color: 'white',
+      fontWeight: 'bold',
+      backgroundColor: 'transparent',
+      marginBottom: 10,
+    },
+
     formContainer: {
       alignSelf:'stretch',
       paddingLeft:20,
@@ -37,20 +66,7 @@ const styles = StyleSheet.create({
       padding: 20,
       backgroundColor:'rgba(255,255,255,0.85)',
       marginBottom:20,
-    },
-    button: {
-      alignSelf: 'center',
-      paddingRight:30,
-      paddingLeft:30,
-      marginTop:20,
-      padding:20,
-      backgroundColor: 'rgba(159, 20, 169, 0.6)',
-      borderRadius: 10,
-    },
-    buttonText: {
-      color: 'white',
-      fontSize: 20,
-      fontWeight: 'bold',
     }
+    
 
 });

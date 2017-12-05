@@ -5,30 +5,39 @@ const _ = require('lodash');
 
 class GameTextInput extends Component {
 
-  handleUserInput = usernameText => {
-    this.setState({
-      usernameText,
-    });
-  }
+  constructor(props) {
+    super(props);
+    this.state = {
+      username:'',
+      gameCode: '',
 
-  handleLoginInput = text => {
-    this.setState({
-      text,
+      text: '',
+      usernameText: '',
+      gameCreated: false,
       errorWithGameCreationText: '',
-    });
-      if (text.length === 5) {
-        console.log('about to send it to the backend');
-        const requestBody = JSON.stringify({
-            loginCode: text,
+    };
+  }
+  enterGame = () => {
+    if (this.state.gameCode === '') {
+      alert("Game code can't be empty");
+      return;
+    };
+    if (this.state.username === '') {
+      alert("Username can't be empty");
+      return;
+    };
+     const requestBody = JSON.stringify({
+            loginCode: this.state.gameCode,
             orgName: "defaultOrg",
           });
-        createGame(requestBody)
-        .then(res => {
+      createGame(requestBody)
+      .then(res => {
           console.log('result message');
           //if res has key message then the result is success
           //else the res should have key error, which will say why the game wasn't created
           console.log(res);
           if (_.has(res, 'message')) {
+            alert('game created');
             this.setState({
               gameCreated: true,
             });
@@ -36,7 +45,7 @@ class GameTextInput extends Component {
           else if (_.has(res, 'error')) {
             console.log(res.error);
             if(res.error.includes('Game with login code')) {
-              console.log('already existing game found, adding user to this game');
+              alert("game exist");
               this.setState({
                 errorWithGameCreationText: 'You entered an existing game code, logging you into that',
               });
@@ -48,12 +57,12 @@ class GameTextInput extends Component {
           }
           }
         })
-        .then(() => {
+      .then(() => {
           //create a user
           console.log('creating a user')
           const userRequestBody = JSON.stringify({
-            username: this.state.usernameText,
-            loginCode: text,
+            username: this.state.username,
+            loginCode: this.state.gameCode,
             mac: 'address', //default, change this?
             //defaults
             x: 2,
@@ -76,16 +85,6 @@ class GameTextInput extends Component {
             errorWithGameCreationText: 'There was an error with game creation: ' + err,
           });
         });
-      }
-    }
-  constructor(props) {
-    super(props);
-    this.state = {
-      text: '',
-      usernameText: '',
-      gameCreated: false,
-      errorWithGameCreationText: '',
-    };
   }
   render() {
     return (
@@ -93,15 +92,16 @@ class GameTextInput extends Component {
         <TextInput
          style={styles.textInput} 
           placeholder="Username"
-          onChangeText={usernameText => this.handleUserInput(usernameText)}
+          onChangeText={ (username) => this.setState({username})}
         />
         <TextInput
           style={styles.textInput}
           placeholder="Game code"
-          onChangeText={text => this.handleLoginInput(text)}
+          onChangeText={gameCode => this.setState({gameCode})}
         />
-      <Text> Game created: {this.state.gameCreated ? 'Yes': 'No'} </Text>
-      <Text>{this.state.errorWithGameCreationText} </Text>
+        <TouchableOpacity style= {styles.button} >
+            <Text style={styles.buttonText} onPress={this.enterGame}> Enter Game </Text>
+        </TouchableOpacity>
       </View>
     
     );
@@ -122,6 +122,21 @@ const styles = StyleSheet.create({
       padding: 20,
       backgroundColor:'rgba(255,255,255,0.85)',
       marginBottom:15,
+    },
+    button: {
+      alignSelf: 'center',
+      paddingRight:30,
+      paddingLeft:30,
+      marginTop:20,
+      padding:20,
+      backgroundColor: 'rgba(159, 20, 169, 0.6)',
+      borderRadius: 10,
+    },
+    buttonText: {
+      color: 'white',
+      fontSize: 20,
+      fontWeight: 'bold',
     }
+
 
 });

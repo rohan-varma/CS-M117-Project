@@ -19,13 +19,9 @@ export default class App extends React.Component {
         <Text> Or, enter a code to create a new game. </Text>
         <GameTextInput />
       </View>*/
-      <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
-        <ImageBackground style={styles.container} source={require('./img/ninja.jpg')}>
-          <Text style={styles.header}> Bluetooth </Text> 
-          <Text style={styles.header}> Assissan </Text> 
+
            <Form />
-        </ImageBackground>
-      </KeyboardAvoidingView>
+
     );
   }
 }
@@ -49,8 +45,5 @@ const styles = StyleSheet.create({
       backgroundColor: 'transparent',
       marginBottom: 10,
     },
-    gameInput: {
-      paddingTop: 50,
-      flex: 1,
-    }
+
 });
