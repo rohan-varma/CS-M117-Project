@@ -12,7 +12,7 @@ import home from './screens/home';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn'
 import {Scene, Router} from 'react-native-router-flux';
-
+import PlayerScreen from './screens/PlayerScreen';
 const _ = require('lodash');
 
 export default class App extends React.Component {
@@ -24,6 +24,7 @@ export default class App extends React.Component {
               <Scene key="login" component={Form}/>
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
+              <Scene key='PlayerScreen' component={PlayerScreen} title = "Player Screen" />
             </Scene>
           </Router>
 
