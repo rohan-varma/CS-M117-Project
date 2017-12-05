@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
 import Safezone from './models/safezone';
+import Alliance from './models/alliance';
+
 const _  = require('lodash')
 const router = express.Router();
 
@@ -238,6 +240,63 @@ router.get('/getTargetLocation', (req, res) => {
 	    res.send(obj.location);
 	}
     });
+
+/**
+ * @api {post} /createAlliance Create Alliance
+ *
+ * @apiParam {String} username		            The id of the invitation
+ * @apiParam {String} allianceName            The email address of the invitee
+ *
+ * @apiExample {js} Example json:
+ *   {
+ *      "username": "joebruin",
+ *      "allianceName": "UCLA Alliance",
+ *  }
+ *
+ * @apiUse Response200
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
+router.post('/createAlliance', (req, res) => {
+	var jsonRequestBody = req.body;
+
+	var findCreatorPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
+
+	var createAlliancePromise = findCreatorPromise.then((creator) => {
+		if (!creator) {
+			throw new Error("creator not found");
+		}
+
+		var allianceFields = {};
+		allianceFields.name = jsonRequestBody.allianceName;
+		allianceFields.allies = [creator._id];
+		allianceFields.targets = [creator.target];
+
+		var alliance = new Alliance(allianceFields);
+		var allianceId = alliance._id;
+		var creator.alliance = allianceId;
+
+		// Saves new alliance and updates the creator's alliance field
+		var promisesArray = [alliance.save(), creator.save()];
+
+		return Promise.all(promisesArray);
+	})
+
+	createAlliancePromise.then(() => {
+		// Success
+		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName)
+		res.status(200).json({
+			"allianceID": allianceID,
+		})
+	}).catch((err) => {
+		// Failed to create alliance
+		console.log("Failed to add users to a new alliance - Error: " + err.message);
+		res.status(400).json({
+			error: "Failed to add users to a new alliance - Error: " + err.message,
+		});
+	})
 });
 
 router.get('/players', (req, res) => {
