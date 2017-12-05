@@ -1,4 +1,4 @@
-const ServerURL = 'http://ec2-52-91-64-28.compute-1.amazonaws.com'
+const ServerURL = 'http://34.193.126.39'
 const createGameURL = ServerURL + '/createGame';
 const addUserURL = ServerURL + '/addUser';
 const startGameURL = ServerURL + '/startGame';

@@ -58,7 +58,7 @@ After updating backend code, if you want the EC2 instance that's running the bac
 To SSH into the EC2 instance:
 ```bash
 chmod 400 mongo117.pem
-ssh -i "mongo117.pem" ec2-user@ec2-34-207-84-67.compute-1.amazonaws.com
+ssh -i "mongo117.pem" ec2-user@34.193.126.39
 ```
 
 Then in the EC2 instance, run the following commands to start the Backend
