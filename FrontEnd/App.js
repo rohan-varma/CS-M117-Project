@@ -6,9 +6,8 @@ import { StyleSheet, Text, View,
   ImageBackground,
   KeyboardAvoidingView
  } from 'react-native';
-import gamePage  from './screens/gamePage';
-import Form from './components/form';
-import home from './screens/home';
+import Lobby from './screens/GameLobby';
+import Home from './screens/Home';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn'
 import {Scene, Router} from 'react-native-router-flux';
@@ -20,8 +19,7 @@ export default class App extends React.Component {
     return (
           <Router>
             <Scene key="root">
-              <Scene key= "home" component={home} initial={true}/>
-              <Scene key="login" component={Form}/>
+              <Scene key="Home" component={Home} initial={true}/>
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
             </Scene>
