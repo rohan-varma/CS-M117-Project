@@ -52,15 +52,16 @@ players
 To drop the database, run `mongo BluA --eval "db.dropDatabase()"`
 
 
-### Backend is currently running on an EC2 instance
-Haven't figured out codedeploy yet, so if you update the backend code, ssh into the EC2 instance first.
+### Backend / EC2 Stuff
+After updating backend code, if you want the EC2 instance that's running the backend to reflect the code changes, ssh into it and manually restart the backend. You should test your code locally beforehand to make sure it works (if you want to test locally, change the SERVER\_URL in FrontEnd/requestors.js to localhost).
+
+To SSH into the EC2 instance:
 ```bash
 chmod 400 mongo117.pem
 ssh -i "mongo117.pem" ec2-user@ec2-34-207-84-67.compute-1.amazonaws.com
 ```
-If you want to test locally, change the SERVER\_URL in FrontEnd/requestors.js to localhost
 
-Then in the server, run the following commands to start the Backend
+Then in the EC2 instance, run the following commands to start the Backend
 ```bash
 sudo su
 cd /home/ec2-user/CS-M117-Project/
