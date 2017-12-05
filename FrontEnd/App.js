@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Navigator, 
+import { StyleSheet, Text, View,
   AppRegistry, 
   TextInput,
   Image,
