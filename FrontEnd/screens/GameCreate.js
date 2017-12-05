@@ -14,7 +14,6 @@ class GameCreate extends Component {
             gameCode: ''
         };
     }
-
     render() {
         return (
         <ImageBackground style={styles.container} source={require('../img/ninja.jpg')}>

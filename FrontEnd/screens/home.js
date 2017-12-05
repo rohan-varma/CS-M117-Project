@@ -7,7 +7,7 @@ import {
   KeyboardAvoidingView
 
  } from 'react-native';
-import { Button, Divider } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import GameTextInput  from '../components/GameTextInput';
 import GameCreate from './GameCreate'
 import GameLogIn from './GameLogIn'
@@ -20,27 +20,34 @@ export default class Form extends Component {
     return (
       <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
         <ImageBackground style={styles.container} source={require('../img/ninja.jpg')}>
-          <Text style={styles.header}> Bluetooth </Text> 
-          <Text style={styles.header}> Assassin </Text> 
-            <View style={styles.formContainer}> 
-                <View style={{ flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <View style={{ flex: 1 }} >
+          <View style={styles.filler}/>
+          <View style={styles.headercontainer}>
+            <Text style={styles.header}> Bluetooth </Text> 
+            <Text style={styles.header}> Assassin </Text> 
+          </View>
+          <View style={{flex:0.5}}/>
+          <View style={styles.formContainer}> 
+              <View style={{ flex: 1 }} >
                 <Button
-                    backgroundColor='#E36588'
-                    title="Login to Existing Game"
-                     onPress= {Actions.GameLogIn}
-                    
+                    backgroundColor='rgba(201, 29, 77, 0.6)'
+                    title="Log In to Existing Game"
+                    onPress= {Actions.GameLogIn}
+                    fontWeight='bold'
+                    borderRadius={10}
                 />
-            </View>
-            <View style={{ flex: 1 }} >
+              </View>
+              <View style={{ flex: 1 }} >
                 <Button
-                    backgroundColor='#9AC4F8'
-                    title="Create New Game"
+                    backgroundColor='rgba(154, 196, 248, 0.75)'
+                    title="Create a New Game"
                     onPress= {Actions.GameCreate}
+                    fontWeight='bold'
+                    borderRadius={10}
                 />
             </View>
-        </View>
-            </View>
+
+          </View>
+         <View style={styles.filler}/>
         </ImageBackground>
       </KeyboardAvoidingView>
 
@@ -51,19 +58,23 @@ export default class Form extends Component {
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  headercontainer: {
       flex:1,
     },
+    wrapper: {
+      flex:1,
+      
+    },
     container: {
+      flexDirection: 'column',
       flex: 1,
       alignSelf: 'stretch',
       width: null,
-      justifyContent: 'center',
+      justifyContent: 'space-around',
       alignItems: 'center',
     },
     header: {
-     
-      fontSize: 38,
+      fontSize: 45,
       color: 'white',
       fontWeight: 'bold',
       backgroundColor: 'transparent',
@@ -74,14 +85,15 @@ const styles = StyleSheet.create({
       alignSelf:'stretch',
       paddingLeft:20,
       paddingRight:20,  
+      flexDirection: 'column',
+      justifyContent: 'center',
+       flex:1
 
     },
-    textInput: {
-      alignSelf: 'stretch',
-      padding: 20,
-      backgroundColor:'rgba(255,255,255,0.85)',
-      marginBottom:20,
-    }
+    filler: {
+      flex: 1,
+    },
+
     
 
 });
