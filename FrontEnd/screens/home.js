@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { 
-    StyleSheet, 
-    Text, View, 
-    Image, Button,
-    KeyboardAvoidingView
-} from 'react-native';
+  StyleSheet, 
+  Text, View, 
+  TouchableOpacity,
+  ImageBackground,
+  KeyboardAvoidingView
+
+ } from 'react-native';
+import { Button } from 'react-native-elements';
 import GameTextInput  from '../components/GameTextInput';
 import GameCreate from './GameCreate'
 import GameLogIn from './GameLogIn'

@@ -12,7 +12,6 @@ class GameCreate extends Component {
             gameCode: ''
         };
     }
-
     render() {
         return (
         <View style={styles.formContainer}> 
