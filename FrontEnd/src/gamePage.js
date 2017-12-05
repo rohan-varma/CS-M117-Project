@@ -1,25 +1,34 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, AppRegistry} from 'react-native';
-import {StackNavigator} from 'react-navigation';
-
-
-export default class gamePage extends Component { 
-  
+import { StyleSheet, View, AppRegistry} from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, Text } from 'native-base';
+export default class gamePage extends Component {
   constructor(props){
     super(props)
   }
   render() {
     return (
-    
-      <View style={styles.formContainer}>
-        <Text> hiiii </Text>
-      </View>
-    
+      <Container>
+        <Content />
+        <Footer>
+          <FooterTab>
+            <Button>
+              <Text>Game Status</Text>
+            </Button>
+            <Button>
+              <Text>Active Player</Text>
+            </Button>
+            <Button>
+              <Text>Dead Player</Text>
+            </Button>
+            <Button>
+              <Text>Safe Zone</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      </Container>
     );
   }
 }
 
-
 const styles = StyleSheet.create({
 });
-
