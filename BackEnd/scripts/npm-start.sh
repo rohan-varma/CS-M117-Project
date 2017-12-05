@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /var/backend/BackEnd
-npm start
+pm2 start app.js

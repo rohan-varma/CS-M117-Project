@@ -4,6 +4,10 @@ files:
   - source: /
     destination: /var/backend/
 hooks:
+  BeforeInstall:
+    - location: BackEnd/scripts/install-dependencies.sh
+      runas: root
+      timeout: 600
   AfterInstall:
     - location: BackEnd/scripts/npm-install.sh
       timeout: 300
