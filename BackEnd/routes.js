@@ -249,7 +249,7 @@ router.post('/createAlliance', (req, res) => {
 	allianceFields.targets = jsonRequestBody.targets;
 
 	var alliance = new Alliance(allianceFields);
-	var allianceId = alliance.id;
+	var allianceId = alliance._id;
 	var allies = JSON.parse(jsonRequestBody.allies);
 
 	alliance.save((err) => {
@@ -263,10 +263,10 @@ router.post('/createAlliance', (req, res) => {
 	});
 
 	// Update users with their alliance ID
-	for (int i = 0; i < allies.length; i++) {
+	for (let i = 0; i < allies.length; i++) {
 		Player.findOneAndUpdate({
 			// Condition
-			id : allies[i].id,
+			_id : allies[i]._id,
 		}, {
 			// Update
 			alliance : allianceId,
