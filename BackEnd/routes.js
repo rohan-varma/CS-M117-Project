@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
 import Safezone from './models/safezone';
+import Alliance from './models/alliance';
 
 const _  = require('lodash')
 const router = express.Router();
@@ -251,9 +252,12 @@ router.post('/createAlliance', (req, res) => {
 	var allianceId = alliance.id;
 	var allies = JSON.parse(jsonRequestBody.allies);
 
-	alliance.save(function(err) {
+	alliance.save((err) => {
 		if (err) {
 			console.log("Failed to create alliance - Error: " + err.message);
+			res.status(400).json({
+				error: "Failed to create alliance - Error: " + err.message,
+			});
 			return;
 		}
 	});
@@ -272,10 +276,18 @@ router.post('/createAlliance', (req, res) => {
 		}, function(err, doc) {
 			if (err) {
 				console.log("Failed to add users to a new alliance - Error: " + err.message);
+				res.status(400).json({
+					error: "Failed to add users to a new alliance - Error: " + err.message,
+				});
 				return;
 			}
 		});
 	}
+
+	// Success
+	res.status(200).json({
+		message: "success",
+	})
 });
 
 router.get('/players', (req, res) => {
