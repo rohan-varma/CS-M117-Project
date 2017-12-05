@@ -8,6 +8,7 @@ var playerSchema = new Schema({
     alive: Boolean,
     macAddress: String,
     game: [{ type: Schema.Types.ObjectId, ref: 'game' }],
+    gameId: String,
     mySafeZone: { type: Schema.Types.ObjectId, ref: 'safezone' },
     target: { type: Schema.Types.ObjectId, ref: 'player' },
     alliance: { type: Schema.Types.ObjectId, ref: 'alliance' },

@@ -78,6 +78,7 @@ router.post('/createGame', (req, res) => {
 					else {
 						res.status(200).json({
 							message: 'success',
+							id: newGame._id,
 						})
 					}
 				}));
@@ -121,7 +122,8 @@ router.post('/addUser', (req, res) => {
 		    	var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
 						 macAddress: req.body.mac,
-						 game: game._id,
+						 game: game._id, //not sure how to use this
+						 gameId: game._id,
 						 mySafeZone: newSafezone._id,
 						 location: [req.body.x, req.body.y] });
 		    	newSafezone.game = game._id;
@@ -236,6 +238,26 @@ router.get('/getTargetLocation', (req, res) => {
 	    res.send(obj.location);
 	}
     });
+});
+
+router.get('/players', (req, res) => {
+	const body = req.body
+	const gameId = body.gameId
+	Player.find({}, (err, players) => {
+		if (err) {
+			res.status(400).json({
+				error: 'error finding players',
+			})
+		}
+		console.log('number of players: ', players.length);
+		console.log('game id: ' + gameId);
+		const thisGamePlayers = _.filter(players, p => p.gameId === gameId);
+		console.log(JSON.stringify(thisGamePlayers, null, 2))
+		res.status(200).json({
+			message: 'success',
+			players: thisGamePlayers,
+		});
+	});
 });
 
 module.exports = router;
