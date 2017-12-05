@@ -242,6 +242,28 @@ router.get('/getTargetLocation', (req, res) => {
     });
 });
 
+const validateGetUsername = request => {
+    const body = request.body;
+    return _.has(body, 'id');
+}
+
+router.get('/getUsername', (req, res) => {
+    if(!validateGetUsername(req)) {
+	res.status(400).json({
+	    error: 'Request object must contain id'
+	});
+    }
+    const body = req.body;
+    Player.findOne({ _id: body.id }, (err, player) => {
+	if (err)
+	    res.send(err);
+	else {
+	    res.status(200).json({ message: 'success',
+				   username: player.username });
+	}
+    });
+});
+
 const validateGetTargets = request => {
     const body = request.body;
     return _.has(body, 'username');
