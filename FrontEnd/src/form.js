@@ -18,16 +18,12 @@ export default class App extends Component {
       <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
         <ImageBackground style={styles.container} source={require('../img/ninja.jpg')}>
           <Text style={styles.header}> Bluetooth </Text> 
-          <Text style={styles.header}> Assissan </Text> 
+          <Text style={styles.header}> Assassin </Text> 
             <View style={styles.formContainer}> 
                 <GameTextInput/> 
-               
             </View>
         </ImageBackground>
       </KeyboardAvoidingView>
-     
-
-
 
     );
 

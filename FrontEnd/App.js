@@ -14,14 +14,7 @@ const _ = require('lodash');
 export default class App extends React.Component {
   render() {
     return (
-     /* <View style={styles.container}>
-        <Text style={{padding:40}}>Hi! Please enter a game code.</Text>
-        <Text> Or, enter a code to create a new game. </Text>
-        <GameTextInput />
-      </View>*/
-
            <Form />
-
     );
   }
 }
