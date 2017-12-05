@@ -8,13 +8,14 @@ import { StyleSheet, Text, View, Navigator,
  } from 'react-native';
 import GameTextInput  from './GameTextInput';
 import Form from './src/form';
+import RootNavigator from './nav.js';
 
 const _ = require('lodash');
 
 export default class App extends React.Component {
   render() {
     return (
-           <Form />
+           <RootNavigator />
     );
   }
 }
