@@ -30,39 +30,69 @@ router.get('/config', (req, res, next) => {
 
 const validateKillRequest = request => {
 	const body = request.body
-	return _.has(body, 'username') 
-		&& _.has(body, 'x') 
-		&& _.has(body, 'y') 
-		&& _.has(body, 'xCoord')
-		&& _.has(body, 'yCoord')
+	return _.has(body, 'username')
+}
+
+function checkTargetProximity(player, target) {
+	console.log("checking proximity")
+	var safezoneA = target.x - target.xCoord
+	console.log(safezoneA)
+	var safezoneB = target.y - target.yCoord
+	console.log(safezoneB)
+	var inSafezone = Math.sqrt(safezoneA*safezoneA + safezoneB*safezoneB)
+	console.log(inSafezone)
+	if (inSafezone < target.radius) {
+		console.log("target is in safezone")
+		return false
+	}
+	var a = player.x - target.x
+	var b = player.y - target.y
+	var dist = Math.sqrt(a*a + b*b)
+	console.log(dist)
+	if (dist < 10) {
+		console.log("target is in proximity")
+		return true
+	}
+	console.log("target too far")
+	return false
 }
 
 router.post('/killTarget', (req, res) => {
-	if (!validateGameRequest(req)) {
+	if (!validateKillRequest(req)) {
 		console.log('failed to validate')
 		res.status(400).json({
-			error: 'Must have both login code and orgName specified',
+			error: 'Must have username specified',
 		});
 		return;
 	}
 	console.log('request validated')
-    Player.findOne({ username: req.body.username }, (err, obj) => {
-	if (!obj)
-	    res.status(400).json({
+    Player.findOne({ username: req.body.username }, (err, player) => {
+	if (!player) 
+		    res.status(400).json({
 			error: 'Player does not exist',
 		});
 	else {
-		Player.findOne(obj.target, (err, obj) => {
-		if(!obj)
+		Player.findOne(player.target, (err, target) => {
+		if(!target)
 		    res.status(400).json({
 			error: 'Player\'s target does not exist',
 		});
 		else {
+			console.log("found target")
 			//check coordinate distance and safezones
-			//kill target if necessary, send notifications
-			//update with new target
-			//alliance checks
-			
+			if (checkTargetProximity(player, target)) {
+				console.log("target in range")
+				//kill target, send notifications
+
+				//update game player status
+
+				//update with new target
+
+			}
+			//TODO: alliance checks
+			res.status(200).json({
+							message: 'success',
+						})
 		}
 	    });
 	}

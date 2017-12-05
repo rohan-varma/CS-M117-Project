@@ -55,8 +55,14 @@ def testStartGame(data):
 		data = data)
 	assert res.status_code == 200
 
-def testKillTarget(login_code, data):
-	res = requests.get("http://localhost:3000/BluA/config")
+def testUpdateLocation(data):
+	res = requests.post("http://localhost:3000/BluA/updateLocation",
+		data = data)
+	assert res.status_code == 200
+
+def testKillTarget(data):
+	res = requests.post("http://localhost:3000/BluA/killTarget",
+		data = data)
 	assert res.status_code == 200
 
 def main():
@@ -77,9 +83,20 @@ def main():
 	#start game
 	testStartGame(test_data[1])
 	#update the player's locations to outside the safezone
-	
-	# #attempt to kill the target
-	# testKillTarget(test_data[0],test_data[1])
+	user1_data['x'] = 5
+	user1_data['y'] = 5
+	user2_data['x'] = 5
+	user2_data['y'] = 5
+	user3_data['x'] = 5
+	user3_data['y'] = 5
+	user4_data['x'] = 5
+	user4_data['y'] = 5
+	testUpdateLocation(user1_data)
+	testUpdateLocation(user2_data)
+	testUpdateLocation(user3_data)
+	testUpdateLocation(user4_data)
+	#attempt to kill the target
+	testKillTarget(user1_data)
 
 if __name__ == "__main__":
 	main()
