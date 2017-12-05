@@ -241,52 +241,61 @@ router.get('/getTargetLocation', (req, res) => {
 	}
     });
 
+/**
+ * @api {post} /createAlliance Create Alliance
+ *
+ * @apiParam {String} username		            The id of the invitation
+ * @apiParam {String} allianceName            The email address of the invitee
+ *
+ * @apiExample {js} Example json:
+ *   {
+ *      "username": "joebruin",
+ *      "allianceName": "UCLA Alliance",
+ *  }
+ *
+ * @apiUse Response200
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
 router.post('/createAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
 
-	var allianceFields = {};
-	allianceFields.allies = jsonRequestBody.allies;
-	allianceFields.targets = jsonRequestBody.targets;
+	var findCreatorPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
 
-	var alliance = new Alliance(allianceFields);
-	var allianceId = alliance._id;
-	var allies = JSON.parse(jsonRequestBody.allies);
-
-	alliance.save((err) => {
-		if (err) {
-			console.log("Failed to create alliance - Error: " + err.message);
-			res.status(400).json({
-				error: "Failed to create alliance - Error: " + err.message,
-			});
-			return;
+	var createAlliancePromise = findCreatorPromise.then((creator) => {
+		if (!creator) {
+			throw new Error("creator not found");
 		}
-	});
 
-	// Update users with their alliance ID
-	for (let i = 0; i < allies.length; i++) {
-		Player.findOneAndUpdate({
-			// Condition
-			_id : allies[i]._id,
-		}, {
-			// Update
-			alliance : allianceId,
-		}, {
-			// Options - new: return the modified document rather than the original
-			new : true,
-		}, function(err, doc) {
-			if (err) {
-				console.log("Failed to add users to a new alliance - Error: " + err.message);
-				res.status(400).json({
-					error: "Failed to add users to a new alliance - Error: " + err.message,
-				});
-				return;
-			}
+		var allianceFields = {};
+		allianceFields.name = jsonRequestBody.allianceName;
+		allianceFields.allies = [creator._id];
+		allianceFields.targets = [creator.target];
+
+		var alliance = new Alliance(allianceFields);
+		var allianceId = alliance._id;
+		var creator.alliance = allianceId;
+
+		// Saves new alliance and updates the creator's alliance field
+		var promisesArray = [alliance.save(), creator.save()];
+
+		return Promise.all(promisesArray);
+	})
+
+	createAlliancePromise.then(() => {
+		// Success
+		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName)
+		res.status(200).json({
+			"allianceID": allianceID,
+		})
+	}).catch((err) => {
+		// Failed to create alliance
+		console.log("Failed to add users to a new alliance - Error: " + err.message);
+		res.status(400).json({
+			error: "Failed to add users to a new alliance - Error: " + err.message,
 		});
-	}
-
-	// Success
-	res.status(200).json({
-		message: "success",
 	})
 });
 
