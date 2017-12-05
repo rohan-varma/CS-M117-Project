@@ -6,7 +6,7 @@ import { StyleSheet, Text, View,
   ImageBackground,
   KeyboardAvoidingView
  } from 'react-native';
-import gamePage  from './screens/gamePage';
+import GamePage  from './screens/gamePage';
 import Form from './components/form';
 import home from './screens/home';
 import GameCreate from './screens/GameCreate';
@@ -24,6 +24,7 @@ export default class App extends React.Component {
               <Scene key="login" component={Form}/>
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
+              <Scene key="GamePage" component={GamePage} title = "game"/>
             </Scene>
           </Router>
 
