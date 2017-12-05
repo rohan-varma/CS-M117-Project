@@ -29,6 +29,32 @@ router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
+const validateGameExists = request => {
+    return _.has(request.body, 'loginCode');
+}
+
+router.get('/gameExists', (req, res) => {
+    if (!validateGameExists(req)) {
+	res.status(400).json({
+	    error: 'Must provide login code'
+	});
+	return
+    }
+    const body = req.body;
+    Game.findOne({ gameCode: body.loginCode }, (err, game) => {
+	if (game)
+	    res.status(200).send({
+		message: 'success',
+		exists: true
+	    });
+	else
+	    res.status(200).send({
+		message: 'success',
+		exists: false
+	    });
+    })
+});
+
 const validateGameRequest = request => {
 	const body = request.body
 	console.log('the body keys');
@@ -36,6 +62,7 @@ const validateGameRequest = request => {
 	return _.has(body, 'loginCode') 
 		&& _.has(body, 'orgName') 
 }
+
 router.post('/createGame', (req, res) => {
 	if (!validateGameRequest(req)) {
 		console.log('failed to validate')
@@ -99,9 +126,10 @@ const validateUserRequest = request => {
 }
 router.post('/addUser', (req, res) => {
 	if (!validateUserRequest(req)) {
-		res.status(400).json({
-			error: 'Request object must contain username loginCode mac x and y',
-		});
+	    res.status(400).json({
+		error: 'Request object must contain username loginCode mac x and y',
+	    });
+	    return;
 	}
 	console.log('HERE IN ADD USER')
     Player.findOne({ username: req.body.username }, (err, obj) => {
@@ -252,6 +280,7 @@ router.get('/getUsername', (req, res) => {
 	res.status(400).json({
 	    error: 'Request object must contain id'
 	});
+	return;
     }
     const body = req.body;
     Player.findOne({ _id: body.id }, (err, player) => {
@@ -274,6 +303,7 @@ router.get('/getTargets', (req, res) => {
 	res.status(400).json({
 	    error: 'Request object must contain username'
 	});
+	return;
     }
     const body = req.body;
     Player.findOne({ username: req.body.username }, (err, player) => {
