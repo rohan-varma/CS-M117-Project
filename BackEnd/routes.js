@@ -249,14 +249,30 @@ router.get('/players', (req, res) => {
 				error: 'error finding players',
 			})
 		}
-		console.log('number of players: ', players.length);
+		//get the game for the organizer? 
+		Game.find({_id: gameId}, (err, game) => {
+			if (err) {
+				res.status(400).json({
+					error: 'error finding game',
+				});
+			}
+			console.log(JSON.stringify(game, null, 2))
+			const organizer = game.organizerName;
+			console.log('organizer name: ', organizer)
+			console.log('number of players: ', players.length);
 		console.log('game id: ' + gameId);
 		const thisGamePlayers = _.filter(players, p => p.gameId === gameId);
+		const alivePlayers = _.filter(thisGamePlayers, p => p.alive);
+		const deadPlayers = _.filter(thisGamePlayers, p => p.dead);
 		console.log(JSON.stringify(thisGamePlayers, null, 2))
 		res.status(200).json({
 			message: 'success',
 			players: thisGamePlayers,
+			alivePlayers,
+			deadPlayers,
+			organizer,
 		});
+		})
 	});
 });
 
