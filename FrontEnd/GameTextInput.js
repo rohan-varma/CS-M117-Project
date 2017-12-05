@@ -86,7 +86,7 @@ export default class GameTextInput extends Component {
           });
         });
 
-    Actions.gamePage();
+    Actions.gamePage({username: this.state.username});
   }
   render() {
     return (

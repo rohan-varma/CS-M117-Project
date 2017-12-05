@@ -8,6 +8,9 @@ export default class gamePage extends Component {
   render() {
     return (
       <Container>
+        <Header> 
+          <Text> Username:{this.props.username} </Text>
+        </Header>
         <Content />
         <Footer>
           <FooterTab>
