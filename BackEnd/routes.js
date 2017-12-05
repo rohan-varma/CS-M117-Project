@@ -242,7 +242,17 @@ router.get('/getTargetLocation', (req, res) => {
     });
 });
 
+const validateGetTargets = request => {
+    const body = request.body;
+    return _.has(body, 'username');
+}
+
 router.get('/getTargets', (req, res) => {
+    if (!validateGetTargets(req)) {
+	res.status(400).json({
+	    error: 'Request object must contain username'
+	});
+    }
     const body = req.body;
     Player.findOne({ username: req.body.username }, (err, player) => {
 	if (err)
