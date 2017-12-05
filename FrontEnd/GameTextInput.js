@@ -18,6 +18,9 @@ class GameTextInput extends Component {
     };
   }
   enterGame = () => {
+    console.log('the props of this')
+    console.log(this.props)
+    this.props.nav.navigate('Details')
     if (this.state.gameCode === '') {
       alert("Game code can't be empty");
       return;

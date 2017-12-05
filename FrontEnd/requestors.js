@@ -1,4 +1,4 @@
-const ServerURL = 'http://34.193.126.39'
+const ServerURL = 'http://localhost:3000/BluA' //'http://34.193.126.39'
 const createGameURL = ServerURL + '/createGame';
 const addUserURL = ServerURL + '/addUser';
 const startGameURL = ServerURL + '/startGame';
