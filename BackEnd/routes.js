@@ -33,28 +33,26 @@ const validateKillRequest = request => {
 	return _.has(body, 'username')
 }
 
-function checkTargetProximity(player, target) {
+function checkTargetProximity(player, target, callback) {
 	console.log("checking proximity")
-	var safezoneA = target.x - target.xCoord
-	console.log(safezoneA)
-	var safezoneB = target.y - target.yCoord
-	console.log(safezoneB)
-	var inSafezone = Math.sqrt(safezoneA*safezoneA + safezoneB*safezoneB)
-	console.log(inSafezone)
-	if (inSafezone < target.radius) {
-		console.log("target is in safezone")
-		return false
-	}
-	var a = player.x - target.x
-	var b = player.y - target.y
-	var dist = Math.sqrt(a*a + b*b)
-	console.log(dist)
-	if (dist < 10) {
-		console.log("target is in proximity")
-		return true
-	}
-	console.log("target too far")
-	return false
+	console.log(target.username)
+	var point = { type : "Point", coordinates : player.location };
+	console.log(point);
+	var isInRange = false;
+    Player.geoNear(point, { maxDistance : 5, spherical : true }, function(err, results, stats) {
+       	if(err) {
+     		console.log(err);
+       		return false;
+       	}
+       	results.filter(function(value) {
+       		if(value.obj.username == target.username) {
+       			console.log(value.obj)
+       			isInRange = true;
+       		}
+       	})
+       	console.log(isInRange)
+       	callback(err, isInRange);
+    });
 }
 
 router.post('/killTarget', (req, res) => {
@@ -80,19 +78,80 @@ router.post('/killTarget', (req, res) => {
 		else {
 			console.log("found target")
 			//check coordinate distance and safezones
-			if (checkTargetProximity(player, target)) {
-				console.log("target in range")
-				//kill target, send notifications
+			checkTargetProximity(player, target, (err, inRange) => {
+				if(err) {
+							res.status(500).json({
+		    					error: 'error with computing proximity',
+		    				});
+						}
+				if(inRange) {
+					console.log("target in range")
+					//kill target (update their data), send notifications
+					//give assassin new target
+					player.target = target.target;
+					target.alive = false;
+					player.save((err) => {
+						if(err) {
+							res.status(500).json({
+		    					error: 'error with player',
+		    				});
+						}
+					}).then(target.save((err) => {
+						if(err) {
+							res.status(500).json({
+		    					error: 'error with player',
+		    				});
+						}
+						console.log("updated player and target");
+					})).then(
+						//update game player status
+						Game.findOne({_id: player.game}, (err, game) => {
+							console.log(player.game);
+							if(!game) {
+								res.status(300).json({
+	    							error: 'Did not find game with login code ' + player.game,
+	    						})
+	    						return;
+							}
+							console.log(game.gameCode);
+							console.log(game.alivePlayers);
+							var updatedPlayers = game.alivePlayers.filter(function(value) {
+								console.log(value+" target: "+target._id);
+								if(value.toString() == target._id.toString()) {
+       								console.log("found value: "+value);
+       								game.deadPlayers.push(value)
+    	   						}
+       							return value.toString() != target._id.toString()
+       						});
+   							console.log("filtered alivePlayers array")
+   							console.log(updatedPlayers)
+   							game.alivePlayers = updatedPlayers
+   							console.log(game.alivePlayers)
+   							if(err)
+   								res.status(500).json({
+	   								error: 'error with updating game state',
+	   							});
+    						game.save((err) => {
+       							if(err)
+       								res.status(500).json({
+		    							error: 'error with saving game',
+		    						});
+       							else {
+       								console.log("updated game");
+       								res.status(200).json({
+										message: 'success',
+									})
+       							}
+       						})
+						}));					
 
-				//update game player status
-
-				//update with new target
-
-			}
-			//TODO: alliance checks
-			res.status(200).json({
-							message: 'success',
+				} else {
+					res.status(400).json({
+							error: 'error',
 						})
+				}
+			});
+			//TODO: alliance checks
 		}
 	    });
 	}
