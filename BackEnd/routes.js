@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
 import Safezone from './models/safezone';
+import Alliance from './models/alliance';
 const _  = require('lodash')
 const router = express.Router();
 
@@ -55,7 +56,7 @@ router.post('/createGame', (req, res) => {
 			req.body.xCoord = req.body.xCoord || 2;
 			req.body.yCoord = req.body.yCoord || 2;
 			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
-				radius: req.body.radius});
+				radius: 5});
 	    	var newGame = new Game({ gameCode: req.body.loginCode,
 					     started: false,
 					     organizerName: req.body.orgName,
@@ -118,7 +119,7 @@ router.post('/addUser', (req, res) => {
 	    		}
 			else {
 				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
-				radius: req.body.radius});
+				radius: 5});
 		    	var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
 						 macAddress: req.body.mac,
@@ -235,7 +236,29 @@ router.get('/getTargetLocation', (req, res) => {
 	if (err)
 	    res.send(err);
 	else {
-	    res.send(obj.location);
+	    res.status(200).json({ message: 'success',
+				   location: obj.location });
+	}
+    });
+});
+
+router.get('/getTargets', (req, res) => {
+    const body = req.body;
+    Player.findOne({ username: req.body.username }, (err, player) => {
+	if (err)
+	    res.send(err);
+	else {
+	    if (player.alliance == null)
+		res.status(200).json({ targets: [player.target] });
+	    else {
+		Alliance.findOne({ _id: player.alliance }, (err, a) => {
+		    if (err)
+			res.send(err);
+		    else
+			res.status(200).json({ message: 'success',
+					       targets: a.targets });
+		});
+	    }
 	}
     });
 });
