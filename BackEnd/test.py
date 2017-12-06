@@ -64,8 +64,17 @@ def testKillTarget(data):
 	res = requests.post("http://localhost:3000/BluA/killTarget",
 		data = data)
 	assert res.status_code == 200
+	print json.loads(res.text)["message"]
+	assert json.loads(res.text)["message"] == "killed target"
 
-def main():
+def testKillTargetWithSafezone(data):
+	res = requests.post("http://localhost:3000/BluA/killTarget",
+		data = data)
+	assert res.status_code == 200
+	print json.loads(res.text)["message"]
+	assert json.loads(res.text)["message"] == "target in safezone"
+
+def testBasicCase():
 	#create game data
 	test_data = createGameData()
 	#create four test users
@@ -98,5 +107,30 @@ def main():
 	#attempt to kill the target
 	testKillTarget(user1_data)
 
+def testTargetInSafezone():
+	#create game data
+	test_data = createGameData()
+	#create four test users
+	user1_data = createUserData(test_data[0])
+	user2_data = createUserData(test_data[0])
+	user3_data = createUserData(test_data[0])
+	user4_data = createUserData(test_data[0])
+	#create a game with the above data
+	testCreateGame(test_data[1])
+	#add users with the above data
+	testAddUser(user1_data)
+	testAddUser(user2_data)
+	testAddUser(user3_data)
+	testAddUser(user4_data)
+	#start game
+	testStartGame(test_data[1])
+	#attempt to kill the target
+	testKillTargetWithSafezone(user1_data)
+
+
+def main():
+	# testBasicCase()
+	testTargetInSafezone()
+	
 if __name__ == "__main__":
 	main()

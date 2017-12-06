@@ -33,6 +33,35 @@ const validateKillRequest = request => {
 	return _.has(body, 'username')
 }
 
+function checkTargetInSafezone(player, target, callback) {
+	console.log("checking safezone")
+	console.log(target.username)
+	console.log(target.mySafeZone)
+	Safezone.findOne({_id: target.mySafeZoneId}, (err, safezone) => {
+		if(!safezone) {
+			console.log("couldn't find safezone")
+			return false;
+		}
+		var point = { type : "Point", coordinates : safezone.location };
+		console.log(point);
+		var isInSafezone = false;
+    	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
+    	   	if(err) {
+    	 		console.log(err);
+    	   		return false;
+    	   	}
+    	   	results.filter(function(value) {
+    	   		if(value.obj.username == target.username) {
+    	   			console.log(value.obj)
+    	   			isInSafezone = true;
+    	   		}
+    	   	})
+    	   	console.log(isInSafezone)
+    	   	callback(err, isInSafezone);
+    	});
+	});
+}
+
 function checkTargetProximity(player, target, callback) {
 	console.log("checking proximity")
 	console.log(target.username)
@@ -73,89 +102,103 @@ router.post('/killTarget', (req, res) => {
 		Player.findOne(player.target, (err, target) => {
 		if(!target)
 		    res.status(400).json({
-			error: 'Player\'s target does not exist',
-		});
+				error: 'Player\'s target does not exist',
+			});
 		else {
 			console.log("found target")
-			//check coordinate distance and safezones
-			checkTargetProximity(player, target, (err, inRange) => {
+			//check target safezones
+			checkTargetInSafezone(player, target, (err, inSafezone) => {
 				if(err) {
 							res.status(500).json({
 		    					error: 'error with computing proximity',
 		    				});
 						}
-				if(inRange) {
-					console.log("target in range")
-					//kill target (update their data), send notifications
-					//give assassin new target
-					player.target = target.target;
-					target.alive = false;
-					player.save((err) => {
-						if(err) {
-							res.status(500).json({
-		    					error: 'error with player',
-		    				});
-						}
-					}).then(target.save((err) => {
-						if(err) {
-							res.status(500).json({
-		    					error: 'error with player',
-		    				});
-						}
-						console.log("updated player and target");
-					})).then(
-						//update game player status
-						Game.findOne({_id: player.game}, (err, game) => {
-							console.log(player.game);
-							if(!game) {
-								res.status(300).json({
-	    							error: 'Did not find game with login code ' + player.game,
-	    						})
-	    						return;
-							}
-							console.log(game.gameCode);
-							console.log(game.alivePlayers);
-							var updatedPlayers = game.alivePlayers.filter(function(value) {
-								console.log(value+" target: "+target._id);
-								if(value.toString() == target._id.toString()) {
-       								console.log("found value: "+value);
-       								game.deadPlayers.push(value)
-    	   						}
-       							return value.toString() != target._id.toString()
-       						});
-   							console.log("filtered alivePlayers array")
-   							console.log(updatedPlayers)
-   							game.alivePlayers = updatedPlayers
-   							console.log(game.alivePlayers)
-   							if(err)
-   								res.status(500).json({
-	   								error: 'error with updating game state',
-	   							});
-    						game.save((err) => {
-       							if(err)
-       								res.status(500).json({
-		    							error: 'error with saving game',
-		    						});
-       							else {
-       								console.log("updated game");
-       								res.status(200).json({
-										message: 'success',
-									})
-       							}
-       						})
-						}));					
-
-				} else {
-					res.status(400).json({
-							error: 'error',
-						})
+				if(inSafezone) {
+					console.log("target in safezone");
+					res.status(200).json({
+										message: 'target in safezone',
+									});
 				}
-			});
+				else {
+					//check coordinate distance
+					checkTargetProximity(player, target, (err, inRange) => {
+						if(err) {
+							res.status(500).json({
+		    					error: 'error with computing proximity',
+		    				});
+						}
+						if(inRange) {
+							console.log("target in range")
+							//kill target (update their data), send notifications
+							//give assassin new target
+							player.target = target.target;
+							target.alive = false;
+							player.save((err) => {
+								if(err) {
+									res.status(500).json({
+				    					error: 'error with player',
+		    						});
+								}
+							}).then(target.save((err) => {
+								if(err) {
+									res.status(500).json({
+		    							error: 'error with player',
+		    						});		
+								}
+								console.log("updated player and target");
+							})).then(
+								//update game player status
+								Game.findOne({_id: player.game}, (err, game) => {
+									console.log(player.game);
+									if(!game) {
+										res.status(400).json({
+	    									error: 'Did not find game with login code ' + player.game,
+	    								})
+									}
+									console.log(game.gameCode);
+									console.log(game.alivePlayers);
+									var updatedPlayers = game.alivePlayers.filter(function(value) {
+										console.log(value+" target: "+target._id);
+										if(value.toString() == target._id.toString()) {
+       										console.log("found value: "+value);
+       										game.deadPlayers.push(value)
+    	   								}
+       									return value.toString() != target._id.toString()
+       								});
+   									console.log("filtered alivePlayers array")
+   									console.log(updatedPlayers)
+   									game.alivePlayers = updatedPlayers
+   									console.log(game.alivePlayers)
+   									if(err)
+   										res.status(500).json({
+	   										error: 'error with updating game state',
+			   							});
+    								game.save((err) => {
+       								if(err)
+       									res.status(500).json({
+		    								error: 'error with saving game',
+		    							});
+       								else {
+       									console.log("updated game");
+       									res.status(200).json({
+											message: 'killed target',
+										})
+       								}
+       							})
+							}));					
+						} else {
+							res.status(200).json({
+								message: 'target not in range',
+							})
+						}
+					})
+				}
 			//TODO: alliance checks
-		}
-	    });
-	}
-    });
+			});
+	    }
+		})
+    }
+	});
 });
 
 const validateGameRequest = request => {
@@ -255,6 +298,7 @@ router.post('/addUser', (req, res) => {
 						 game: game._id, //not sure how to use this
 						 gameId: game._id,
 						 mySafeZone: newSafezone._id,
+						 mySafeZoneId: newSafezone._id,
 						 location: [req.body.x, req.body.y] });
 		    	newSafezone.game = game._id;
 		    	let playerId;
