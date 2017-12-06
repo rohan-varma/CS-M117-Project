@@ -183,7 +183,7 @@ function killTargetAttempt(req, res) {
 	    								})
 									}
 									console.log(game.gameCode);
-									console.log(game.alivePlayers);
+//									console.log(game.alivePlayers);
 									var updatedPlayers = game.alivePlayers.filter(function(value) {
 										console.log(value+" target: "+target._id);
 										if(value.toString() == target._id.toString()) {
@@ -532,6 +532,7 @@ const validateGetTargets = request => {
 
 router.post('/targets', (req, res) => {
     if (!validateGetTargets(req)) {
+    	console.log('YOUR SHITTY REQUEST BODY')
     	console.log(JSON.stringify(req.body, null, 2))
 	res.status(400).json({
 	    error: 'Request object must contain username',
