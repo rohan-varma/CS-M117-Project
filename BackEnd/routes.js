@@ -118,16 +118,8 @@ function checkTargetProximity(player, target, callback) {
     });
 }
 
-router.post('/killTarget', (req, res) => {
-	if (!validateKillRequest(req)) {
-		console.log('failed to validate')
-		res.status(400).json({
-			error: 'Must have username specified',
-		});
-		return;
-	}
-	console.log('request validated')
-    Player.findOne({ username: req.body.username }, (err, player) => {
+function killTargetAttempt(req, res) {
+	Player.findOne({ username: req.body.username }, (err, player) => {
 	if (!player) 
 		    res.status(400).json({
 			error: 'Player does not exist',
@@ -233,6 +225,18 @@ router.post('/killTarget', (req, res) => {
 		})
     }
 	});
+}
+
+router.post('/killTarget', (req, res) => {
+	if (!validateKillRequest(req)) {
+		console.log('failed to validate')
+		res.status(400).json({
+			error: 'Must have username specified',
+		});
+		return;
+	}
+	console.log('request validated')
+    killTargetAttempt(req, res);
 });
 
 const validateGameExists = request => {
