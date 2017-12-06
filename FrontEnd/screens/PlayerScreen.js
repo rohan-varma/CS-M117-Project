@@ -51,7 +51,6 @@ class PlayerScreen extends Component {
     .catch(err => {
       console.log('err is ', err)
     })
-    //hack
 
   }
 
