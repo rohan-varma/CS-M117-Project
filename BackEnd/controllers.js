@@ -13,7 +13,7 @@ const getPlayers = (gameCode, cb) => {
 			cb(err, {})
 		}
 		//get the game for the organizer? 
-		Game.find({gameCode: gameCode}, (err, game) => {
+		Game.findOne({gameCode: gameCode}, (err, game) => {
 		    if (err) {
 			cb(err, {})
 		    }
@@ -21,20 +21,22 @@ const getPlayers = (gameCode, cb) => {
 		    const organizer = game.organizerName || 'organizer';
 		    console.log('organizer name: ', organizer)
 		    const pIdToUsername = playerId => {
-			Players.findOne({ _id: playerId }, (err, p) => {
-			    return p.username;
-			});
+			return Player.findById(playerId);
 		    }
 		    const alivePlayers = _.map(game.alivePlayers, pIdToUsername);
 		    const deadPlayers = _.map(game.deadPlayers, pIdToUsername);
-		    const playerData = {
-			message: 'success',
-			players: alivePlayers.concat(deadPlayers),
-			alivePlayers,
-			deadPlayers,
-			organizer,
-		    }
-		    cb(null, playerData)
+		    Promise.all(alivePlayers).then(aPlayers => {
+			Promise.all(deadPlayers).then(dPlayers => {
+			    const playerData = {
+				message: 'success',
+				players: aPlayers.concat(dPlayers),
+				alivePlayers: aPlayers,
+				deadPlayers: dPlayers,
+				organizer
+			    }
+			    cb(null, playerData)
+			});
+		    })
 		})
 	});
 }
