@@ -285,8 +285,6 @@ router.post('/createGame', (req, res) => {
 	console.log('request validated')
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
     	if (game) {
-    		console.log('somehow found a game here')
-    		console.log(JSON.stringify(game, null, 2))
     		res.status(400).send({
     			error: "Game with login code " + req.body.loginCode + " already exists!",
     		});
@@ -702,37 +700,6 @@ router.post('/players', (req, res) => {
 			res.status(200).json(playerData);
 		}
 	});
-	// Player.find({}, (err, players) => {
-	// 	if (err) {
-	// 		res.status(400).json({
-	// 			error: 'error finding players',
-	// 		})
-	// 	}
-	// 	//get the game for the organizer? 
-	// 	Game.find({_id: gameId}, (err, game) => {
-	// 		if (err) {
-	// 			res.status(400).json({
-	// 				error: 'error finding game',
-	// 			});
-	// 		}
-	// 		console.log(JSON.stringify(game, null, 2))
-	// 		const organizer = game.organizerName;
-	// 		console.log('organizer name: ', organizer)
-	// 		console.log('number of players: ', players.length);
-	// 	console.log('game id: ' + gameId);
-	// 	const thisGamePlayers = _.filter(players, p => p.gameId === gameId);
-	// 	const alivePlayers = _.filter(thisGamePlayers, p => p.alive);
-	// 	const deadPlayers = _.filter(thisGamePlayers, p => p.dead);
-	// 	console.log(JSON.stringify(thisGamePlayers, null, 2))
-	// 	res.status(200).json({
-	// 		message: 'success',
-	// 		players: thisGamePlayers,
-	// 		alivePlayers,
-	// 		deadPlayers,
-	// 		organizer,
-	// 	});
-	// 	})
-	// });
 });
 
 module.exports = router;
