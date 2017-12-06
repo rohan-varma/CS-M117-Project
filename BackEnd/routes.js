@@ -340,7 +340,7 @@ router.get('/getTargets', (req, res) => {
  * @apiUse Response200
  * @apiSuccessExample {json} Success example
  *    {
- *      "allianceId": allianceId,
+ *      "allianceId": "41224d776a326fb40f000001",
  *    }
  *
  * @apiUse Error400
@@ -395,13 +395,13 @@ router.post('/createAlliance', (req, res) => {
  * @apiExample {json} Example json input:
  *    {
  *      "username": "joebruin",
- *      "allianceId": allianceId,
+ *      "allianceId": "41224d776a326fb40f000001"
  *    }
  *
  * @apiUse Response200
  * @apiSuccessExample {json} Success example
  *    {
- *      "allianceName": allianceName,
+ *      "allianceName": allianceName
  *    }
  *
  * @apiUse Error400
