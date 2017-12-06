@@ -10,33 +10,34 @@ const _  = require('lodash')
 const getPlayers = (gameCode, cb) => {
 	Player.find({}, (err, players) => {
 		if (err) {
-			cb(err, {})
+			return cb(err, {})
 		}
 		//get the game for the organizer? 
 		Game.findOne({gameCode: gameCode}, (err, game) => {
 		    if (err || !game) {
 			cb(err, {})
-		    }
-		    console.log(JSON.stringify(game, null, 2))
-		    const organizer = game.organizerName || 'organizer';
-		    console.log('organizer name: ', organizer)
-		    const pIdToUsername = playerId => {
-			return Player.findById(playerId);
-		    }
-		    const alivePlayers = _.map(game.alivePlayers, pIdToUsername);
-		    const deadPlayers = _.map(game.deadPlayers, pIdToUsername);
-		    Promise.all(alivePlayers).then(aPlayers => {
-			Promise.all(deadPlayers).then(dPlayers => {
-			    const playerData = {
-				message: 'success',
-				players: aPlayers.concat(dPlayers),
-				alivePlayers: aPlayers,
-				deadPlayers: dPlayers,
-				organizer
+		    } else {
+			    console.log(JSON.stringify(game, null, 2))
+			    const organizer = game.organizerName || 'organizer';
+			    console.log('organizer name: ', organizer)
+		    	const pIdToUsername = playerId => {
+				return Player.findById(playerId);
 			    }
-			    cb(null, playerData)
-			});
-		    })
+			    const alivePlayers = _.map(game.alivePlayers, pIdToUsername);
+			    const deadPlayers = _.map(game.deadPlayers, pIdToUsername);
+			    Promise.all(alivePlayers).then(aPlayers => {
+				Promise.all(deadPlayers).then(dPlayers => {
+				    const playerData = {
+					message: 'success',
+					players: aPlayers.concat(dPlayers),
+					alivePlayers: aPlayers,
+					deadPlayers: dPlayers,
+					organizer
+				    }
+				    cb(null, playerData)
+				});
+			    })
+			}
 		})
 	});
 }

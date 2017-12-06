@@ -11,7 +11,7 @@ const { getPlayers } = require('./controllers.js')
 
 var mongoDB = config.client.mongodb.defaultUri + '/' + config.client.mongodb.defaultDatabase;
 mongoose.connect(mongoDB, {
-    useMongoClient: true
+	useMongoClient: true
 });
 
 var db = mongoose.connection;
@@ -19,15 +19,15 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 router.get('/', (req, res, next) => {
-    var test = {
+	var test = {
 	"AppName": "Bluetooth Assassin",
 	"Version": 1.0
-    }
-    res.status(200).json(test);
+	}
+	res.status(200).json(test);
 });
 
 router.get('/config', (req, res, next) => {
-    res.json(config.client);
+	res.json(config.client);
 });
 
 const disbandAlliance = (allianceId, callback) => {
@@ -68,20 +68,20 @@ function checkTargetInSafezone(player, target, callback) {
 		var point = { type : "Point", coordinates : safezone.location };
 		console.log(point);
 		var isInSafezone = false;
-    	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
-    	   	if(err) {
-    	 		console.log(err);
-    	   		return;
-    	   	}
-    	   	results.filter(function(value) {
-    	   		if(value.obj.username == target.username) {
-    	   			console.log(value.obj)
-    	   			isInSafezone = true;
-    	   		}
-    	   	})
-    	   	console.log(isInSafezone)
-    	   	if(!isInSafezone) {
-    	   		Game.findOne({_id: player.game}, (err, game) => {
+		Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
+			if(err) {
+				console.log(err);
+				return;
+			}
+			results.filter(function(value) {
+				if(value.obj.username == target.username) {
+					console.log(value.obj)
+					isInSafezone = true;
+				}
+			})
+			console.log(isInSafezone)
+			if(!isInSafezone) {
+				Game.findOne({_id: player.game}, (err, game) => {
 				console.log(player.game);
 				if(!game) {
 					return;
@@ -95,29 +95,29 @@ function checkTargetInSafezone(player, target, callback) {
 					console.log('WE FOUND A SAFEZONE HELL YEA')
 					var point = { type : "Point", coordinates : safezone.location };
 					console.log(point);
-			    	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
-			    	   	if(err) {
-    				 		console.log(err);
-    				   		return;
-  				  	   	}
-    			   	results.filter(function(value) {
-    	   				if(value.obj.username == target.username) {
-   			 	   			console.log("found match "+value.obj)
-    	   					isInSafezone = true;
-    	  		 		}
-    	   			})
-    	   			console.log("inSafezone before return: "+isInSafezone)
-    				callback(err, isInSafezone);
+					Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
+						if(err) {
+							console.log(err);
+							return;
+						}
+					results.filter(function(value) {
+						if(value.obj.username == target.username) {
+							console.log("found match "+value.obj)
+							isInSafezone = true;
+						}
+					})
+					console.log("inSafezone before return: "+isInSafezone)
+					callback(err, isInSafezone);
 					});
 					});
-    	   		}
-    	   		});
-    	   	}
-    	   	else {
-    	   		console.log("inSafezone before return: "+isInSafezone)
-    			callback(err, isInSafezone);
-    	   	}
-    	});		
+				}
+				});
+			}
+			else {
+				console.log("inSafezone before return: "+isInSafezone)
+				callback(err, isInSafezone);
+			}
+		});		
 	});
 }
 
@@ -127,128 +127,88 @@ function checkTargetProximity(player, target, callback) {
 	var point = { type : "Point", coordinates : player.location };
 	console.log(point);
 	var isInRange = false;
-    Player.geoNear(point, { maxDistance : 5, spherical : true }, function(err, results, stats) {
-       	if(err) {
-     		console.log(err);
-       		return false;
-       	}
-       	results.filter(function(value) {
-       		if(value.obj.username == target.username) {
-       			console.log(value.obj)
-       			isInRange = true;
-       		}
-       	})
-       	console.log(isInRange)
-       	callback(err, isInRange);
-    });
+	Player.geoNear(point, { maxDistance : 5, spherical : true }, function(err, results, stats) {
+		if(err) {
+			console.log(err);
+			return false;
+		}
+		results.filter(function(value) {
+			if(value.obj.username == target.username) {
+				console.log(value.obj)
+				isInRange = true;
+			}
+		})
+		console.log(isInRange)
+		callback(err, isInRange);
+	});
 }
 
-function killTargetAttempt(req, res) {
-	Player.findOne({ username: req.body.username }, (err, player) => {
-	if (!player) 
-		    res.status(400).json({
-			error: 'Player does not exist',
-		});
-	else {
-		Player.findOne(player.target, (err, target) => {
-		if(!target)
-		    res.status(400).json({
-				error: 'Player\'s target does not exist',
-			});
+function killTargetAttempt(player, target, callback) {
+	//check target safezones
+	checkTargetInSafezone(player, target, (err, inSafezone) => {
+		if(err) {
+			callback(err, null)
+		}
+		if(inSafezone) {
+			console.log("target in safezone");
+			callback(null, 'target in safezone')
+		}
 		else {
-			console.log("found target")
-			//check target safezones
-			checkTargetInSafezone(player, target, (err, inSafezone) => {
+			//check coordinate distance
+			checkTargetProximity(player, target, (err, inRange) => {
 				if(err) {
-							res.status(500).json({
-		    					error: 'error with computing proximity',
-		    				});
-						}
-				if(inSafezone) {
-					console.log("target in safezone");
-					res.status(200).json({
-										message: 'target in safezone',
-									});
+					callback(err, null)
 				}
-				else {
-					//check coordinate distance
-					checkTargetProximity(player, target, (err, inRange) => {
+				if(inRange) {
+					console.log("target in range")
+					//kill target (update their data), send notifications
+					//give assassin new target
+					player.target = target.target;
+					target.alive = false;
+					player.save((err) => {
 						if(err) {
-							res.status(500).json({
-		    					error: 'error with computing proximity',
-		    				});
+							callback(err, null)
 						}
-						if(inRange) {
-							console.log("target in range")
-							//kill target (update their data), send notifications
-							//give assassin new target
-							player.target = target.target;
-							target.alive = false;
-							player.save((err) => {
-								if(err) {
-									res.status(500).json({
-				    					error: 'error with player',
-		    						});
+					}).then(target.save((err) => {
+						if(err) {
+							callback(err, null)
+						}
+						console.log("updated player and target");
+					})).then(
+						//update game player status
+						Game.findOne({_id: player.game}, (err, game) => {
+							console.log(player.game);
+							if(!game) {
+								let newError = new Error('Did not find game with login code ' + player.game);
+								callback(newError, null)
+							}
+							console.log(game.gameCode);
+							var updatedPlayers = game.alivePlayers.filter(function(value) {
+								console.log(value+" target: "+target._id);
+								if(value.toString() == target._id.toString()) {
+									console.log("found value: "+value);
+									game.deadPlayers.push(value)
 								}
-							}).then(target.save((err) => {
-								if(err) {
-									res.status(500).json({
-		    							error: 'error with player',
-		    						});		
+								return value.toString() != target._id.toString()
+							});
+							console.log("filtered alivePlayers array")
+							console.log(updatedPlayers)
+							game.alivePlayers = updatedPlayers
+							console.log(game.alivePlayers)
+							game.save((err) => {
+								if(err)
+									callback(err, null)
+								else {
+									console.log("updated game");
+									callback(null, 'killed target')
 								}
-								console.log("updated player and target");
-							})).then(
-								//update game player status
-								Game.findOne({_id: player.game}, (err, game) => {
-									console.log(player.game);
-									if(!game) {
-										res.status(400).json({
-	    									error: 'Did not find game with login code ' + player.game,
-	    								})
-									}
-									console.log(game.gameCode);
-//									console.log(game.alivePlayers);
-									var updatedPlayers = game.alivePlayers.filter(function(value) {
-										console.log(value+" target: "+target._id);
-										if(value.toString() == target._id.toString()) {
-       										console.log("found value: "+value);
-       										game.deadPlayers.push(value)
-    	   								}
-       									return value.toString() != target._id.toString()
-       								});
-   									console.log("filtered alivePlayers array")
-   									console.log(updatedPlayers)
-   									game.alivePlayers = updatedPlayers
-   									console.log(game.alivePlayers)
-   									if(err)
-   										res.status(500).json({
-	   										error: 'error with updating game state',
-			   							});
-    								game.save((err) => {
-       								if(err)
-       									res.status(500).json({
-		    								error: 'error with saving game',
-		    							});
-       								else {
-       									console.log("updated game");
-       									res.status(200).json({
-											message: 'killed target',
-										})
-       								}
-       							})
-							}));					
-						} else {
-							res.status(200).json({
-								message: 'target not in range',
 							})
-						}
-					})
-				}
-			//TODO: alliance checks
-			});
-	    }
-		})
-    }
+						}));					
+					} else {
+						callback(null, 'target not in range')
+					}
+			})
+		}
 	});
 }
 
@@ -314,7 +274,29 @@ router.post('/killTarget', (req, res) => {
 		return;
 	}
 	console.log('request validated')
-    killTargetAttempt(req, res);
+	Player.findOne({ username: req.body.username }, (err, player) => {
+	if (!player) 
+			res.status(400).json({
+			error: 'Player does not exist',
+		});
+	else {
+		Player.findOne(player.target, (err, target) => {
+		if(!target)
+			res.status(400).json({
+				error: 'Player\'s target does not exist',
+			});
+		else {
+			killTargetAttempt(player, target, (err, msg) => {
+				if(err) {
+					res.status(400).json({error: err.message});
+				} else {
+					res.status(200).json({message: msg});
+				}
+			});
+		}
+		});
+	}
+	});
 });
 
 const validateGameExists = request => {
@@ -322,28 +304,28 @@ const validateGameExists = request => {
 }
 
 router.post('/gameExists', (req, res) => {
-    if (!validateGameExists(req)) {
+	if (!validateGameExists(req)) {
 	res.status(400).json({
-	    error: 'Must provide login code'
+		error: 'Must provide login code'
 	});
 	return
-    }
-    const body = req.body;
-    Game.findOne({ gameCode: body.loginCode }, (err, game) => {
+	}
+	const body = req.body;
+	Game.findOne({ gameCode: body.loginCode }, (err, game) => {
 	if (game) {
 		res.status(200).send({
 		message: 'success',
 		exists: true,
 		started: (game.started ? true : false)
-	    });
+		});
 	}
 	else
-	    res.status(200).send({
+		res.status(200).send({
 		message: 'success',
 		exists: false,
 		started: false
-	    });
-    })
+		});
+	})
 });
 
 const validateGameRequest = request => {
@@ -363,29 +345,29 @@ router.post('/createGame', (req, res) => {
 		return;
 	}
 	console.log('request validated')
-    Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
-    	if (game) {
-    		res.status(400).send({
-    			error: "Game with login code " + req.body.loginCode + " already exists!",
-    		});
-    	}
+	Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
+		if (game) {
+			res.status(400).send({
+				error: "Game with login code " + req.body.loginCode + " already exists!",
+			});
+		}
 		else {
 			//create default x and yCoords if the req.body does not have them
 			req.body.xCoord = req.body.xCoord || 2;
 			req.body.yCoord = req.body.yCoord || 2;
 			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
 				radius: 5});
-	    	var newGame = new Game({ gameCode: req.body.loginCode,
-					     started: false,
-					     organizerName: req.body.orgName,
-					     centralSafeZone: newSafezone._id});
-	    	newSafezone.game = newGame._id;
-	    	newGame.save((err) => {
-	    		if (err) {
-	    			res.status(500).json({
-	    				error: 'there was an error with newGame',
-	    			})
-	    		}
+			var newGame = new Game({ gameCode: req.body.loginCode,
+						 started: false,
+						 organizerName: req.body.orgName,
+						 centralSafeZone: newSafezone._id});
+			newSafezone.game = newGame._id;
+			newGame.save((err) => {
+				if (err) {
+					res.status(500).json({
+						error: 'there was an error with newGame',
+					})
+				}
 			else {
 				newSafezone.save((err => {
 					if (err) {
@@ -402,9 +384,9 @@ router.post('/createGame', (req, res) => {
 					}
 				}));
 			}
-	    	});
+			});
 		}
-    	});
+		});
 });
 
 const validateUserRequest = request => {
@@ -417,33 +399,33 @@ const validateUserRequest = request => {
 }
 router.post('/addUser', (req, res) => {
 	if (!validateUserRequest(req)) {
-	    res.status(400).json({
+		res.status(400).json({
 		error: 'Request object must contain username loginCode mac x and y',
-	    });
-	    return;
+		});
+		return;
 	}
 	console.log('HERE IN ADD USER')
-    Player.findOne({ username: req.body.username }, (err, obj) => {
-    	if(obj) {
-    		res.status(400).json({
-    			error: 'Player with username ' + req.body.username + ' already exists',
-                username: req.body.username,
-    		});
-    	}
+	Player.findOne({ username: req.body.username }, (err, obj) => {
+		if(obj) {
+			res.status(400).json({
+				error: 'Player with username ' + req.body.username + ' already exists',
+				username: req.body.username,
+			});
+		}
 		else {
-	    	Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
-	    		if(!game) {
-	    			res.status(400).json({
-	    				error: 'Did not find game with login code ' + req.body.loginCode,
-	    			})
-	    		}
+			Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
+				if(!game) {
+					res.status(400).json({
+						error: 'Did not find game with login code ' + req.body.loginCode,
+					})
+				}
 			else {
 				req.body.xCoord = req.body.xCoord || 2;
 				req.body.yCoord = req.body.yCoord || 2;
 				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
 				radius: req.body.radius});
 
-        var newPlayer = new Player({ username: req.body.username,
+		var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
 						 macAddress: req.body.mac,
 						 game: game._id, //not sure how to use this
@@ -451,54 +433,54 @@ router.post('/addUser', (req, res) => {
 						 mySafeZone: newSafezone._id,
 						 mySafeZoneId: newSafezone._id,
 						 location: [req.body.x, req.body.y] });
-		    	newSafezone.game = game._id;
-		    	let playerId;
-		    	let username;
-		    	console.log('calling new player.save');
-		    	//this code is wrong, but seems to work.
-		    	newPlayer.save((err, player) => {
-		    		if (err) {
-		    			console.log('some error with player')
-		    			res.status(400).json({
-		    				error: 'error with saving player',
-		    			});
-		    		}
-		    		console.log('the player')
-		    		console.log(JSON.stringify(player, null, 2))
-		    		playerId = player._id;
-		    		username = player.username;
-		    		game.alivePlayers.push(player)
-		    		game.hasPlayers = true;
-		    		game.save(err => {
-		    			if (err) {
-		    				console.log('err saving game')
-		    				res.status(400).json({error: 'error saving game'})
-		    			} else {
-		    				newSafezone.save(err => {
-		    					if (err) {
-		    						console.log(err)
-		    						console.log('error saving safezone')
-		    						res.status(400).json({error: 'saving savezone'})
-		    					} else {
-		    						res.status(200).json({message: 'success', id: playerId, username: username})
-		    					}
-		    				})
-		    			}
-		    		})
-		    	})
+				newSafezone.game = game._id;
+				let playerId;
+				let username;
+				console.log('calling new player.save');
+				//this code is wrong, but seems to work.
+				newPlayer.save((err, player) => {
+					if (err) {
+						console.log('some error with player')
+						res.status(400).json({
+							error: 'error with saving player',
+						});
+					}
+					console.log('the player')
+					console.log(JSON.stringify(player, null, 2))
+					playerId = player._id;
+					username = player.username;
+					game.alivePlayers.push(player)
+					game.hasPlayers = true;
+					game.save(err => {
+						if (err) {
+							console.log('err saving game')
+							res.status(400).json({error: 'error saving game'})
+						} else {
+							newSafezone.save(err => {
+								if (err) {
+									console.log(err)
+									console.log('error saving safezone')
+									res.status(400).json({error: 'saving savezone'})
+								} else {
+									res.status(200).json({message: 'success', id: playerId, username: username})
+								}
+							})
+						}
+					})
+				})
 			}
-	    });
+		});
 		}
-    });
+	});
 });
 
 // Fisher-Yates Shuffle algorithm thanks to StackOverflow
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
+	var currentIndex = array.length, temporaryValue, randomIndex;
 
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
+	// While there remain elements to shuffle...
+	while (0 !== currentIndex) {
 
 	// Pick a remaining element...
 	randomIndex = Math.floor(Math.random() * currentIndex);
@@ -508,33 +490,33 @@ function shuffle(array) {
 	temporaryValue = array[currentIndex];
 	array[currentIndex] = array[randomIndex];
 	array[randomIndex] = temporaryValue;
-    }
+	}
 
-    return array;
+	return array;
 }
 
 router.post('/startGame', (req, res) => {
-    if(req.body.loginCode == null) {
+	if(req.body.loginCode == null) {
 	res.sendStatus(400);
 	return;
-    }
-    Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
+	}
+	Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
 	shuffle(game.alivePlayers);
 	for(var i = 0, len = game.alivePlayers.length; i < len - 1; i++) {
-	    Player.findOneAndUpdate({ _id: game.alivePlayers[i] },
-				    { $set: { target: game.alivePlayers[i + 1] } },
-				    (err, doc) => {
+		Player.findOneAndUpdate({ _id: game.alivePlayers[i] },
+					{ $set: { target: game.alivePlayers[i + 1] } },
+					(err, doc) => {
 					if (err) {
-					    console.log("Failed to add target to player");
+						console.log("Failed to add target to player");
 					}
-				    });
+					});
 	}
 	Player.findOneAndUpdate({ _id: game.alivePlayers[game.alivePlayers.length - 1]},
 				{ $set: { target: game.alivePlayers[0] } },
 				(err, doc) => {
-				    if (err) {
+					if (err) {
 					console.log("Failed to add target to player");
-				    }
+					}
 				});
 	game.started = true;
 	game.save((err) => {
@@ -550,69 +532,69 @@ router.post('/startGame', (req, res) => {
 			})
 		}
 	});
-    });
+	});
 });
 
 router.post('/updateLocation', (req, res) => {
-    if(req.body.username == null || req.body.x == null || req.body.y == null) {
+	if(req.body.username == null || req.body.x == null || req.body.y == null) {
 	res.sendStatus(400);
 	return;
-    }
-    Player.findOneAndUpdate({ username: req.body.username },
-			    { $set: { location: [req.body.x, req.body.y] } },
-			    (err, doc) => {
+	}
+	Player.findOneAndUpdate({ username: req.body.username },
+				{ $set: { location: [req.body.x, req.body.y] } },
+				(err, doc) => {
 				if (err)
-				    res.send(err);
+					res.send(err);
 				else
-				    res.sendStatus(200);
-			    });
+					res.sendStatus(200);
+				});
 });
 
 router.post('/getTargetLocation', (req, res) => {
-    Player.findOne({ username: req.body.username }, (err, obj) => {
+	Player.findOne({ username: req.body.username }, (err, obj) => {
 	if (err)
-	    res.send(err);
+		res.send(err);
 	else {
-	    res.status(200).json({ message: 'success',
+		res.status(200).json({ message: 'success',
 				   location: obj.location });
 	}
-    });
+	});
 });
 
 const validateGetUsername = request => {
-    const body = request.body;
-    return _.has(body, 'id');
+	const body = request.body;
+	return _.has(body, 'id');
 }
 
 router.post('/getUsername', (req, res) => {
-    if(!validateGetUsername(req)) {
+	if(!validateGetUsername(req)) {
 	res.status(400).json({
-	    error: 'Request object must contain id'
+		error: 'Request object must contain id'
 	});
 	return;
-    }
-    const body = req.body;
-    Player.findOne({ _id: body.id }, (err, player) => {
+	}
+	const body = req.body;
+	Player.findOne({ _id: body.id }, (err, player) => {
 	if (err)
-	    res.send(err);
+		res.send(err);
 	else {
-	    res.status(200).json({ message: 'success',
+		res.status(200).json({ message: 'success',
 				   username: player.username });
 	}
-    });
+	});
 });
 
 const validateGetTargets = request => {
-    const body = request.body;
-    return _.has(body, 'username');
+	const body = request.body;
+	return _.has(body, 'username');
 }
 
 router.post('/targets', (req, res) => {
-    if (!validateGetTargets(req)) {
-    	console.log('YOUR SHITTY REQUEST BODY')
-    	console.log(JSON.stringify(req.body, null, 2))
+	if (!validateGetTargets(req)) {
+		console.log('YOUR SHITTY REQUEST BODY')
+		console.log(JSON.stringify(req.body, null, 2))
 	res.status(400).json({
-	    error: 'Request object must contain username',
+		error: 'Request object must contain username',
 	});
 	return;
     }
@@ -649,9 +631,9 @@ router.post('/targets', (req, res) => {
 			    });
 			}
 		});
-	    }
+		}
 	}
-    });
+	});
 });
 
 /**
