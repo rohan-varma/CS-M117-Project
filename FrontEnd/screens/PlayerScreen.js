@@ -53,7 +53,7 @@ class PlayerScreen extends Component {
     })
     //shitty default state
     this.state = {
-      dataSource: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+      //dataSource: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
       playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
       alivePlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
       deadPlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
