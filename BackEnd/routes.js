@@ -509,8 +509,8 @@ router.get('/getTargets', (req, res) => {
 /**
  * @api {post} /createAlliance Create Alliance
  *
- * @apiParam {String} username		            The id of the invitation
- * @apiParam {String} allianceName            The email address of the invitee
+ * @apiParam {String} username                The username of the creator
+ * @apiParam {String} allianceName            The name of the alliance
  *
  * @apiExample {json} Example json input:
  *    {
@@ -567,7 +567,8 @@ router.post('/createAlliance', (req, res) => {
 /**
  * @api {post} /joinAlliance Join Alliance
  *
- * @apiParam {String} allianceId 	            The email address of the invitee
+ * @apiParam {String} username                The username of the player
+ * @apiParam {String} allianceId              The ID of the alliance to join
  *
  * @apiExample {json} Example json input:
  *    {
