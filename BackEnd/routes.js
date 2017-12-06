@@ -201,9 +201,10 @@ router.post('/killTarget', (req, res) => {
 		})
     }
 	});
+});
 
-  const validateGameExists = request => {
-    return _.has(request.body, 'loginCode');
+const validateGameExists = request => {
+  return _.has(request.body, 'loginCode');
 }
 
 router.get('/gameExists', (req, res) => {
