@@ -218,7 +218,7 @@ const validateSafezoneRequest = request => {
 }
 
 router.post('/organizerName', (req, res) => {
-    if(!_has.(req.body, 'loginCode')) {
+    if(!_.has(req.body, 'loginCode')) {
 	res.status(400).json({
 	    error: 'Must have loginCode specified'
 	});
