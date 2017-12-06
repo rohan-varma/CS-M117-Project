@@ -531,17 +531,16 @@ router.get('/getTargets', (req, res) => {
 router.post('/createAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
 
-	var findCreatorPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
-
-	var createAlliancePromise = findCreatorPromise.then(creator => {
+	Player.findOne({ username: jsonRequestBody.username }).exec().then(creator => {
 		if (!creator) {
 			throw new Error("creator not found");
 		}
 
-		var allianceFields = {};
-		allianceFields.name = jsonRequestBody.allianceName;
-		allianceFields.allies = [creator._id];
-		allianceFields.targets = [creator.target];
+		var allianceFields = {
+			name: jsonRequestBody.allianceName,
+			allies: [creator._id],
+			targets: [creator.target]
+		};
 
 		var alliance = new Alliance(allianceFields);
 		var allianceId = alliance._id;
@@ -549,11 +548,8 @@ router.post('/createAlliance', (req, res) => {
 
 		// Saves new alliance and updates the creator's alliance field
 		var promisesArray = [alliance.save(), creator.save()];
-
 		return Promise.all(promisesArray);
-	});
-
-	createAlliancePromise.then(() => {
+	}).then(() => {
 		// Success
 		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName);
 		res.status(200).json({
@@ -591,9 +587,11 @@ router.post('/createAlliance', (req, res) => {
  */
 router.post('/joinAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
+	var allianceId = jsonRequestBody.allianceId;
 
+	// Get player and alliance
 	var findPlayerPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
-	var findAlliancePromise = Alliance.findById(jsonRequestBody.allianceId).exec();
+	var findAlliancePromise = Alliance.findById(allianceId).exec();
 	var promisesArray = [findPlayerPromise, findAlliancePromise];
 
 	Promise.all(promisesArray).then(docs => {
@@ -608,10 +606,11 @@ router.post('/joinAlliance', (req, res) => {
 		}
 
 		// Target validation
-		for (let i = 0; i < alliance.targets; i++) {
-			if (player._id === alliance.targets[i])
+		alliance.targets.forEach(target => {
+			if (target._id.equals(player._id)) {
 				throw new Error("player is a target of someone within the alliance");
-		}
+			}
+		});
 
 		// Add player to alliance
 		player.alliance = allianceId;
