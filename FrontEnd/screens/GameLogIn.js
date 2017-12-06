@@ -7,7 +7,7 @@ import { Lobby} from './GameLobby';
 import MapView from 'react-native-maps';
 
 const _ = require('lodash');
-const { gameExists, createGame, addUserToGame } = require('../requestors');
+const { gameExists, createGame, addUserToGame,organizerName } = require('../requestors');
 
 class GameInput extends Component {
     constructor(props) {
@@ -25,7 +25,26 @@ class GameInput extends Component {
             },
         };
     }
-   
+    enterLobby = () => {
+        console.log("HIIIIII ENTERING LOBBY");
+        const organizerRequest = JSON.stringify({
+            loginCode: this.state.gameCode
+        });
+        organizerName(organizerRequest)
+        .then(res => {
+            console.log("HIHIHIIIIII")
+            console.log(res);
+            var orgName = res.organizerName;
+            console.log(orgName);
+            if ( orgName == this.state.username) {
+                Actions.Lobby_Master({username: this.state.username, gameCode: this.state.gameCode});
+            }
+            else {
+                Actions.Lobby({username: this.state.username, gameCode: this.state.gameCode});
+            }
+        })
+        
+    }
     enterGame = () => {
         if (this.state.username == '') {
             alert('Please enter a username');
@@ -57,13 +76,13 @@ class GameInput extends Component {
                 if (res.exists) {
                     addUserToGame(userRequestBody).then(res => {
                         // success
-                        Actions.Lobby({
-                            username: this.state.username,
-                            gameCode: this.state.gameCode});
+                        this.enterLobby();
                     }).catch(err => {
+                        console.log(err);
                         if (err.status == 400 && err.username == this.state.username) {
                             // if player with username exists in current game
-                            Actions.Lobby({username: this.state.username, gameCode: this.state.gameCode});
+                            //Actions.Lobby({username: this.state.username, gameCode: this.state.gameCode});
+                            this.enterLobby();
                         }
                         alert("Failed to join game, please try again.");
                         Actions.GameLogIn();
@@ -72,16 +91,13 @@ class GameInput extends Component {
                 else if (this.props.gameCreated) {
                     createGame(gameRequestBody).then(res => {
                         addUserToGame(userRequestBody).then(res => {
-                            Actions.Lobby({
-                                username: this.state.username,
-                                gameCode: this.state.gameCode});
+                           this.enterLobby();
                         }).catch(err => {
+                            console.log(err);
                             if (err.status == 400 &&
                                 err.username == this.state.username) {
                                 // if player with username exists in current game
-                                Actions.GameLobby({
-                                    username: this.state.username, 
-                                    gameCode: this.state.gameCode});
+                               this.enterLobby();
                             }
                             alert("Failed to join game, please try again");
                             Actions.GameLogIn({
