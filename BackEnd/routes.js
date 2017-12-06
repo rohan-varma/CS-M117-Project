@@ -702,7 +702,7 @@ router.post('/players', (req, res) => {
 	const gameId = body.gameId
 	getPlayers(gameId, (err, playerData) => {
 		if (err) {
-			res.staus(400).json({error: err});
+			res.status(400).json({error: err});
 		} else {
 			res.status(200).json(playerData);
 		}
