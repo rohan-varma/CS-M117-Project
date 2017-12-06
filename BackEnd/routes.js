@@ -244,7 +244,7 @@ const validateGameExists = request => {
   return _.has(request.body, 'loginCode');
 }
 
-router.get('/gameExists', (req, res) => {
+router.post('/gameExists', (req, res) => {
     if (!validateGameExists(req)) {
 	res.status(400).json({
 	    error: 'Must provide login code'
@@ -491,8 +491,8 @@ router.post('/updateLocation', (req, res) => {
 			    });
 });
 
-router.get('/getTargetLocation', (req, res) => {
-    Player.findOne({ username: req.query.username }, (err, obj) => {
+router.post('/getTargetLocation', (req, res) => {
+    Player.findOne({ username: req.body.username }, (err, obj) => {
 	if (err)
 	    res.send(err);
 	else {
@@ -507,7 +507,7 @@ const validateGetUsername = request => {
     return _.has(body, 'id');
 }
 
-router.get('/getUsername', (req, res) => {
+router.post('/getUsername', (req, res) => {
     if(!validateGetUsername(req)) {
 	res.status(400).json({
 	    error: 'Request object must contain id'
