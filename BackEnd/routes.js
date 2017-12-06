@@ -690,7 +690,7 @@ router.post('/createAlliance', (req, res) => {
 		var allianceFields = {
 			allies: [creator._id],
 			targets: [creator.target]
-			dictionary: [{target: creator.target, ally: target: creator._id}]
+			dictionary: [{ally: creator._id, target: creator.target}]
 		};
 
 		var alliance = new Alliance(allianceFields);
@@ -764,7 +764,7 @@ router.post('/joinAlliance', (req, res) => {
 		player.alliance = allianceId;
 		alliance.allies.push(player._id);
 		alliance.targets.push(player.target);
-		alliance.dictionary.push({target: player.target, ally: player._id});
+		alliance.dictionary.push({ally: player._id, target: player.target});
 
 		var savePlayerPromise = player.save();
 		var saveAlliancePromise = alliance.save();
