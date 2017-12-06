@@ -18,7 +18,7 @@ const getPlayers = (gameId, cb) => {
 				cb(err, {})
 			}
 			console.log(JSON.stringify(game, null, 2))
-			const organizer = game.organizerName;
+			const organizer = game.organizerName || 'organizer';
 			console.log('organizer name: ', organizer)
 		console.log('game id: ' + gameId);
 		const thisGamePlayers = _.filter(players, p => p.gameId === gameId);
