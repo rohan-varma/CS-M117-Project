@@ -42,10 +42,23 @@ export default class GamePage extends Component {
     };
   }
   startGame = () => {   
-  // check if game is started
-  startGame(this.props.gameCode);
-  Actions.PlayerScreen({username:this.props.username,gameCode:this.props.gameCode});
+      // check if game is started
+      const req = JSON.stringify({loginCode: this.props.gameCode});
+      startGame(req)
+	  .then(res => {
+	      Actions.PlayerScreen({username:this.props.username,gameCode:this.props.gameCode});
+	  });
 
+  }
+  reload = () => {
+      getAllPlayersForGame(JSON.stringify({loginCode: this.props.gameCode}))
+	  .then(res => {
+	      console.log(JSON.stringify(res, null, 2))
+	      obj = res;
+	      this.setState({
+		  currentplayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
+	      })
+	  })
   }
 
   render() {
