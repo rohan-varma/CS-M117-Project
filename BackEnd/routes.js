@@ -253,15 +253,18 @@ router.get('/gameExists', (req, res) => {
     }
     const body = req.body;
     Game.findOne({ gameCode: body.loginCode }, (err, game) => {
-	if (game)
-	    res.status(200).send({
+	if (game) {
+		res.status(200).send({
 		message: 'success',
-		exists: true
+		exists: true,
+		started: (game.started ? true : false)
 	    });
+	}
 	else
 	    res.status(200).send({
 		message: 'success',
-		exists: false
+		exists: false,
+		started: false
 	    });
     })
 });
