@@ -74,6 +74,19 @@ def testKillTargetWithSafezone(data):
 	print json.loads(res.text)["message"]
 	assert json.loads(res.text)["message"] == "target in safezone"
 
+def testCreateAlliance(data):
+	allianceName = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	data.append(allianceName)
+	res = requests.post("http://localhost:3000/BluA/createAlliance",
+		data = data)
+	return allianceName
+
+def testJoinAlliance(data):
+	# allianceName = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	# data.append(allianceName)
+	res = requests.post("http://localhost:3000/BluA/joinAlliance",
+		data = data)
+
 def testBasicCase():
 	#create game data
 	test_data = createGameData()
@@ -161,10 +174,78 @@ def testTargetInCentralSafezone():
 	#attempt to kill the target
 	testKillTargetWithSafezone(user1_data)
 
+def testTargetInAlliance():
+	#create game data
+	test_data = createGameData()
+	#create four test users
+	user1_data = createUserData(test_data[0])
+	user2_data = createUserData(test_data[0])
+	user3_data = createUserData(test_data[0])
+	user4_data = createUserData(test_data[0])
+	user5_data = createUserData(test_data[0])
+	user6_data = createUserData(test_data[0])
+	user7_data = createUserData(test_data[0])
+	user8_data = createUserData(test_data[0])
+	user9_data = createUserData(test_data[0])
+	user10_data = createUserData(test_data[0])
+	user11_data = createUserData(test_data[0])
+	user12_data = createUserData(test_data[0])
+	#create a game with the above data
+	testCreateGame(test_data[1])
+	#add users with the above data
+	testAddUser(user1_data)
+	testAddUser(user2_data)
+	testAddUser(user3_data)
+	testAddUser(user4_data)
+	testAddUser(user5_data)
+	testAddUser(user6_data)
+	testAddUser(user7_data)
+	testAddUser(user8_data)
+	testAddUser(user9_data)
+	testAddUser(user10_data)
+	testAddUser(user11_data)
+	testAddUser(user12_data)
+	#start game
+	testStartGame(test_data[1])
+	#update the player's locations to outside the individual safezone
+	#but inside the game safezone
+	user1_data['x'] = 5
+	user1_data['y'] = 5
+	user2_data['x'] = 5
+	user2_data['y'] = 5
+	user3_data['x'] = 5
+	user3_data['y'] = 5
+	user4_data['x'] = 5
+	user4_data['y'] = 5
+	user5_data['x'] = 5
+	user5_data['y'] = 5
+	user6_data['x'] = 5
+	user6_data['y'] = 5
+	user7_data['x'] = 5
+	user7_data['y'] = 5
+	user8_data['x'] = 5
+	user8_data['y'] = 5
+	testUpdateLocation(user1_data)
+	testUpdateLocation(user2_data)
+	testUpdateLocation(user3_data)
+	testUpdateLocation(user4_data)
+	testUpdateLocation(user5_data)
+	testUpdateLocation(user6_data)
+	testUpdateLocation(user7_data)
+	testUpdateLocation(user8_data)
+	#add 1-4 to an alliance
+	testCreateAlliance(user1_data)
+	testJoinAlliance(user2_data)
+	testJoinAlliance(user3_data)
+	testJoinAlliance(user4_data)
+	#attempt to kill the target
+	testKillTarget(user1_data)
+
 def main():
 	testBasicCase()
 	testTargetInIndividualSafezone()
 	testTargetInCentralSafezone()
+	testTargetInAlliance()
 	
 if __name__ == "__main__":
 	main()

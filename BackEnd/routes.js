@@ -237,6 +237,20 @@ router.post('/killTarget', (req, res) => {
 	}
 	console.log('request validated')
     killTargetAttempt(req, res);
+    Player.findOne({ username: req.body.username }, (err, player) => {
+	if (!player) 
+		    res.status(400).json({
+				error: 'Player does not exist',
+			});
+	Alliance.findOne({_id: player.alliance}, (err, alliance) => {
+		if(alliance) {
+			alliance.allies.forEach(function(element) {
+				req.body.username = alliance.allies.username;
+				killTargetAttempt(req, res);
+			});
+		}
+	});
+	});
 });
 
 const validateGameExists = request => {
