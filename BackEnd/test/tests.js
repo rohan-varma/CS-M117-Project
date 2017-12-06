@@ -152,7 +152,7 @@ describe('get players', () => {
 })
 
 describe('creates a game, adds users, and starts it, and displays an internal game state', () => {
-	it('works', cb => {
+	it.only('works', cb => {
 			const startRequest = () => {
 		return chai.request(server).post('/BluA/addUser')
 	}

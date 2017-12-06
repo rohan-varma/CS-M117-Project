@@ -7,6 +7,7 @@ import Safezone from './models/safezone';
 import Alliance from './models/alliance';
 const _  = require('lodash')
 const router = express.Router();
+const { getPlayers } = require('./controllers.js')
 
 var mongoDB = config.client.mongodb.defaultUri + '/' + config.client.mongodb.defaultDatabase;
 mongoose.connect(mongoDB, {
@@ -462,13 +463,12 @@ router.post('/startGame', (req, res) => {
 		if (err) {
 			res.status(500).json({error: 'could not save game to start it'})
 		} else {
-			res.status(200).json({
-				//send back a bunch of info
-				alivePlayers: game.alivePlayers,
-				playerIds: _.map(game.alivePlayers, p => p._id),
-				playerUsernames: _.map(game.alivePlayers, p => p.username),
-				gameId: game._id,
-				hasPlayers: game.hasPlayers,
+			getPlayers(game._id, (err, players) => {
+				if (err) {
+					res.status(400).json({error: err});
+				} else {
+					res.status(200).json(players);
+				}
 			})
 		}
 	});
@@ -696,36 +696,6 @@ router.post('/joinAlliance', (req, res) => {
 	});
 });
 
-const getPlayers = (gameId, cb) => {
-	Player.find({}, (err, players) => {
-		if (err) {
-			cb(err, {})
-		}
-		//get the game for the organizer? 
-		Game.find({_id: gameId}, (err, game) => {
-			if (err) {
-				cb(err, {})
-			}
-			console.log(JSON.stringify(game, null, 2))
-			const organizer = game.organizerName;
-			console.log('organizer name: ', organizer)
-			console.log('number of players: ', players.length);
-		console.log('game id: ' + gameId);
-		const thisGamePlayers = _.filter(players, p => p.gameId === gameId);
-		const alivePlayers = _.filter(thisGamePlayers, p => p.alive);
-		const deadPlayers = _.filter(thisGamePlayers, p => p.dead);
-		console.log(JSON.stringify(thisGamePlayers, null, 2))
-		const playerData = {
-			message: 'success',
-			players: thisGamePlayers,
-			alivePlayers,
-			deadPlayers,
-			organizer,
-		}
-		cb(null, playerData)
-		})
-	});
-}
 router.post('/players', (req, res) => {
 	const body = req.body
 	const gameId = body.gameId
