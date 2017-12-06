@@ -697,6 +697,54 @@ router.post('/joinAlliance', (req, res) => {
 	});
 });
 
+/**
+ * @api {post} /getAlliance Get a Player's Alliance Info
+ *
+ * @apiParam {String} username                The username of the player
+ *
+ * @apiExample {json} Example json input:
+ *    {
+ *      "username": "joebruin"
+ *    }
+ *
+ * @apiUse Response200
+ * @apiSuccessExample {json} Success example
+ *    {
+ *      "allianceId": "41224d776a326fb40f000001",
+ *      "allies": [ ... ],
+ *      "targets": [ ... ]
+ *    }
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
+router.post('/getAlliance', (req, res) => {
+	let jsonRequestBody = req.body;
+
+	Player.findOne({ username: jsonRequestBody.username }).then(player => {
+		if (!player) {
+			throw new Error("player not found");
+		}
+		let allianceId = player.alliance;
+		return Alliance.findById(allianceId);
+	}).then(alliance => {
+		if (!alliance) {
+			throw new Error("player's alliance not found");
+		}
+
+		res.status(200).json({
+			"allianceId": alliance._id,
+			"allies": alliance.allies,
+			"targets": alliance.targets,
+		});
+	}).catch(err => {
+		res.status(400).json({
+			error: "Failed to get alliance - Error: " + err.message,
+		});
+	});
+});
+
 router.post('/players', (req, res) => {
 	const body = req.body
 	const gameId = body.gameId
