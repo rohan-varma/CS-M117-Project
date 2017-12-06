@@ -834,6 +834,7 @@ router.post('/getAlliance', (req, res) => {
 });
 
 router.post('/players', (req, res) => {
+	console.log ('hihihih');
 	const body = req.body
 	const gameCode = body.loginCode
 	getPlayers(gameCode, (err, playerData) => {

@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-
-
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput}   from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import GameTextInput  from '../components/GameTextInput';
@@ -59,13 +57,13 @@ class GameInput extends Component {
                 if (res.exists) {
                     addUserToGame(userRequestBody).then(res => {
                         // success
-                        Actions.GameLobby({
+                        Actions.Lobby({
                             username: this.state.username,
                             gameCode: this.state.gameCode});
                     }).catch(err => {
                         if (err.status == 400 && err.username == this.state.username) {
                             // if player with username exists in current game
-                            Actions.GameLobby({username: this.state.username, gameCode: this.state.gameCode});
+                            Actions.Lobby({username: this.state.username, gameCode: this.state.gameCode});
                         }
                         alert("Failed to join game, please try again.");
                         Actions.GameLogIn();
@@ -121,7 +119,7 @@ class GameInput extends Component {
     
         return (
             <View style={styles.formContainer} >
-                <Text style={styles.text}>Enter Username and unique Game ID</Text>
+                <Text style={styles.text}>Enter username and a game ID</Text>
                 <TextInput
                     style={styles.textInput}
                     placeholder="Username"
@@ -132,10 +130,10 @@ class GameInput extends Component {
                     placeholder="Game Code"
                     onChangeText={ (gameCode) => this.setState({gameCode}) }
                 />
-
-                <Text style={styles.text}>Select your safe zone</Text>
-                <MapView
-                    style={{ alignSelf: 'stretch', height: 300 }}
+                <View style={{flexDirection: 'column', flex:1}}>
+                  <Text style={styles.text}>Select your safe zone</Text>
+                  <MapView
+                    style={{ alignSelf: 'stretch', flex:1 }}
                     region={this.state.mapRegion}
                     onRegionChange={this._handleMapRegionChange}>
 
@@ -145,15 +143,17 @@ class GameInput extends Component {
                         fillColor="rgba(255, 0, 0, 0.3)"
                         strokeColor="rgba(255, 0, 0, 0.3)" />
 
-                </MapView>
-
-                <Button
+                  </MapView>
+                </View>
+                <View style={{marginTop:20,flexDirection: 'column', flex:0.2}}>
+                  <Button
                     backgroundColor='rgba(201, 29, 77, 0.6)'
                     title="Enter Game"
                     onPress={this.enterGame}
                     fontWeight='bold'
                     borderRadius={10}
-                />
+                  />
+                </View>
             </View>
         );
     }
@@ -164,7 +164,6 @@ const styles = StyleSheet.create({
       alignSelf:'stretch',
       paddingLeft:20,
       paddingRight:20,
-      paddingTop: 50,
       flexDirection: 'column',
       flex: 1,
     },
@@ -172,12 +171,15 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 20,
         fontWeight: 'bold',
+        paddingTop:20,
+        paddingBottom:20,
     },
     textInput: {
       alignSelf: 'stretch',
       padding: 20,
       backgroundColor:'rgba(255,255,255,0.85)',
-      marginBottom:15,
+      marginBottom:7,
+      marginTop:7,
     },
     button: {
       alignSelf: 'center',
