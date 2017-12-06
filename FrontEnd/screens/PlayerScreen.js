@@ -30,6 +30,10 @@ class PlayerScreen extends Component {
         //handle res
         console.log('result for get player targets')
         console.log(res);
+        const playerTargets = res.targets;
+        this.setState({
+          playerTargets: ds.cloneWithRows(playerTargets.map(t => ({name: t.username}))),
+        })
       })
       .catch(err => {
         //handle err
