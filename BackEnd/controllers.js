@@ -21,26 +21,22 @@ const getPlayers = (gameCode, cb) => {
 		    const organizer = game.organizerName || 'organizer';
 		    console.log('organizer name: ', organizer)
 		    const pIdToUsername = playerId => {
-			Player.findOne({ _id: playerId }, (err, p) => {
-			    return p.username;
-			});
+			return Player.findById(playerId);
 		    }
-		    console.log('the game')
-		    console.log(JSON.stringify(game, null, 2))
-		    console.log('game.alivePlayers')
-		    console.log(JSON.stringify(game.alivePlayers, null, 2))
 		    const alivePlayers = _.map(game.alivePlayers, pIdToUsername);
 		    const deadPlayers = _.map(game.deadPlayers, pIdToUsername);
-		    const playerData = {
-			message: 'success',
-			players: alivePlayers.concat(deadPlayers),
-			alivePlayers,
-			deadPlayers,
-			organizer,
-		    }
-		    console.log('we returning this shit')
-		    console.log(JSON.stringify(playerData, null, 2))
-		    cb(null, playerData)
+		    Promise.all(alivePlayers).then(aPlayers => {
+			Promise.all(deadPlayers).then(dPlayers => {
+			    const playerData = {
+				message: 'success',
+				players: aPlayers.concat(dPlayers),
+				alivePlayers: aPlayers,
+				deadPlayers: dPlayers,
+				organizer
+			    }
+			    cb(null, playerData)
+			});
+		    })
 		})
 	});
 }
