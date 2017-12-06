@@ -1,7 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
 var allianceSchema = new Schema({
-	name: String,
 	allies: [{ type: Schema.Types.ObjectId, ref: 'player' }],
 	targets: [{ type: Schema.Types.ObjectId, ref: 'player' }],
 });
