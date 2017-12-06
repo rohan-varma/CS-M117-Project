@@ -57,13 +57,13 @@ class GameInput extends Component {
                 if (res.exists) {
                     addUserToGame(userRequestBody).then(res => {
                         // success
-                        Actions.GameLobby({
+                        Actions.Lobby({
                             username: this.state.username,
                             gameCode: this.state.gameCode});
                     }).catch(err => {
                         if (err.status == 400 && err.username == this.state.username) {
                             // if player with username exists in current game
-                            Actions.GameLobby({username: this.state.username, gameCode: this.state.gameCode});
+                            Actions.Lobby({username: this.state.username, gameCode: this.state.gameCode});
                         }
                         alert("Failed to join game, please try again.");
                         Actions.GameLogIn();

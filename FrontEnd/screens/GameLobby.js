@@ -2,23 +2,32 @@ import React, { Component } from 'react';
 import { StyleSheet, View, AppRegistry,ListView} from 'react-native';
 import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
 import MapView from 'react-native-maps';
-const { createGame, addUserToGame, getAllPlayersForGame } = require('../requestors');
+import { Actions } from 'react-native-router-flux';
+const { createGame, addUserToGame, getAllPlayersForGame,gameExists } = require('../requestors');
 const _ = require('lodash');
- var items = ['Simon Mignolet','Nathaniel Clyne','Dejan Lovren','Mama Sakho','Emre Can']
+ //var items = ['Simon Mignolet','Nathaniel Clyne','Dejan Lovren','Mama Sakho','Emre Can']
+const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 export default class GamePage extends Component {
+
   constructor(props){
     super(props)
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    // const requestObj = JSON.stringify({gameId: '11111', playerId: this.props.playerId})
-    // getAllPlayersForGame(requestObj)
-    // .then(res => {
-    //   console.log(JSON.stringify(_.keys(res), null, 2))
-    //   obj = res;
-    //   this.setState({
-    //     currentplayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
-        
-    //   })
-    // })
+    
+    const requestObj = JSON.stringify({loginCode:this.props.gameCode})
+    getAllPlayersForGame(requestObj)
+    .then(res => {
+      console.log(JSON.stringify(res, null, 2))
+      obj = res;
+      this.setState({
+        currentplayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
+      })
+    })
+    const req = JSON.stringify({loginCode:this.props.gameCode})
+    gameExists(req)
+    .then(res => {
+      this.setState({
+        ifGameStarted: res.started,
+      })
+    })
     this.state={
       safezoneRadius: 40,
             // default to Boelter Hall, UCLA
@@ -28,9 +37,31 @@ export default class GamePage extends Component {
                 latitudeDelta: 0.002,
                 longitudeDelta: 0.002,
             },
-      currentplayers: ds.cloneWithRows(items),
+      currentplayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+      ifGameStarted: false,
     };
   }
+  reload = () => {   
+  // check if game is started
+  gameExists(JSON.stringify({loginCode:this.props.gameCode}))
+    .then(res => {
+      this.setState({
+        ifGameStarted: res.started,
+      })
+    })
+  if (this.state.ifGameStarted) {Actions.PlayerScreen({username:this.props.username,gameCode:this.props.gameCode});}
+   getAllPlayersForGame(JSON.stringify({loginCode: this.props.gameCode}))
+    .then(res => {
+      console.log(JSON.stringify(res, null, 2))
+      obj = res;
+      this.setState({
+        currentplayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
+        
+      })
+    })
+
+  }
+
   render() {
     
    
@@ -43,20 +74,8 @@ export default class GamePage extends Component {
         </Header>
 
         <View>
-          <Text style={styles.text}>Game Status: Waiting for gameOrganizer to start the game </Text>
-        </View>
-
-        <View style={{flex:1}}>
-          <ListItem itemDivider>
-              <Text>Current Players:</Text>
-          </ListItem> 
-           <ListView
-              dataSource={this.state.currentplayers}
-              renderRow={currentplayers => {
-         
-              return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{currentplayers}</Text></View>
-            }}
-          /> 
+          <Text style={styles.text}>Game Status: </Text>
+          <Text style={{color:'red',alignSelf:'center'}}> Waiting for gameOrganizer to start the game </Text>
         </View>
         <View style={{flexDirection: 'column', flex:1}}>
          <Text style={styles.text}>This is your safe zone and the shared safe zone</Text>
@@ -73,10 +92,23 @@ export default class GamePage extends Component {
 
                 </MapView>
         </View>
+        <View style={{flex:1}}>
+          <ListItem itemDivider>
+              <Text>Current Players:</Text>
+          </ListItem> 
+           <ListView
+              dataSource={this.state.currentplayers}
+              renderRow={currentplayers => {
+              return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{currentplayers.name}</Text></View>
+            }}
+          /> 
+        </View>
+        
         <Footer>
           <FooterTab>
-            <Button>
-              <Text>Refresh</Text>
+            <Button info
+              onPress={this.reload}>
+              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Refresh</Text>
             </Button>
           </FooterTab>
         </Footer>
@@ -89,7 +121,7 @@ export default class GamePage extends Component {
 const styles = StyleSheet.create({
   text:{
     padding: 10,
-
+    alignSelf:'center'
 
   },
   playerWrapper: {

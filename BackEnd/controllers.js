@@ -8,13 +8,14 @@ import Alliance from './models/alliance';
 const _  = require('lodash')
 
 const getPlayers = (gameCode, cb) => {
+	console.log ('testing');
 	Player.find({}, (err, players) => {
 		if (err) {
 			cb(err, {})
 		}
 		//get the game for the organizer? 
 		Game.findOne({gameCode: gameCode}, (err, game) => {
-		    if (err) {
+		    if (err || !game ) {
 			cb(err, {})
 		    }
 		    console.log(JSON.stringify(game, null, 2))
