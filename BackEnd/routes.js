@@ -334,13 +334,13 @@ router.get('/getTargets', (req, res) => {
  * @apiExample {json} Example json input:
  *    {
  *      "username": "joebruin",
- *      "allianceName": "UCLA Alliance",
+ *      "allianceName": "UCLA Alliance"
  *    }
  *
  * @apiUse Response200
  * @apiSuccessExample {json} Success example
  *    {
- *      "allianceID": allianceID,
+ *      "allianceId": allianceId,
  *    }
  *
  * @apiUse Error400
@@ -376,7 +376,7 @@ router.post('/createAlliance', (req, res) => {
 		// Success
 		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName)
 		res.status(200).json({
-			"allianceID": allianceID,
+			"allianceId": allianceId,
 		});
 	}).catch((err) => {
 		// Failed to create alliance
@@ -386,6 +386,32 @@ router.post('/createAlliance', (req, res) => {
 		});
 	});
 });
+
+/**
+ * @api {post} /joinAlliance Join Alliance
+ *
+ * @apiParam {String} allianceId 	            The email address of the invitee
+ *
+ * @apiExample {json} Example json input:
+ *    {
+ *      "allianceId": allianceId,
+ *    }
+ *
+ * @apiUse Response200
+ * @apiSuccessExample {json} Success example
+ *    {
+ *      "allianceName": allianceName,
+ *    }
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
+router.post('/joinAlliance', (req, res) => {
+	var jsonRequestBody = req.body;
+
+	var findAlliancePromise = Alliance.findOne()
+})
 
 router.get('/players', (req, res) => {
 	const body = req.body
