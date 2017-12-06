@@ -27,7 +27,6 @@ const getPlayers = (gameCode, cb) => {
 		    }
 		    const alivePlayers = _.map(game.alivePlayers, pIdToUsername);
 		    const deadPlayers = _.map(game.deadPlayers, pIdToUsername);
-		    console.log(JSON.stringify(thisGamePlayers, null, 2))
 		    const playerData = {
 			message: 'success',
 			players: alivePlayers.concat(deadPlayers),
