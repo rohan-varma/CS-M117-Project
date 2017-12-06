@@ -785,7 +785,8 @@ router.post('/targets', (req, res) => {
 router.post('/createAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
 	var allianceId = null;
-
+	console.log('create alliance request body')
+	console.log(JSON.stringify(jsonRequestBody, null, 2))
 	Player.findOne({ username: jsonRequestBody.username }).then(creator => {
 		if (!creator) {
 			throw new Error("creator not found");
@@ -837,9 +838,10 @@ router.post('/createAlliance', (req, res) => {
  *
  */
 router.post('/joinAlliance', (req, res) => {
+	console.log('IN JOIN ALLIANCE')
 	var jsonRequestBody = req.body;
 	var allianceId = jsonRequestBody.allianceId;
-
+	console.log(JSON.stringify(jsonRequestBody, null, 2))
 	// Get player and alliance
 	var findPlayerPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
 	var findAlliancePromise = Alliance.findById(allianceId).exec();
@@ -911,7 +913,8 @@ router.post('/joinAlliance', (req, res) => {
  */
 router.post('/getAlliance', (req, res) => {
 	let jsonRequestBody = req.body;
-
+	console.log('get alliance request body')
+	console.log(JSON.stringify(jsonRequestBody, null, 2))
 	Player.findOne({ username: jsonRequestBody.username }).then(player => {
 		if (!player) {
 			throw new Error("player not found");
@@ -922,13 +925,24 @@ router.post('/getAlliance', (req, res) => {
 		if (!alliance) {
 			throw new Error("player's alliance not found");
 		}
+		const pIdToUsername = playerId => Player.findById(playerId)
+		Promise.all(_.map(alliance.allies, pIdToUsername)).then(result => {
+			Promise.all(_.map(alliance.targets, pIdToUsername)).then(targs => {
+				res.status(200).json({
+				message:'success',
+				allies: result,
+				targets: targs,
+				dictionary: alliance.dictionary,
+			})
 
-		res.status(200).json({
-			"allianceId": alliance._id,
-			"allies": alliance.allies,
-			"targets": alliance.targets,
-			"dictionary": alliance.dictionary,
-		});
+			})
+			});
+		// res.status(200).json({
+		// 	"allianceId": alliance._id,
+		// 	"allies": alliance.allies,
+		// 	"targets": alliance.targets,
+		// 	"dictionary": alliance.dictionary,
+		// });
 	}).catch(err => {
 		res.status(400).json({
 			error: "Failed to get alliance - Error: " + err.message,
