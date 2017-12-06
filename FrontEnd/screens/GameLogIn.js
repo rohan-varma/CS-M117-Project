@@ -57,9 +57,11 @@ class GameInput extends Component {
         gameExists(gameRequestBody).then(res => {
             if (_.has(res, 'exists')) {
                 if (res.exists) {
-
                     addUserToGame(userRequestBody).then(res => {
                         // success
+                        Actions.GameLobby({
+                            username: this.state.username,
+                            gameCode: this.state.gameCode});
                     }).catch(err => {
                         if (err.status == 400 && err.username == this.state.username) {
                             // if player with username exists in current game
@@ -69,9 +71,7 @@ class GameInput extends Component {
                         Actions.GameLogIn();
                     });
                 }
-            }
-            else {
-                if (this.props.gameCreated) {
+                else if (this.props.gameCreated) {
                     createGame(gameRequestBody).then(res => {
                         addUserToGame(userRequestBody).then(res => {
                             Actions.Lobby({
@@ -107,9 +107,9 @@ class GameInput extends Component {
                 }
                 else {
                     alert("Please create a game first");
-                    Actions.GameLogIn();
+                    Actions.GameCreate();
                 }
-            };
+            }
         });
     }
 
@@ -117,7 +117,6 @@ class GameInput extends Component {
         this.setState({ mapRegion });
     };
 
-    goToLobby = () => Actions.Lobby({username: this.state.username, gameCode:this.state.gameCode}); 
     render() {
     
         return (
@@ -151,7 +150,7 @@ class GameInput extends Component {
                 <Button
                     backgroundColor='rgba(201, 29, 77, 0.6)'
                     title="Enter Game"
-                    onPress={this.goToLobby}
+                    onPress={this.enterGame}
                     fontWeight='bold'
                     borderRadius={10}
                 />
