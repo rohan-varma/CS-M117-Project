@@ -12,7 +12,7 @@ var playerSchema = new Schema({
     mySafeZone: { type: Schema.Types.ObjectId, ref: 'safezone' },
     mySafeZoneId: String,
     target: { type: Schema.Types.ObjectId, ref: 'player' },
-    alliance: { type: Schema.Types.ObjectId, ref: 'alliance' },
+    alliance: { type: Schema.Types.ObjectId, ref: 'alliance', default: "" },
     location: {
 	type: [Number],
 	index: '2dsphere'
