@@ -12,82 +12,22 @@ export default class InAlliance extends Component {
 
 	constructor(props) {
 		super(props)
-    console.log('this.props InAlliance')
-    console.log(this.props.username)
-    console.log(this.props.gameCode)
-    console.log(this.props.allianceObject.allies)
-    console.log(this.props.allianceObject.targets)
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    console.log(`username: ${this.props.username}`)
+    console.log(`gameCode: ${this.props.gameCode}`)
+    console.log('allies')
+    console.log(JSON.stringify(this.props.allianceObject.allies.length, null, 2))
+    console.log(JSON.stringify(this.props.allianceObject.targets.length, null, 2))
+    this.state = {
+        allies: ds.cloneWithRows(this.props.allianceObject.allies.map(p => ({name: p.username}))),
+        targets: ds.cloneWithRows(this.props.allianceObject.targets.map(p => ({name: p.username}))),
+      };
+    console.log('the state')
+    console.log(JSON.stringify(this.state, null, 2))
 	}
-
-	// reload = () => {
-	// 	//check if alliance exists for this player
-	// 	//if so go to the other alliance screen
-	// 	//somet more bullshit
-	// 	const gameCode = this.props.gameCode || '17WCBXGKMVBA5WLP16VK29PJUVDPSX3K4PU8L4GIGI0L0O';
- //    	const username = this.props.username || 'UA8FSACQKCV37RGDWE6R';
- //    	const requestObj = {loginCode: gameCode, username: username}
-	// 	console.log('checking if the player has an alliance')
-	// 	getAlliance(JSON.stringify(requestObj, null, 2))
-	// 	.then(res => {
-	// 		console.log('get alliance res')
-	// 		console.log(JSON.stringify(res, null, 2))
-	// 		if (res.allies.length > 0) {
-	// 			//this user has an alliance, so take the user to the page where they view alliances
-	// 			alert('you have an alliance!')
-	// 		}
-	// 	})
-	// 	.catch(err => {
-	// 		console.log('get alliance err')
-	// 		console.log(JSON.stringify(err, null, 2))
-	// 	})
-	// }
-
-	
-	create = () => {
-		console.log('create alliance called')
-		const gameCode = this.props.gameCode || '17WCBXGKMVBA5WLP16VK29PJUVDPSX3K4PU8L4GIGI0L0O';
-    	const username = this.props.username || 'UA8FSACQKCV37RGDWE6R';
-    	const requestObj = {loginCode: gameCode, username: username}
-    	createAlliance(JSON.stringify(requestObj, null, 2))
-    	.then(res => {
-    		console.log('create alliance res')
-    		console.log(res);
-    		this.state.allianceIds.push(res.allianceId);
-    		console.log(this.state.allianceIds)
-    		this.setState({hasJoinedAlliance: true});
-    		alert(`An alliance with id ${res.allianceId} has been created!`)
-    	})
-    	.catch(err => {
-    		console.log('err creating alliance')
-    		console.log(err)
-    		alert('Error: we were unable to create an alliance. Please try again.')
-    	})
-
-		//call out to the backend here
-	}
-
-	join = () => {
-		console.log('join alliance called')
-
-		if(this.state.allianceIds.length === 0) {
-			alert('No alliances exit right now, please create one')
-		} else {
-			//just pick an alliance for now
-			toJoin = this.state.allianceIds[0];
-			joinAlliance(JSON.stringify({allianceId: toJoin}, null, 2))
-			.then(res => {
-				console.log('join alliance res')
-				console.log(JSON.stringify(res, null, 2))
-				this.setState({hasJoinedAlliance: true})
-			})
-			.catch(err => {
-				console.log('join alliance err')
-				console.log(JSON.stringify(err,null, 2))
-			})
-		}
- 	}
-
   render() {
+    console.log('allies in render')
+    console.log(JSON.stringify(this.state.allies))
     return (
       <View style={styles.formContainer}>
 
@@ -95,7 +35,20 @@ export default class InAlliance extends Component {
           <Text style= {{fontWeight: 'bold'}}> Alliance Page </Text>
           <Text style= {{fontWeight: 'bold'}}> My Username:{'rohan'} </Text>
         </Header>
-      <Text> Members of your Alliance</Text>
+      <Text> Members of your Alliance: </Text>
+      <ListView
+        dataSource={this.state.allies}
+        renderRow={player => {
+          return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
+        }}
+      />
+      <Text> Targets of your Alliance: </Text>
+      <ListView
+        dataSource={this.state.targets}
+        renderRow={player => {
+          return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
+        }}
+      />
       </View>
     );
   }
