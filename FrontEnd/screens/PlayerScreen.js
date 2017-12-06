@@ -30,7 +30,7 @@ class PlayerScreen extends Component {
         //handle res
         console.log('result for get player targets')
         console.log(res);
-        const playerTargets = res.targets;
+        const playerTargets = res.targets || [];
         this.setState({
           playerTargets: ds.cloneWithRows(playerTargets.map(t => ({name: t.username}))),
         })
@@ -51,7 +51,8 @@ class PlayerScreen extends Component {
     .catch(err => {
       console.log('err is ', err)
     })
-    //shitty default state
+    //hack
+
   }
 
   render() {
@@ -59,9 +60,17 @@ class PlayerScreen extends Component {
       <View style={styles.formContainer}>
       <Text> Players in Game </Text>
       <ListView
-        dataSource={this.state.alivePlayers}
+        dataSource={this.state.alivePlayers.length !== 0 ? this.state.alivePlayers : [{name: 'No Players'}]}
         renderRow={player => {
           console.log(player)
+          return <Text>{player.name}</Text>
+        }}
+      />
+      <Text style={{paddingTop: 30}}> The Noble Players Who Were Killed In Battle </Text>
+      <ListView
+        dataSource={this.state.deadPlayers.length !== 0 ? this.state.deadPlayers : [{name: 'No Players'}]}
+        renderRow={player => {
+          console.log(this.state.deadPlayers)
           return <Text>{player.name}</Text>
         }}
       />
