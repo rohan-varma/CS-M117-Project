@@ -539,7 +539,7 @@ router.post('/targets', (req, res) => {
 	return;
     }
     const body = req.body;
-    const search = req.body.username ? {username: req.body.username } : {_id: req.body.playerId };
+    const search = {_id: req.body.playerId };
     Player.findOne(search, (err, player) => {
 	if (err) {
 		res.status(400).json({message: 'error when trying to find player'});
