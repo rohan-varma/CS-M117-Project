@@ -71,7 +71,7 @@ describe('addUser', () => {
 		});
 	});
 
-	it.only('adds  user', cb => {
+	it('adds  user', cb => {
 		// first create a game
 		const code = Math.random().toString(36).substring(15);
 		console.log('HERE')
@@ -108,7 +108,7 @@ describe('get players', () => {
 	const startRequest = () => {
 		return chai.request(server).post('/BluA/addUser')
 	}
-	it('can get players', cb => {
+	it.only('can get players', cb => {
 		let gameId;
 		//first create game and add players
 		const code = Math.random().toString(36).substring(15);
@@ -142,10 +142,71 @@ describe('get players', () => {
 				const body = res.body;
 				console.log(JSON.stringify(body, null, 2))
 				const players = body.players;
+				console.log(JSON.stringify(players,  null, 2))
 				expect(players).to.have.length(1);
 				cb()
 			})
 		})
 		})
+	})
+})
+
+describe('creates a game, adds users, and starts it, and displays an internal game state', () => {
+	it('works', cb => {
+			const startRequest = () => {
+		return chai.request(server).post('/BluA/addUser')
+	}
+		// first create a game
+		const code = Math.random().toString(36).substring(15);
+		console.log('HERE')
+		chai.request(server)
+		.post('/BluA/createGame')
+		.send({
+			loginCode: code,
+			orgName: 'something',
+			xCoord: 2,
+			yCoord: 2,
+		})
+		.end((err, res) => {
+			startRequest()
+		.send({
+			username: Math.random().toString(36).substring(15),
+			loginCode: code,
+			mac: '100',
+			x: 2,
+			y: 2,
+		})
+		.end((err, res) => {
+			expect(err).to.eql(null)
+			const body = res.body
+			console.log(JSON.stringify(body, null, 2))
+			//add another player
+			startRequest().send({
+				username: Math.random().toString(36).substring(15),
+				loginCode: code,
+				mac: '100',
+				x: 2,
+				y: 2,
+			})
+			.end((err, res) => {
+				const body = res.body;
+				console.log('ABOUT TO CALL START GAME')
+				chai.request(server).post('/BluA/startGame')
+				.send({
+					loginCode: code,
+					orgName: 'something',
+				})
+				.end((err, res) => {
+					console.log('did a create game thing i think')
+					console.log(err);
+					const body = res.body;
+					console.log('body')
+					console.log(JSON.stringify(body, null, 2))
+					cb();
+				})
+			})
+		})
+		})
+		console.log('HERE')
 	})
 })

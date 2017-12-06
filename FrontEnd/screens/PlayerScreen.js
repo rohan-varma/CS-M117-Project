@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button, Imag
 import { Actions } from 'react-native-router-flux';
 import GameTextInput  from '../GameTextInput';
 //import Form  from '../src/form';
-const { createGame, addUserToGame, getAllPlayersForGame } = require('../requestors');
+const { createGame, addUserToGame, getAllPlayersForGame, getTargetsForPlayer } = require('../requestors');
 const _ = require('lodash');
 
 
@@ -17,15 +17,35 @@ class PlayerScreen extends Component {
     let obj;
     //fetch the players
     console.log('USING GAME ID ', this.props.gameId)
-    const requestObj = JSON.stringify({gameId: this.props.gameId, playerId: this.props.playerId})
-    getAllPlayersForGame(requestObj)
+    const requestObj = {gameId: this.props.gameId, playerId: this.props.playerId}
+    getAllPlayersForGame(JSON.stringify(requestObj))
     .then(res => {
+      //get targets for this player //this.props.playerId
+      console.log('the shitty request object')
+      const targetReqObj = {
+        gameId: this.props.gameId || '5a27ac3355c516ffe4f47bad', //default game
+        playerId: this.props.playerId || '5a27ac3355c516ffe4f47baf', //default player in that game
+        username: this.props.username,
+      }
+      console.log(JSON.stringify(targetReqObj, null, 2))
+      getTargetsForPlayer(JSON.stringify(targetReqObj))
+      .then(res => {
+        //handle res
+        console.log('result for get player targets')
+        console.log(res);
+      })
+      .catch(err => {
+        //handle err
+        console.log('had error get player targets')
+        console.log(err)
+      })
+      //continue here? 
       console.log('hello world!')
       console.log(JSON.stringify(_.keys(res), null, 2))
       obj = res;
       this.setState({
-        dataSource: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
-        playerTargets: ds.cloneWithRows(res.deadPlayers.map(p => ({name: p.username}))),
+        alivePlayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
+        deadPlayers: ds.cloneWithRows(res.deadPlayers.map(p => ({name: p.username}))),
       })
     })
     .catch(err => {
@@ -35,6 +55,8 @@ class PlayerScreen extends Component {
     this.state = {
       dataSource: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
       playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
+      alivePlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+      deadPlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
     };
   }
 
@@ -43,7 +65,7 @@ class PlayerScreen extends Component {
       <View style={styles.formContainer}>
       <Text> Players in Game </Text>
       <ListView
-        dataSource={this.state.dataSource}
+        dataSource={this.state.alivePlayers}
         renderRow={player => {
           console.log(player)
           return <Text>{player.name}</Text>
