@@ -14,7 +14,7 @@ const getPlayers = (gameCode, cb) => {
 		}
 		//get the game for the organizer? 
 		Game.findOne({gameCode: gameCode}, (err, game) => {
-		    if (err) {
+		    if (err || !game) {
 			cb(err, {})
 		    }
 		    console.log(JSON.stringify(game, null, 2))
