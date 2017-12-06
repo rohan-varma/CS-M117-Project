@@ -42,6 +42,7 @@ function checkTargetInSafezone(player, target, callback) {
 			console.log("couldn't find safezone")
 			return false;
 		}
+		console.log('WE FOUND A SAFEZONE HELL YEA')
 		var point = { type : "Point", coordinates : safezone.location };
 		console.log(point);
 		var isInSafezone = false;
@@ -290,7 +291,9 @@ router.post('/addUser', (req, res) => {
 	    			})
 	    		}
 			else {
-				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
+				req.body.xCoord = req.body.xCoord || 2;
+				req.body.yCoord = req.body.yCoord || 2;
+				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
 				radius: req.body.radius});
 		    	var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
@@ -305,30 +308,33 @@ router.post('/addUser', (req, res) => {
 		    	console.log('calling new player.save');
 		    	//this code is wrong, but seems to work.
 		    	newPlayer.save((err, player) => {
-		    		playerId = player._id;
 		    		if (err) {
-		    			res.status(500).json({
-		    				error: 'error with player',
+		    			console.log('some error with player')
+		    			res.status(400).json({
+		    				error: 'error with saving player',
 		    			});
 		    		}
-		    		console.log('had no error')
-		    	}).then(player => {
-		    		console.log(player)
-		    		console.log('in this thingy')
-		    		game.alivePlayers.push(player._id);
+		    		console.log('the player')
+		    		console.log(JSON.stringify(player, null, 2))
+		    		playerId = player._id;
+		    		game.alivePlayers.push(player)
 		    		game.save(err => {
 		    			if (err) {
-		    				res.status(500).json({
-		    					error: 'error saving game',
-		    				});
+		    				console.log('err saving game')
+		    				res.status(400).json({error: 'error saving game'})
+		    			} else {
+		    				newSafezone.save(err => {
+		    					if (err) {
+		    						console.log(err)
+		    						console.log('error saving safezone')
+		    						res.status(400).json({error: 'saving savezone'})
+		    					} else {
+		    						res.status(200).json({message: 'success', id: playerId})
+		    					}
+		    				})
 		    			}
-		    			else {
-		    				res.status(200).json({
-		    					id: player._id,
-		    				});
-		    			}
-		    		});
-		    	});
+		    		})
+		    	})
 			}
 	    });
 		}
