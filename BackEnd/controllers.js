@@ -7,32 +7,36 @@ import Safezone from './models/safezone';
 import Alliance from './models/alliance';
 const _  = require('lodash')
 
-const getPlayers = (gameId, cb) => {
+const getPlayers = (gameCode, cb) => {
 	Player.find({}, (err, players) => {
 		if (err) {
 			cb(err, {})
 		}
 		//get the game for the organizer? 
-		Game.find({_id: gameId}, (err, game) => {
-			if (err) {
-				cb(err, {})
-			}
-			console.log(JSON.stringify(game, null, 2))
-			const organizer = game.organizerName || 'organizer';
-			console.log('organizer name: ', organizer)
-		console.log('game id: ' + gameId);
-		const thisGamePlayers = _.filter(players, p => p.gameId === gameId);
-		const alivePlayers = _.filter(thisGamePlayers, p => p.alive);
-		const deadPlayers = _.filter(thisGamePlayers, p => p.dead);
-		console.log(JSON.stringify(thisGamePlayers, null, 2))
-		const playerData = {
-			message: 'success',
-			players: thisGamePlayers,
-			alivePlayers,
-			deadPlayers,
-			organizer,
-		}
-		cb(null, playerData)
+		Game.findOne({gameCode: gameCode}, (err, game) => {
+		    if (err) {
+			cb(err, {})
+		    }
+		    console.log(JSON.stringify(game, null, 2))
+		    const organizer = game.organizerName || 'organizer';
+		    console.log('organizer name: ', organizer)
+		    const pIdToUsername = playerId => {
+			return Player.findById(playerId);
+		    }
+		    const alivePlayers = _.map(game.alivePlayers, pIdToUsername);
+		    const deadPlayers = _.map(game.deadPlayers, pIdToUsername);
+		    Promise.all(alivePlayers).then(aPlayers => {
+			Promise.all(deadPlayers).then(dPlayers => {
+			    const playerData = {
+				message: 'success',
+				players: aPlayers.concat(dPlayers),
+				alivePlayers: aPlayers,
+				deadPlayers: dPlayers,
+				organizer
+			    }
+			    cb(null, playerData)
+			});
+		    })
 		})
 	});
 }

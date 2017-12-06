@@ -620,7 +620,7 @@ router.post('/targets', (req, res) => {
     console.log('request body')
     console.log(JSON.stringify(body, null, 2))
     Player.findOne({username: req.body.username}, (err, player) => {
-	if (err) {
+	if (err || !player) {
 		res.status(400).json({message: 'error when trying to find player'});
 	}
 	else {
@@ -815,8 +815,8 @@ router.post('/getAlliance', (req, res) => {
 
 router.post('/players', (req, res) => {
 	const body = req.body
-	const gameId = body.gameId
-	getPlayers(gameId, (err, playerData) => {
+	const gameCode = body.loginCode
+	getPlayers(gameCode, (err, playerData) => {
 		if (err) {
 			res.status(400).json({error: err});
 		} else {
