@@ -476,7 +476,7 @@ router.post('/createGame', (req, res) => {
 			req.body.xCoord = req.body.xCoord || 2;
 			req.body.yCoord = req.body.yCoord || 2;
 			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
-				radius: 5});
+				radius: req.body.radius});
 			var newGame = new Game({ gameCode: req.body.loginCode,
 						 started: false,
 						 organizerName: req.body.orgName,
