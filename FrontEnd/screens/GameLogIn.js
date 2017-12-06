@@ -46,9 +46,9 @@ class GameInput extends Component {
         });
         */
     }
-
+    goToLobby = () => Actions.Lobby({username: this.state.username, gameCode:this.state.gameCode}); 
     render() {
-       const gotoGamePage = () => Actions.GamePage({username: this.state.username}); 
+     
         return (
             <View style={styles.formContainer} >
                 <TextInput
@@ -68,10 +68,9 @@ class GameInput extends Component {
                  <Button
                     backgroundColor='rgba(201, 29, 77, 0.6)'
                     title="Enter Game"
-                    
+                    onPress={this.goToLobby}
                     fontWeight='bold'
                     borderRadius={10}
-
                 />
             </View>
         );
