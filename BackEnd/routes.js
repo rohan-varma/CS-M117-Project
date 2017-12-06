@@ -39,10 +39,6 @@ function checkTargetInSafezone(player, target, callback) {
 	console.log(target.username)
 	console.log(target.mySafeZone)
 	Safezone.findOne({_id: target.mySafeZoneId}, (err, safezone) => {
-		if(!safezone) {
-			console.log("couldn't find safezone")
-			// return false;
-		}
 		console.log('WE FOUND A SAFEZONE HELL YEA')
 		var point = { type : "Point", coordinates : safezone.location };
 		console.log(point);
@@ -50,7 +46,7 @@ function checkTargetInSafezone(player, target, callback) {
     	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
     	   	if(err) {
     	 		console.log(err);
-    	   		return false;
+    	   		return;
     	   	}
     	   	results.filter(function(value) {
     	   		if(value.obj.username == target.username) {
@@ -63,13 +59,13 @@ function checkTargetInSafezone(player, target, callback) {
     	   		Game.findOne({_id: player.game}, (err, game) => {
 				console.log(player.game);
 				if(!game) {
-					return false;
+					return;
 				}
 				else {
 					Safezone.findOne({_id: game.centralSafeZone}, (err, safezone) => {
 					if(!safezone) {
 						console.log("couldn't find safezone")
-						// return false;
+						return;
 					}
 					console.log('WE FOUND A SAFEZONE HELL YEA')
 					var point = { type : "Point", coordinates : safezone.location };
@@ -77,7 +73,7 @@ function checkTargetInSafezone(player, target, callback) {
 			    	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
 			    	   	if(err) {
     				 		console.log(err);
-    				   		return false;
+    				   		return;
   				  	   	}
     			   	results.filter(function(value) {
     	   				if(value.obj.username == target.username) {
