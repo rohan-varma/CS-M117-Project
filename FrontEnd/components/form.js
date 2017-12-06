@@ -9,10 +9,11 @@ import {
   KeyboardAvoidingView
 
  } from 'react-native';
-import GameTextInput  from '../GameTextInput';
+import GameTextInput  from './GameTextInput';
 
 
-export default class App extends Component {
+export default class Form extends Component {
+  static navigationOptions = { header: null };
   render() {
     return (
       <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>

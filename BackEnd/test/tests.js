@@ -137,7 +137,7 @@ describe('get players', () => {
 			console.log(JSON.stringify(body, null, 2))
 			//find the player here
 			console.log('trying to find the player now');
-			chai.request(server).get('/BluA/players').send({gameId: gameId})
+			chai.request(server).post('/BluA/players').send({gameId: gameId})
 			.end((err, res) => {
 				const body = res.body;
 				console.log(JSON.stringify(body, null, 2))

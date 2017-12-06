@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import Player from './models/player';
 import Game from './models/game';
 import Safezone from './models/safezone';
+import Alliance from './models/alliance';
 const _  = require('lodash')
 const router = express.Router();
 
@@ -200,6 +201,31 @@ router.post('/killTarget', (req, res) => {
 		})
     }
 	});
+
+  const validateGameExists = request => {
+    return _.has(request.body, 'loginCode');
+}
+
+router.get('/gameExists', (req, res) => {
+    if (!validateGameExists(req)) {
+	res.status(400).json({
+	    error: 'Must provide login code'
+	});
+	return
+    }
+    const body = req.body;
+    Game.findOne({ gameCode: body.loginCode }, (err, game) => {
+	if (game)
+	    res.status(200).send({
+		message: 'success',
+		exists: true
+	    });
+	else
+	    res.status(200).send({
+		message: 'success',
+		exists: false
+	    });
+    })
 });
 
 const validateGameRequest = request => {
@@ -209,6 +235,7 @@ const validateGameRequest = request => {
 	return _.has(body, 'loginCode') 
 		&& _.has(body, 'orgName') 
 }
+
 router.post('/createGame', (req, res) => {
 	if (!validateGameRequest(req)) {
 		console.log('failed to validate')
@@ -229,7 +256,7 @@ router.post('/createGame', (req, res) => {
 			req.body.xCoord = req.body.xCoord || 2;
 			req.body.yCoord = req.body.yCoord || 2;
 			var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
-				radius: req.body.radius});
+				radius: 5});
 	    	var newGame = new Game({ gameCode: req.body.loginCode,
 					     started: false,
 					     organizerName: req.body.orgName,
@@ -272,9 +299,10 @@ const validateUserRequest = request => {
 }
 router.post('/addUser', (req, res) => {
 	if (!validateUserRequest(req)) {
-		res.status(400).json({
-			error: 'Request object must contain username loginCode mac x and y',
-		});
+	    res.status(400).json({
+		error: 'Request object must contain username loginCode mac x and y',
+	    });
+	    return;
 	}
 	console.log('HERE IN ADD USER')
     Player.findOne({ username: req.body.username }, (err, obj) => {
@@ -295,7 +323,8 @@ router.post('/addUser', (req, res) => {
 				req.body.yCoord = req.body.yCoord || 2;
 				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
 				radius: req.body.radius});
-		    	var newPlayer = new Player({ username: req.body.username,
+
+        var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
 						 macAddress: req.body.mac,
 						 game: game._id, //not sure how to use this
@@ -415,12 +444,156 @@ router.get('/getTargetLocation', (req, res) => {
 	if (err)
 	    res.send(err);
 	else {
-	    res.send(obj.location);
+	    res.status(200).json({ message: 'success',
+				   location: obj.location });
 	}
     });
 });
 
-router.get('/players', (req, res) => {
+const validateGetUsername = request => {
+    const body = request.body;
+    return _.has(body, 'id');
+}
+
+router.get('/getUsername', (req, res) => {
+    if(!validateGetUsername(req)) {
+	res.status(400).json({
+	    error: 'Request object must contain id'
+	});
+	return;
+    }
+    const body = req.body;
+    Player.findOne({ _id: body.id }, (err, player) => {
+	if (err)
+	    res.send(err);
+	else {
+	    res.status(200).json({ message: 'success',
+				   username: player.username });
+	}
+    });
+});
+
+const validateGetTargets = request => {
+    const body = request.body;
+    return _.has(body, 'username');
+}
+
+router.get('/getTargets', (req, res) => {
+    if (!validateGetTargets(req)) {
+	res.status(400).json({
+	    error: 'Request object must contain username'
+	});
+	return;
+    }
+    const body = req.body;
+    Player.findOne({ username: req.body.username }, (err, player) => {
+	if (err)
+	    res.send(err);
+	else {
+	    if (player.alliance == null)
+		res.status(200).json({ targets: [player.target] });
+	    else {
+		Alliance.findOne({ _id: player.alliance }, (err, a) => {
+		    if (err)
+			res.send(err);
+		    else
+			res.status(200).json({ message: 'success',
+					       targets: a.targets });
+		});
+	    }
+	}
+    });
+});
+
+/**
+ * @api {post} /createAlliance Create Alliance
+ *
+ * @apiParam {String} username		            The id of the invitation
+ * @apiParam {String} allianceName            The email address of the invitee
+ *
+ * @apiExample {json} Example json input:
+ *    {
+ *      "username": "joebruin",
+ *      "allianceName": "UCLA Alliance"
+ *    }
+ *
+ * @apiUse Response200
+ * @apiSuccessExample {json} Success example
+ *    {
+ *      "allianceId": allianceId,
+ *    }
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
+router.post('/createAlliance', (req, res) => {
+	var jsonRequestBody = req.body;
+
+	var findCreatorPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
+
+	var createAlliancePromise = findCreatorPromise.then((creator) => {
+		if (!creator) {
+			throw new Error("creator not found");
+		}
+
+		var allianceFields = {};
+		allianceFields.name = jsonRequestBody.allianceName;
+		allianceFields.allies = [creator._id];
+		allianceFields.targets = [creator.target];
+
+		var alliance = new Alliance(allianceFields);
+		var allianceId = alliance._id;
+		creator.alliance = allianceId;
+
+		// Saves new alliance and updates the creator's alliance field
+		var promisesArray = [alliance.save(), creator.save()];
+
+		return Promise.all(promisesArray);
+	});
+
+	createAlliancePromise.then(() => {
+		// Success
+		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName)
+		res.status(200).json({
+			"allianceId": allianceId,
+		});
+	}).catch((err) => {
+		// Failed to create alliance
+		console.log("Failed to add users to a new alliance - Error: " + err.message);
+		res.status(400).json({
+			error: "Failed to add users to a new alliance - Error: " + err.message,
+		});
+	});
+});
+
+/**
+ * @api {post} /joinAlliance Join Alliance
+ *
+ * @apiParam {String} allianceId 	            The email address of the invitee
+ *
+ * @apiExample {json} Example json input:
+ *    {
+ *      "allianceId": allianceId,
+ *    }
+ *
+ * @apiUse Response200
+ * @apiSuccessExample {json} Success example
+ *    {
+ *      "allianceName": allianceName,
+ *    }
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
+router.post('/joinAlliance', (req, res) => {
+	var jsonRequestBody = req.body;
+
+	var findAlliancePromise = Alliance.findOne()
+})
+
+router.post('/players', (req, res) => {
 	const body = req.body
 	const gameId = body.gameId
 	Player.find({}, (err, players) => {
