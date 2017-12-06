@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button}   from 'react-native';
+import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button } from 'react-native';
 import { Actions } from 'react-native-router-flux';
-import GameTextInput  from '../GameTextInput';
-const { createGame, addUserToGame } = require('../requestors');
+import { GameCreate } from './GameCreate'
+const { gameExists, createGame, addUserToGame } = require('../requestors');
 const _ = require('lodash');
 
 class GameInput extends Component {
@@ -23,6 +23,23 @@ class GameInput extends Component {
             alert('Please enter a valid gamecode (5 characters)');
             return;
         };
+
+        const requestBody = JSON.stringify({
+            loginCode: this.state.gameCode,
+            orgName: "defaultOrg",
+        });
+
+        /*
+        createGame(requestBody).then( res => {
+            // if game doesn't exist, go to create game first
+            if (_.has(res, '') {
+                // If the game hasn't been created yet
+                Actions.GameCreate();
+            }
+        }).then( () => {
+        }).catch( err => {
+        });
+        */
     }
 
     render() {
@@ -40,10 +57,10 @@ class GameInput extends Component {
                     onChangeText={ (gameCode) => this.setState({gameCode}) }
                 />
 
-                <Button style={styles.button}
-                  
-                    title="placeholder for now, until i hook this up with login"
-                
+                <Button
+                    style={styles.button}
+                    title="Join Game"
+                    onPress={() => this.enterGame() }
                 />
             </View>
         );

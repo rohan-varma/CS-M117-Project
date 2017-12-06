@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView
 
  } from 'react-native';
-import GameTextInput  from '../GameTextInput';
+import GameTextInput  from './GameTextInput';
 
 
 export default class Form extends Component {

@@ -8,7 +8,6 @@ const _ = require('lodash');
 
 class PlayerScreen extends Component {
   constructor(props) {
-    //props has players (or we can get the players), basically it needs something to get the players and the target 
     super(props);
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
