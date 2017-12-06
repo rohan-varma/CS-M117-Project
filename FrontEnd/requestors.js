@@ -1,8 +1,9 @@
-const ServerURL = 'http://35.225.245.61/BluA'
+const ServerURL = 'http://localhost:3000/BluA'
 const createGameURL = ServerURL + '/createGame';
 const addUserURL = ServerURL + '/addUser';
 const startGameURL = ServerURL + '/startGame';
 const updateLocationURL = ServerURL + '/updateLocation';
+const playerURL = ServerURL + '/players';
 
 //these are the functions that interface with the backend. Import and use them wherever in the fronted its needed.
 const createGame = body => fetch(createGameURL, {
@@ -23,7 +24,18 @@ const addUserToGame = body => fetch(addUserURL, {
     body: body,
 }).then(res => res.json())
 
+const getAllPlayersForGame = body => fetch(playerURL, {
+  method: 'POST',
+  headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+}).then(res => res.json())
+
+
 module.exports = {
   createGame,
   addUserToGame,
+  getAllPlayersForGame,
 };
