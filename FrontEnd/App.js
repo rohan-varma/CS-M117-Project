@@ -22,12 +22,12 @@ export default class App extends React.Component {
     return (
           <Router>
             <Scene key="root">
-              <Scene key="Home" component={Home}  />
+              <Scene key="Home" component={Home} initial={true} />
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
               <Scene key="Lobby" component={Lobby} title="Game Lobby"/>
               <Scene key="PlayerScreen" component={PlayerScreen} title = "Players" />
-              <Scene key="Lobby-Master" component={Lobby_Master} initial={true} title="Game Lobby"/>
+              <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby"/>
             </Scene>
           </Router>
 
