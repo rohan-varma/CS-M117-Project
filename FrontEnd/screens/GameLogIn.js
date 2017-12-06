@@ -25,12 +25,6 @@ class GameInput extends Component {
                 latitudeDelta: 0.002,
                 longitudeDelta: 0.002,
             },
-
-            gameCreated: false,
-            maxPlayers: 15,
-            gameXCoord: -118.443,
-            gameYCoord: 34.0689,
-            alliancesAllowed: true,
         };
     }
    
@@ -44,11 +38,12 @@ class GameInput extends Component {
             return;
         };
 
+
         const gameRequestBody = JSON.stringify({
             loginCode: this.state.gameCode,
             orgName: this.state.username,
-            xCoord: this.state.gameXCoord,
-            yCoord: this.state.gameYCoord,
+            xCoord: this.props.gameXCoord,
+            yCoord: this.props.gameYCoord,
         });
         // create user and login
         const userRequestBody = JSON.stringify({
@@ -76,9 +71,12 @@ class GameInput extends Component {
                 }
             }
             else {
-                if (this.state.gameCreated) {
+                if (this.props.gameCreated) {
                     createGame(gameRequestBody).then(res => {
                         addUserToGame(userRequestBody).then(res => {
+                            Actions.Lobby({
+                                username: this.state.username,
+                                gameCode: this.state.gameCode});
                         }).catch(err => {
                             if (err.status == 400 &&
                                 err.username == this.state.username) {
@@ -87,35 +85,31 @@ class GameInput extends Component {
                                     username: this.state.username, 
                                     gameCode: this.state.gameCode});
                             }
-                            alert("Failed to join game, please try again.");
+                            alert("Failed to join game, please try again");
                             Actions.GameLogIn({
-                                gameCreated: this.state.gameCreated,
-                                maxPlayers: this.state.maxPlayers,
-                                gameXCoord: this.state.gameXCoord,
-                                gameYCoord: this.state.gameYCoord,
-                                alliancesAllowed: this.state.alliancesAllowed,
+                                gameCreated: this.props.gameCreated,
+                                maxPlayers: this.props.maxPlayers,
+                                gameXCoord: this.props.gameXCoord,
+                                gameYCoord: this.props.gameYCoord,
+                                alliancesAllowed: this.props.alliancesAllowed,
                             });
                         });
                     }).catch(err => {
-                        alert("Failed to create and join game, please try again.");
+                        alert("Failed to create and join game, please try again");
                         Actions.GameLogIn({
-                            gameCreated: this.state.gameCreated,
-                            maxPlayers: this.state.maxPlayers,
-                            gameXCoord: this.state.gameXCoord,
-                            gameYCoord: this.state.gameYCoord,
-                            alliancesAllowed: this.state.alliancesAllowed,
+                            gameCreated: this.props.gameCreated,
+                            maxPlayers: this.props.maxPlayers,
+                            gameXCoord: this.props.gameXCoord,
+                            gameYCoord: this.props.gameYCoord,
+                            alliancesAllowed: this.props.alliancesAllowed,
                         });
                     });
                 }
                 else {
-                    alert("Looks like the game you're trying to join doesn't exist yet. Create the game first.");
+                    alert("Please create a game first");
                     Actions.GameLogIn();
                 }
             };
-
-            Actions.GameLobby({
-                username: this.state.username,
-                gameCode: this.state.gameCode});
         });
     }
 
