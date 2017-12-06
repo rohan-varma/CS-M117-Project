@@ -24,7 +24,7 @@ class PlayerScreen extends Component {
       console.log('the shitty request object')
       const targetReqObj = {
         gameId: this.props.gameId || '5a27ac3355c516ffe4f47bad', //default game
-        username: this.props.username,
+        username: this.props.username || 'defaultuser',
       }
       console.log(JSON.stringify(targetReqObj, null, 2))
       getTargetsForPlayer(JSON.stringify(targetReqObj))

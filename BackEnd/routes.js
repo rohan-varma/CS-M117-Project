@@ -567,7 +567,7 @@ router.post('/targets', (req, res) => {
     console.log('request body')
     console.log(JSON.stringify(body, null, 2))
     Player.findOne({username: req.body.username}, (err, player) => {
-	if (err) {
+	if (err || !player) {
 		res.status(400).json({message: 'error when trying to find player'});
 	}
 	else {
