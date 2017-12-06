@@ -232,7 +232,7 @@ router.post('/organizerName', (req, res) => {
 	else {
 	    res.status(200).json({
 		message: 'success',
-		organizerName: game.organizerGame
+		organizerName: game.organizerName
 	    });
 	}
     });
