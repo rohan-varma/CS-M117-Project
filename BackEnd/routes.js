@@ -762,8 +762,8 @@ router.post('/getAlliance', (req, res) => {
 
 router.post('/players', (req, res) => {
 	const body = req.body
-	const gameId = body.gameId
-	getPlayers(gameId, (err, playerData) => {
+	const gameCode = body.loginCode
+	getPlayers(gameCode, (err, playerData) => {
 		if (err) {
 			res.status(400).json({error: err});
 		} else {
