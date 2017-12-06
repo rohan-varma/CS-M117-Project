@@ -63,15 +63,14 @@ class PlayerScreen extends Component {
         dataSource={this.state.alivePlayers.length !== 0 ? this.state.alivePlayers : [{name: 'No Players'}]}
         renderRow={player => {
           console.log(player)
-          return <Text>{player.name}</Text>
+          return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
       />
       <Text style={{paddingTop: 30}}> The Noble Players Who Were Killed In Battle </Text>
       <ListView
         dataSource={this.state.deadPlayers.length !== 0 ? this.state.deadPlayers : [{name: 'No Players'}]}
         renderRow={player => {
-          console.log(this.state.deadPlayers)
-          return <Text>{player.name}</Text>
+          return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
       />
       <Text style={{paddingTop: 30}}> Your Targets </Text> 
@@ -79,7 +78,7 @@ class PlayerScreen extends Component {
         dataSource={this.state.playerTargets}
         renderRow={player => {
           console.log(player)
-          return <Text>{player.name}</Text>
+          return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
       />
       </View>
@@ -112,7 +111,27 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 20,
       fontWeight: 'bold',
-    }
+    },
+    text:{
+    padding: 10,
+    alignSelf:'center'
+
+  },
+  playerWrapper: {
+    backgroundColor: 'white',
+
+  },
+  playerlistwrapper: {
+    alignSelf:'stretch',
+    backgroundColor:'white',
+    borderColor:'lightgray',
+    
+  }, 
+  playerlist: {
+    padding: 10,
+    alignSelf:'center',
+    backgroundColor:'white',
+  }
 
 
 });
