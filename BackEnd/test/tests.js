@@ -71,7 +71,7 @@ describe('addUser', () => {
 		});
 	});
 
-	it('adds  user', cb => {
+	it.only('adds  user', cb => {
 		// first create a game
 		const code = Math.random().toString(36).substring(15);
 		console.log('HERE')
@@ -108,7 +108,7 @@ describe('get players', () => {
 	const startRequest = () => {
 		return chai.request(server).post('/BluA/addUser')
 	}
-	it.only('can get players', cb => {
+	it('can get players', cb => {
 		let gameId;
 		//first create game and add players
 		const code = Math.random().toString(36).substring(15);
