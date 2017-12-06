@@ -143,7 +143,7 @@ function checkTargetProximity(player, target, callback) {
 	});
 }
 
-function killTargetAttempt(player, target, callback) {
+function killTargetAttempt(player, target, assassin, callback) {
 	//check target safezones
 	checkTargetInSafezone(player, target, (err, inSafezone) => {
 		if(err) {
@@ -163,9 +163,10 @@ function killTargetAttempt(player, target, callback) {
 					console.log("target in range")
 					//kill target (update their data), send notifications
 					//give assassin new target
-					player.target = target.target;
+					var toUpdate = (assassin ? assassin.target : player.target)
+					toUpdate = target.target;
 					target.alive = false;
-					player.save((err) => {
+					toUpdate.save((err) => {
 						if(err) {
 							callback(err, null)
 						}
@@ -281,19 +282,41 @@ router.post('/killTarget', (req, res) => {
 		});
 	else {
 		Player.findOne(player.target, (err, target) => {
-		if(!target)
-			res.status(400).json({
-				error: 'Player\'s target does not exist',
-			});
-		else {
-			killTargetAttempt(player, target, (err, msg) => {
-				if(err) {
-					res.status(400).json({error: err.message});
-				} else {
-					res.status(200).json({message: msg});
-				}
-			});
-		}
+			if(!target)
+				res.status(400).json({
+					error: 'Player\'s target does not exist',
+				});
+			else {
+				killTargetAttempt(player, target, null, (err, msg) => {
+					if(err) {
+						res.status(400).json({error: err.message});
+					} else if (msg === 'target killed' || !player.alliance) {
+						res.status(200).json({message: msg});
+					} else {
+						// Check if you can kill a target in alliance
+						// Look up alliance, if found run killTargetAttempt on every target in the alliance
+						Alliance.findById(player.alliance, (err, alliance) => {
+							if (!alliance) {
+								res.status(400).json({
+									error: "alliance not found",
+								});
+							}
+							alliance.dictionary.forEach(element => {
+								killTargetAttempt(player, element.target, element.ally, (err, msg) => {
+									if(err) {
+										res.status(400).json({error: err.message});
+									} else {
+										console.log('killed alliance target!')
+										res.status(200).json({
+											message: msg,
+										});
+									}
+								})
+							})
+						})
+					}
+				});
+			}
 		});
 	}
 	});
