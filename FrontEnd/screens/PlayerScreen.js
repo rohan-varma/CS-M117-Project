@@ -11,27 +11,29 @@ const _ = require('lodash');
 class PlayerScreen extends Component {
   constructor(props) {
     //passed in game id
-    console.log('constructing this shit now')
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     super(props);
-    let obj;
-    //fetch the players
-    console.log('USING GAME ID ', this.props.gameId)
-    const requestObj = {gameId: this.props.gameId, playerId: this.props.playerId}
+    this.state = {
+      playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
+      alivePlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+      deadPlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+  };
+    //need a loginCode and username
+    const gameCode = this.props.gameCode || 'axxw4vi8jjor';
+    const username = this.props.username || 'crwqt9i5jc3di';
+    const requestObj = {loginCode: gameCode, username: username}
+    //get all players needs a login code
     getAllPlayersForGame(JSON.stringify(requestObj))
     .then(res => {
-      //get targets for this player //this.props.playerId
-      console.log('the shitty request object')
-      const targetReqObj = {
-        gameId: this.props.gameId || '5a27ac3355c516ffe4f47bad', //default game
-        username: this.props.username,
-      }
-      console.log(JSON.stringify(targetReqObj, null, 2))
-      getTargetsForPlayer(JSON.stringify(targetReqObj))
+      getTargetsForPlayer(JSON.stringify(requestObj))
       .then(res => {
         //handle res
         console.log('result for get player targets')
         console.log(res);
+        const playerTargets = res.targets;
+        this.setState({
+          playerTargets: ds.cloneWithRows(playerTargets.map(t => ({name: t.username}))),
+        })
       })
       .catch(err => {
         //handle err
@@ -39,9 +41,8 @@ class PlayerScreen extends Component {
         console.log(err)
       })
       //continue here? 
-      console.log('hello world!')
-      console.log(JSON.stringify(_.keys(res), null, 2))
-      obj = res;
+      console.log('this object has the player data')
+      console.log(JSON.stringify(res, null, 2))
       this.setState({
         alivePlayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
         deadPlayers: ds.cloneWithRows(res.deadPlayers.map(p => ({name: p.username}))),
@@ -51,12 +52,6 @@ class PlayerScreen extends Component {
       console.log('err is ', err)
     })
     //shitty default state
-    this.state = {
-      //dataSource: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-      playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
-      alivePlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-      deadPlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-    };
   }
 
   render() {
