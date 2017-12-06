@@ -30,8 +30,28 @@ router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
-var disbandAlliance = allianceId => {
+const disbandAlliance = (allianceId, callback) => {
+	Alliance.findById(allianceId).then(alliance => {
+		if (!alliance) {
+			throw new Error("alliance not found");
+		}
 
+		// Set every player in alliance's alliance field to empty string
+		let updatePlayerAlliancePromises = alliance.allies.map(allyId => {
+			return Player.findByIdAndUpdate(allyId, { alliance: "" }).exec();
+		});
+
+		return Promise.all(updatePlayerAlliancePromises);
+	}).then(() => {
+		// Remove the alliance document
+		return Alliance.findByIdAndRemove(allianceId).exec();
+	}).then(() => {
+		// Success
+		callback(null);
+	}).catch(err => {
+		// Failed -> pass error to callback
+		callback(err);
+	});
 };
 
 const validateKillRequest = request => {
