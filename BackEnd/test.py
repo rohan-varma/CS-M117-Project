@@ -5,7 +5,7 @@ import string
 
 def createGameData():
 	# random login code
-	login_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	login_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(46))
 	data = {'loginCode': login_code,
  			'orgName': "person",
 			'xCoord' : 7, 'yCoord': 7, 'radius': 2}
@@ -42,6 +42,9 @@ def testCreateGame (data):
 	# but if we use the same login code to create a game we should get an error
 	res = requests.post("http://localhost:3000/BluA/createGame",
 		data = data)
+	body = res.json()
+	print('result body')
+	print(body)
 	assert res.status_code == 400
 	assert 'error' in res.json()
 

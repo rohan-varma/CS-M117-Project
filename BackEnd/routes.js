@@ -7,6 +7,7 @@ import Safezone from './models/safezone';
 import Alliance from './models/alliance';
 const _  = require('lodash')
 const router = express.Router();
+const { getPlayers } = require('./controllers.js')
 
 var mongoDB = config.client.mongodb.defaultUri + '/' + config.client.mongodb.defaultDatabase;
 mongoose.connect(mongoDB, {
@@ -372,6 +373,7 @@ router.post('/addUser', (req, res) => {
 						 location: [req.body.x, req.body.y] });
 		    	newSafezone.game = game._id;
 		    	let playerId;
+		    	let username;
 		    	console.log('calling new player.save');
 		    	//this code is wrong, but seems to work.
 		    	newPlayer.save((err, player) => {
@@ -384,7 +386,9 @@ router.post('/addUser', (req, res) => {
 		    		console.log('the player')
 		    		console.log(JSON.stringify(player, null, 2))
 		    		playerId = player._id;
+		    		username = player.username;
 		    		game.alivePlayers.push(player)
+		    		game.hasPlayers = true;
 		    		game.save(err => {
 		    			if (err) {
 		    				console.log('err saving game')
@@ -396,7 +400,7 @@ router.post('/addUser', (req, res) => {
 		    						console.log('error saving safezone')
 		    						res.status(400).json({error: 'saving savezone'})
 		    					} else {
-		    						res.status(200).json({message: 'success', id: playerId})
+		    						res.status(200).json({message: 'success', id: playerId, username: username})
 		    					}
 		    				})
 		    			}
@@ -454,10 +458,17 @@ router.post('/startGame', (req, res) => {
 				});
 	game.started = true;
 	game.save((err) => {
-	    if (err)
-		res.sendStatus(500);
-	    else
-		res.sendStatus(200);
+		if (err) {
+			res.status(500).json({error: 'could not save game to start it'})
+		} else {
+			getPlayers(game._id, (err, players) => {
+				if (err) {
+					res.status(400).json({error: err});
+				} else {
+					res.status(200).json(players);
+				}
+			})
+		}
 	});
     });
 });
@@ -513,30 +524,34 @@ router.get('/getUsername', (req, res) => {
 
 const validateGetTargets = request => {
     const body = request.body;
-    return _.has(body, 'username');
+    return _.has(body, 'username') || _.has(body, 'playerId');
 }
 
-router.get('/getTargets', (req, res) => {
+router.post('/targets', (req, res) => {
     if (!validateGetTargets(req)) {
+    	console.log(JSON.stringify(req.body, null, 2))
 	res.status(400).json({
-	    error: 'Request object must contain username'
+	    error: 'Request object must contain username or playerId'
 	});
 	return;
     }
     const body = req.body;
-    Player.findOne({ username: req.body.username }, (err, player) => {
-	if (err)
-	    res.send(err);
+    const search = req.body.username ? {username: req.body.username } : {_id: req.body.playerId };
+    Player.findOne(search, (err, player) => {
+	if (err) {
+		res.status(400).json({message: 'error when trying to find player'});
+	}
 	else {
 	    if (player.alliance == null)
 		res.status(200).json({ targets: [player.target] });
 	    else {
 		Alliance.findOne({ _id: player.alliance }, (err, a) => {
-		    if (err)
-			res.send(err);
-		    else
-			res.status(200).json({ message: 'success',
+			if (err) {
+				res.status(400).json({error: err});
+			} else {
+				res.status(200).json({ message: 'success',
 					       targets: a.targets });
+			}
 		});
 	    }
 	}
@@ -678,36 +693,12 @@ router.post('/joinAlliance', (req, res) => {
 router.post('/players', (req, res) => {
 	const body = req.body
 	const gameId = body.gameId
-	Player.find({}, (err, players) => {
+	getPlayers(gameId, (err, playerData) => {
 		if (err) {
-			res.status(400).json({
-				error: 'error finding players',
-			})
+			res.staus(400).json({error: err});
+		} else {
+			res.status(200).json(playerData);
 		}
-		//get the game for the organizer? 
-		Game.find({_id: gameId}, (err, game) => {
-			if (err) {
-				res.status(400).json({
-					error: 'error finding game',
-				});
-			}
-			console.log(JSON.stringify(game, null, 2))
-			const organizer = game.organizerName;
-			console.log('organizer name: ', organizer)
-			console.log('number of players: ', players.length);
-		console.log('game id: ' + gameId);
-		const thisGamePlayers = _.filter(players, p => p.gameId === gameId);
-		const alivePlayers = _.filter(thisGamePlayers, p => p.alive);
-		const deadPlayers = _.filter(thisGamePlayers, p => p.dead);
-		console.log(JSON.stringify(thisGamePlayers, null, 2))
-		res.status(200).json({
-			message: 'success',
-			players: thisGamePlayers,
-			alivePlayers,
-			deadPlayers,
-			organizer,
-		});
-		})
 	});
 });
 

@@ -5,6 +5,7 @@ const addUserURL = ServerURL + '/addUser';
 const startGameURL = ServerURL + '/startGame';
 const updateLocationURL = ServerURL + '/updateLocation';
 const playerURL = ServerURL + '/players';
+const targetURL = ServerURL + '/targets';
 
 //these are the functions that interface with the backend. Import and use them wherever in the fronted its needed.
 const gameExists = body => fetch(gameExistsURL, {
@@ -43,8 +44,18 @@ const getAllPlayersForGame = body => fetch(playerURL, {
     body: body,
 }).then(res => res.json())
 
+const getTargetsForPlayer = body => fetch(targetURL, {
+  method: 'POST',
+  headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+}).then(res => res.json())
+
 
 module.exports = {
+  getTargetsForPlayer,
   gameExists,
   createGame,
   addUserToGame,
