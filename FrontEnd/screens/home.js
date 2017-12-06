@@ -3,9 +3,8 @@ import {
   StyleSheet, 
   Text, View, 
   TouchableOpacity,
-  ImageBackground,
+  Image,
   KeyboardAvoidingView
-
  } from 'react-native';
 import { Button } from 'react-native-elements';
 import GameTextInput  from '../components/GameTextInput';

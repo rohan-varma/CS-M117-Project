@@ -29,6 +29,7 @@ class GameInput extends Component {
             orgName: "defaultOrg",
         });
 
+        /*
         createGame(requestBody).then( res => {
             // if game doesn't exist, go to create game first
             if (_.has(res, '') {
@@ -38,7 +39,7 @@ class GameInput extends Component {
         }).then( () => {
         }).catch( err => {
         });
-
+        */
     }
 
     render() {
