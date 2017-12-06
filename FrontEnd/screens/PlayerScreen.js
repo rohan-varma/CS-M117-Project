@@ -13,7 +13,11 @@ class PlayerScreen extends Component {
     //passed in game id
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     super(props);
-    let obj;
+    this.state = {
+      playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
+      alivePlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+      deadPlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+  };
     //need a loginCode and username
     const gameCode = this.props.gameCode || 'axxw4vi8jjor';
     const username = this.props.username || 'crwqt9i5jc3di';
@@ -21,8 +25,6 @@ class PlayerScreen extends Component {
     //get all players needs a login code
     getAllPlayersForGame(JSON.stringify(requestObj))
     .then(res => {
-      console.log('the shitty request object')
-      console.log(JSON.stringify(requestObj, null, 2))
       getTargetsForPlayer(JSON.stringify(requestObj))
       .then(res => {
         //handle res
@@ -36,23 +38,16 @@ class PlayerScreen extends Component {
       })
       //continue here? 
       console.log('this object has the player data')
-      console.log(JSON.stringify(_.keys(res), null, 2))
-      obj = res;
+      console.log(JSON.stringify(res, null, 2))
       this.setState({
-        alivePlayers: ds.cloneWithRows(obj.alivePlayers.map(p => ({name: p.username}))),
-        deadPlayers: ds.cloneWithRows(obj.deadPlayers.map(p => ({name: p.username}))),
+        alivePlayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
+        deadPlayers: ds.cloneWithRows(res.deadPlayers.map(p => ({name: p.username}))),
       })
     })
     .catch(err => {
       console.log('err is ', err)
     })
     //shitty default state
-    this.state = {
-      //dataSource: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-      playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
-      alivePlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-      deadPlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-    };
   }
 
   render() {

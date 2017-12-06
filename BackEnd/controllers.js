@@ -13,7 +13,7 @@ const getPlayers = (gameCode, cb) => {
 			cb(err, {})
 		}
 		//get the game for the organizer? 
-		Game.find({gameCode: gameCode}, (err, game) => {
+		Game.findOne({gameCode: gameCode}, (err, game) => {
 		    if (err) {
 			cb(err, {})
 		    }
@@ -21,10 +21,14 @@ const getPlayers = (gameCode, cb) => {
 		    const organizer = game.organizerName || 'organizer';
 		    console.log('organizer name: ', organizer)
 		    const pIdToUsername = playerId => {
-			Players.findOne({ _id: playerId }, (err, p) => {
+			Player.findOne({ _id: playerId }, (err, p) => {
 			    return p.username;
 			});
 		    }
+		    console.log('the game')
+		    console.log(JSON.stringify(game, null, 2))
+		    console.log('game.alivePlayers')
+		    console.log(JSON.stringify(game.alivePlayers, null, 2))
 		    const alivePlayers = _.map(game.alivePlayers, pIdToUsername);
 		    const deadPlayers = _.map(game.deadPlayers, pIdToUsername);
 		    const playerData = {
@@ -34,6 +38,8 @@ const getPlayers = (gameCode, cb) => {
 			deadPlayers,
 			organizer,
 		    }
+		    console.log('we returning this shit')
+		    console.log(JSON.stringify(playerData, null, 2))
 		    cb(null, playerData)
 		})
 	});
