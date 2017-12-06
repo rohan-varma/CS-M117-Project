@@ -30,6 +30,30 @@ router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
+const disbandAlliance = (allianceId, callback) => {
+	Alliance.findById(allianceId).then(alliance => {
+		if (!alliance) {
+			throw new Error("alliance not found");
+		}
+
+		// Set every player in alliance's alliance field to empty string
+		let updatePlayerAlliancePromises = alliance.allies.map(allyId => {
+			return Player.findByIdAndUpdate(allyId, { alliance: "" }).exec();
+		});
+
+		return Promise.all(updatePlayerAlliancePromises);
+	}).then(() => {
+		// Remove the alliance document
+		return Alliance.findByIdAndRemove(allianceId).exec();
+	}).then(() => {
+		// Success
+		callback(null);
+	}).catch(err => {
+		// Failed -> pass error to callback
+		callback(err);
+	});
+}
+
 const validateKillRequest = request => {
 	const body = request.body
 	return _.has(body, 'username')
@@ -569,12 +593,10 @@ router.post('/targets', (req, res) => {
  * @api {post} /createAlliance Create Alliance
  *
  * @apiParam {String} username                The username of the creator
- * @apiParam {String} allianceName            The name of the alliance
  *
  * @apiExample {json} Example json input:
  *    {
  *      "username": "joebruin",
- *      "allianceName": "UCLA Alliance"
  *    }
  *
  * @apiUse Response200
@@ -590,13 +612,12 @@ router.post('/targets', (req, res) => {
 router.post('/createAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
 
-	Player.findOne({ username: jsonRequestBody.username }).exec().then(creator => {
+	Player.findOne({ username: jsonRequestBody.username }).then(creator => {
 		if (!creator) {
 			throw new Error("creator not found");
 		}
 
 		var allianceFields = {
-			name: jsonRequestBody.allianceName,
 			allies: [creator._id],
 			targets: [creator.target]
 		};
@@ -636,10 +657,6 @@ router.post('/createAlliance', (req, res) => {
  *    }
  *
  * @apiUse Response200
- * @apiSuccessExample {json} Success example
- *    {
- *      "allianceName": allianceName
- *    }
  *
  * @apiUse Error400
  * @apiError (Error400) 400 Failed to create alliance
@@ -685,14 +702,60 @@ router.post('/joinAlliance', (req, res) => {
 	}).then(() => {
 		// Success
 		console.log(jsonRequestBody.username + " successfully joined the alliance: " + jsonRequestBody.allianceName);
-		res.status(200).json({
-			"allianceName": alliance.name,
-		});
+		res.status(200).json("");
 	}).catch(err => {
 		// Failed to join alliance
 		console.log(jsonRequestBody.username + " failed to join an alliance - Error: " + err.message);
 		res.status(400).json({
 			error: "Failed to join alliance - Error: " + err.message,
+		});
+	});
+});
+
+/**
+ * @api {post} /getAlliance Get a Player's Alliance Info
+ *
+ * @apiParam {String} username                The username of the player
+ *
+ * @apiExample {json} Example json input:
+ *    {
+ *      "username": "joebruin"
+ *    }
+ *
+ * @apiUse Response200
+ * @apiSuccessExample {json} Success example
+ *    {
+ *      "allianceId": "41224d776a326fb40f000001",
+ *      "allies": [ ... ],
+ *      "targets": [ ... ]
+ *    }
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
+router.post('/getAlliance', (req, res) => {
+	let jsonRequestBody = req.body;
+
+	Player.findOne({ username: jsonRequestBody.username }).then(player => {
+		if (!player) {
+			throw new Error("player not found");
+		}
+		let allianceId = player.alliance;
+		return Alliance.findById(allianceId);
+	}).then(alliance => {
+		if (!alliance) {
+			throw new Error("player's alliance not found");
+		}
+
+		res.status(200).json({
+			"id": alliance._id,
+			"allies": alliance.allies,
+			"targets": alliance.targets,
+		});
+	}).catch(err => {
+		res.status(400).json({
+			error: "Failed to get alliance - Error: " + err.message,
 		});
 	});
 });
