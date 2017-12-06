@@ -521,7 +521,13 @@ router.post('/startGame', (req, res) => {
 	res.sendStatus(400);
 	return;
 	}
-	Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
+    Game.findOne({ gameCode: req.body.loginCode, started: false }, (err, game) => {
+	if(!game || err) {
+	    res.status(400).json({
+		error: 'Game does not exist'
+	    });
+	    return;
+	}
 	shuffle(game.alivePlayers);
 	for(var i = 0, len = game.alivePlayers.length; i < len - 1; i++) {
 		Player.findOneAndUpdate({ _id: game.alivePlayers[i] },
