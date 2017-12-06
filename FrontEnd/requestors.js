@@ -26,6 +26,15 @@ const createGame = body => fetch(createGameURL, {
     body: body,
   }).then(res => res.json())
 
+const startGame = body => fetch(startGameURL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  }).then(res => res.json())
+
 const addUserToGame = body => fetch(addUserURL, {
   method: 'POST',
   headers: {
@@ -60,4 +69,5 @@ module.exports = {
   createGame,
   addUserToGame,
   getAllPlayersForGame,
+  startGame,
 };
