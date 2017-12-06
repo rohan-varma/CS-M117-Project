@@ -136,6 +136,7 @@ router.post('/addUser', (req, res) => {
     	if(obj) {
     		res.status(400).json({
     			error: 'Player with username ' + req.body.username + ' already exists',
+                username: req.body.username,
     		});
     	}
 		else {

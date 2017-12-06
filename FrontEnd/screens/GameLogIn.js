@@ -6,6 +6,7 @@ import { Actions } from 'react-native-router-flux';
 import GameTextInput  from '../components/GameTextInput';
 import { Button } from 'react-native-elements';
 import { Lobby} from './GameLobby';
+import MapView from 'react-native-maps';
 
 const _ = require('lodash');
 const { gameExists, createGame, addUserToGame } = require('../requestors');
@@ -16,6 +17,20 @@ class GameInput extends Component {
         this.state = {
             username:'',
             gameCode: '',
+            safezoneRadius: 40,
+            // default to Boelter Hall, UCLA
+            mapRegion: {
+                latitude: 34.0689,
+                longitude: -118.443,
+                latitudeDelta: 0.002,
+                longitudeDelta: 0.002,
+            },
+
+            gameCreated: false,
+            maxPlayers: 15,
+            gameXCoord: -118.443,
+            gameYCoord: 34.0689,
+            alliancesAllowed: true,
         };
     }
    
@@ -29,28 +44,91 @@ class GameInput extends Component {
             return;
         };
 
-        const requestBody = JSON.stringify({
+        const gameRequestBody = JSON.stringify({
             loginCode: this.state.gameCode,
-            orgName: "defaultOrg",
+            orgName: this.state.username,
+            xCoord: this.state.gameXCoord,
+            yCoord: this.state.gameYCoord,
+        });
+        // create user and login
+        const userRequestBody = JSON.stringify({
+            username: this.state.username,
+            loginCode: this.state.gameCode,
+            mac: 'address',
+            x: this.state.mapRegion.longitude,
+            y: this.state.mapRegion.latitude,
         });
 
-        /*
-        createGame(requestBody).then( res => {
-            // if game doesn't exist, go to create game first
-            if (_.has(res, '') {
-                // If the game hasn't been created yet
-                Actions.GameCreate();
+        gameExists(gameRequestBody).then(res => {
+            if (_.has(res, 'exists')) {
+                if (res.exists) {
+
+                    addUserToGame(userRequestBody).then(res => {
+                        // success
+                    }).catch(err => {
+                        if (err.status == 400 && err.username == this.state.username) {
+                            // if player with username exists in current game
+                            Actions.GameLobby({username: this.state.username, gameCode: this.state.gameCode});
+                        }
+                        alert("Failed to join game, please try again.");
+                        Actions.GameLogIn();
+                    });
+                }
             }
-        }).then( () => {
-        }).catch( err => {
+            else {
+                if (this.state.gameCreated) {
+                    createGame(gameRequestBody).then(res => {
+                        addUserToGame(userRequestBody).then(res => {
+                        }).catch(err => {
+                            if (err.status == 400 &&
+                                err.username == this.state.username) {
+                                // if player with username exists in current game
+                                Actions.GameLobby({
+                                    username: this.state.username, 
+                                    gameCode: this.state.gameCode});
+                            }
+                            alert("Failed to join game, please try again.");
+                            Actions.GameLogIn({
+                                gameCreated: this.state.gameCreated,
+                                maxPlayers: this.state.maxPlayers,
+                                gameXCoord: this.state.gameXCoord,
+                                gameYCoord: this.state.gameYCoord,
+                                alliancesAllowed: this.state.alliancesAllowed,
+                            });
+                        });
+                    }).catch(err => {
+                        alert("Failed to create and join game, please try again.");
+                        Actions.GameLogIn({
+                            gameCreated: this.state.gameCreated,
+                            maxPlayers: this.state.maxPlayers,
+                            gameXCoord: this.state.gameXCoord,
+                            gameYCoord: this.state.gameYCoord,
+                            alliancesAllowed: this.state.alliancesAllowed,
+                        });
+                    });
+                }
+                else {
+                    alert("Looks like the game you're trying to join doesn't exist yet. Create the game first.");
+                    Actions.GameLogIn();
+                }
+            }
+
+            Actions.GameLobby({username: this.state.username, gameCode: this.state.gameCode});
         });
-        */
     }
 
+    gotoGamePage = () => { 
+        Actions.Lobby({username: this.state.username});
+    };
+
+    _handleMapRegionChange = mapRegion => {
+        this.setState({ mapRegion });
+    };
+
     render() {
-       const gotoGamePage = () => Actions.GamePage({username: this.state.username}); 
         return (
             <View style={styles.formContainer} >
+                <Text style={styles.text}>Enter Username and unique Game ID</Text>
                 <TextInput
                     style={styles.textInput}
                     placeholder="Username"
@@ -62,16 +140,26 @@ class GameInput extends Component {
                     onChangeText={ (gameCode) => this.setState({gameCode}) }
                 />
 
-                <View style={{flex:0.1}}/>
-                <Text> Choose a Safe Zone </Text>
-                <View style={{flex:0.5}}/>
-                 <Button
+                <Text style={styles.text}>Select your safe zone</Text>
+                <MapView
+                    style={{ alignSelf: 'stretch', height: 300 }}
+                    region={this.state.mapRegion}
+                    onRegionChange={this._handleMapRegionChange}>
+
+                    <MapView.Circle
+                        center={{latitude: this.state.mapRegion.latitude, longitude: this.state.mapRegion.longitude}}
+                        radius={this.state.safezoneRadius}
+                        fillColor="rgba(255, 0, 0, 0.3)"
+                        strokeColor="rgba(255, 0, 0, 0.3)" />
+
+                </MapView>
+
+                <Button
                     backgroundColor='rgba(201, 29, 77, 0.6)'
                     title="Enter Game"
-                    
+                    onPress={ this.enterGame }
                     fontWeight='bold'
                     borderRadius={10}
-
                 />
             </View>
         );
@@ -86,6 +174,11 @@ const styles = StyleSheet.create({
       paddingTop: 50,
       flexDirection: 'column',
       flex: 1,
+    },
+    text: {
+        color: 'black',
+        fontSize: 20,
+        fontWeight: 'bold',
     },
     textInput: {
       alignSelf: 'stretch',
