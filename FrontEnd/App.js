@@ -10,11 +10,10 @@ import { StyleSheet, Text, View,
 import Lobby from './screens/GameLobby';
 import Home from './screens/home';
 import Form from './components/form';
-
+import PlayerScreen from './screens/PlayerScreen';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn'
 import {Scene, Router} from 'react-native-router-flux';
-
 const _ = require('lodash');
 
 export default class App extends React.Component {

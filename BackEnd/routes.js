@@ -413,7 +413,7 @@ router.post('/joinAlliance', (req, res) => {
 	var findAlliancePromise = Alliance.findOne()
 })
 
-router.get('/players', (req, res) => {
+router.post('/players', (req, res) => {
 	const body = req.body
 	const gameId = body.gameId
 	Player.find({}, (err, players) => {
