@@ -111,9 +111,11 @@ class GameInput extends Component {
                     alert("Looks like the game you're trying to join doesn't exist yet. Create the game first.");
                     Actions.GameLogIn();
                 }
-            }
+            };
 
-            Actions.GameLobby({username: this.state.username, gameCode: this.state.gameCode});
+            Actions.GameLobby({
+                username: this.state.username,
+                gameCode: this.state.gameCode});
         });
     }
 
