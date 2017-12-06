@@ -352,7 +352,7 @@ router.post('/createAlliance', (req, res) => {
 
 	var findCreatorPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
 
-	var createAlliancePromise = findCreatorPromise.then((creator) => {
+	var createAlliancePromise = findCreatorPromise.then(creator => {
 		if (!creator) {
 			throw new Error("creator not found");
 		}
@@ -374,11 +374,11 @@ router.post('/createAlliance', (req, res) => {
 
 	createAlliancePromise.then(() => {
 		// Success
-		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName)
+		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName);
 		res.status(200).json({
 			"allianceId": allianceId,
 		});
-	}).catch((err) => {
+	}).catch(err => {
 		// Failed to create alliance
 		console.log("Failed to add users to a new alliance - Error: " + err.message);
 		res.status(400).json({
@@ -394,6 +394,7 @@ router.post('/createAlliance', (req, res) => {
  *
  * @apiExample {json} Example json input:
  *    {
+ *      "username": "joebruin",
  *      "allianceId": allianceId,
  *    }
  *
@@ -410,8 +411,51 @@ router.post('/createAlliance', (req, res) => {
 router.post('/joinAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
 
-	var findAlliancePromise = Alliance.findOne()
-})
+	var findPlayerPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
+	var findAlliancePromise = Alliance.findById(jsonRequestBody.allianceId).exec();
+	var promisesArray = [findPlayerPromise, findAlliancePromise];
+
+	Promise.all(promisesArray).then(docs => {
+		var player = docs[0];
+		var alliance = docs[1];
+
+		if (!player) {
+			throw new Error("player not found");
+		}
+		else if (!alliance) {
+			throw new Error("alliance not found");
+		}
+
+		// Target validation
+		for (let i = 0; i < alliance.targets; i++) {
+			if (player._id === alliance.targets[i])
+				throw new Error("player is a target of someone within the alliance");
+		}
+
+		// Add player to alliance
+		player.alliance = allianceId;
+		alliance.allies.push(player._id);
+		alliance.targets.push(player.target)
+
+		var savePlayerPromise = player.save();
+		var saveAlliancePromise = alliance.save();
+		var saveDocsPromisesArray = [savePlayerPromise, saveAlliancePromise];
+
+		return Promise.all(saveDocsPromisesArray);
+	}).then(() => {
+		// Success
+		console.log(jsonRequestBody.username + " successfully joined the alliance: " + jsonRequestBody.allianceName);
+		res.status(200).json({
+			"allianceName": alliance.name,
+		});
+	}).catch(err => {
+		// Failed to join alliance
+		console.log(jsonRequestBody.username + " failed to join an alliance - Error: " + err.message);
+		res.status(400).json({
+			error: "Failed to join alliance - Error: " + err.message,
+		});
+	});
+});
 
 router.post('/players', (req, res) => {
 	const body = req.body
