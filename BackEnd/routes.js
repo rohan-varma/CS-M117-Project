@@ -527,24 +527,27 @@ router.post('/getUsername', (req, res) => {
 
 const validateGetTargets = request => {
     const body = request.body;
-    return _.has(body, 'username') || _.has(body, 'playerId');
+    return _.has(body, 'username');
 }
 
 router.post('/targets', (req, res) => {
     if (!validateGetTargets(req)) {
     	console.log(JSON.stringify(req.body, null, 2))
 	res.status(400).json({
-	    error: 'Request object must contain username or playerId'
+	    error: 'Request object must contain username',
 	});
 	return;
     }
     const body = req.body;
-    const search = {_id: req.body.playerId };
-    Player.findOne(search, (err, player) => {
+    console.log('request body')
+    console.log(JSON.stringify(body, null, 2))
+    Player.findOne({username: req.body.username}, (err, player) => {
 	if (err) {
 		res.status(400).json({message: 'error when trying to find player'});
 	}
 	else {
+		console.log('FOUND THIS PLAYER')
+		console.log(JSON.stringify(player, null, 2))
 	    if (player.alliance == null)
 		res.status(200).json({ targets: [player.target] });
 	    else {
