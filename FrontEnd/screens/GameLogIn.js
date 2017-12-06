@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button } from 'react-native';
+
+
+import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput}   from 'react-native';
 import { Actions } from 'react-native-router-flux';
-import { GameCreate } from './GameCreate'
-const { gameExists, createGame, addUserToGame } = require('../requestors');
+import GameTextInput  from '../components/GameTextInput';
+import { Button } from 'react-native-elements';
+import { Lobby} from './GameLobby';
+
 const _ = require('lodash');
+const { gameExists, createGame, addUserToGame } = require('../requestors');
 
 class GameInput extends Component {
     constructor(props) {
@@ -13,7 +18,7 @@ class GameInput extends Component {
             gameCode: '',
         };
     }
-
+   
     enterGame = () => {
         if (this.state.username == '') {
             alert('Please enter a username');
@@ -43,6 +48,7 @@ class GameInput extends Component {
     }
 
     render() {
+       const gotoGamePage = () => Actions.GamePage({username: this.state.username}); 
         return (
             <View style={styles.formContainer} >
                 <TextInput
@@ -50,17 +56,22 @@ class GameInput extends Component {
                     placeholder="Username"
                     onChangeText={ (username) => this.setState({username}) }
                 />
-
                 <TextInput
                     style={styles.textInput}
                     placeholder="Game Code"
                     onChangeText={ (gameCode) => this.setState({gameCode}) }
                 />
 
-                <Button
-                    style={styles.button}
-                    title="Join Game"
-                    onPress={() => this.enterGame() }
+                <View style={{flex:0.1}}/>
+                <Text> Choose a Safe Zone </Text>
+                <View style={{flex:0.5}}/>
+                 <Button
+                    backgroundColor='rgba(201, 29, 77, 0.6)'
+                    title="Enter Game"
+                    
+                    fontWeight='bold'
+                    borderRadius={10}
+
                 />
             </View>
         );
@@ -72,7 +83,9 @@ const styles = StyleSheet.create({
       alignSelf:'stretch',
       paddingLeft:20,
       paddingRight:20,
-      paddingTop: 50
+      paddingTop: 50,
+      flexDirection: 'column',
+      flex: 1,
     },
     textInput: {
       alignSelf: 'stretch',
