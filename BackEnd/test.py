@@ -58,6 +58,17 @@ def testStartGame(data):
 		data = data)
 	assert res.status_code == 200
 
+def testCreateAlliance(data):
+	res = requests.post("http://localhost:3000/BluA/createAlliance",
+		data = data)
+	assert res.status_code == 200
+	return json.loads(res.text)["allianceId"]
+
+def testJoinAlliance(data):
+	res = requests.post("http://localhost:3000/BluA/joinAlliance",
+		data = data)
+	assert res.status_code == 200
+
 def testUpdateLocation(data):
 	res = requests.post("http://localhost:3000/BluA/updateLocation",
 		data = data)
@@ -164,10 +175,48 @@ def testTargetInCentralSafezone():
 	#attempt to kill the target
 	testKillTargetWithSafezone(user1_data)
 
+def testTargetInAlliance():
+	#create game data
+	test_data = createGameData()
+	#create four test users
+	user1_data = createUserData(test_data[0])
+	user2_data = createUserData(test_data[0])
+	user3_data = createUserData(test_data[0])
+	user4_data = createUserData(test_data[0])
+	#create a game with the above data
+	testCreateGame(test_data[1])
+	#add users with the above data
+	testAddUser(user1_data)
+	testAddUser(user2_data)
+	testAddUser(user3_data)
+	testAddUser(user4_data)
+	#start game
+	testStartGame(test_data[1])
+	#update the player's locations to outside the safezone
+	user1_data['x'] = 5
+	user1_data['y'] = 5
+	user2_data['x'] = 5
+	user2_data['y'] = 5
+	user3_data['x'] = 2
+	user3_data['y'] = 2
+	user4_data['x'] = 5
+	user4_data['y'] = 5
+	testUpdateLocation(user1_data)
+	testUpdateLocation(user2_data)
+	testUpdateLocation(user3_data)
+	testUpdateLocation(user4_data)
+	#alliance
+	allId = testCreateAlliance(user1_data)
+	user2_data['allianceId'] = allId
+	testJoinAlliance(user2_data)
+	#attempt to kill the target
+	testKillTarget(user1_data)
+
 def main():
-	testBasicCase()
-	testTargetInIndividualSafezone()
-	testTargetInCentralSafezone()
+	# testBasicCase()
+	# testTargetInIndividualSafezone()
+	# testTargetInCentralSafezone()
+	testTargetInAlliance()
 	
 if __name__ == "__main__":
 	main()

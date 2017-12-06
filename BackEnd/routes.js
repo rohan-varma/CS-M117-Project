@@ -64,6 +64,10 @@ function checkTargetInSafezone(player, target, callback) {
 	console.log(target.username)
 	console.log(target.mySafeZone)
 	Safezone.findOne({_id: target.mySafeZoneId}, (err, safezone) => {
+		if(!safezone) {
+			let newError = new Error('Did not find safezone with id ' + target.mySafeZoneId);
+			callback(newError, null);
+		}
 		console.log('WE FOUND A SAFEZONE HELL YEA')
 		var point = { type : "Point", coordinates : safezone.location };
 		console.log(point);
@@ -143,7 +147,7 @@ function checkTargetProximity(player, target, callback) {
 	});
 }
 
-function killTargetAttempt(player, target, callback) {
+function killTargetAttempt(player, target, assassin, callback) {
 	//check target safezones
 	checkTargetInSafezone(player, target, (err, inSafezone) => {
 		if(err) {
@@ -163,7 +167,16 @@ function killTargetAttempt(player, target, callback) {
 					console.log("target in range")
 					//kill target (update their data), send notifications
 					//give assassin new target
-					player.target = target.target;
+					if(assassin) {
+						assassin.target = target.target
+						assassin.save((err) => {
+							if(err) {
+								callback(err, null)
+							}
+						})
+					} else {
+						player.target = target.target
+					}
 					target.alive = false;
 					player.save((err) => {
 						if(err) {
@@ -302,19 +315,105 @@ router.post('/killTarget', (req, res) => {
 		});
 	else {
 		Player.findOne(player.target, (err, target) => {
-		if(!target)
-			res.status(400).json({
-				error: 'Player\'s target does not exist',
-			});
-		else {
-			killTargetAttempt(player, target, (err, msg) => {
-				if(err) {
-					res.status(400).json({error: err.message});
-				} else {
-					res.status(200).json({message: msg});
-				}
-			});
-		}
+			if(!target)
+				res.status(400).json({
+					error: 'Player\'s target does not exist',
+				});
+			else {
+				console.log(player)
+				console.log(target)
+				killTargetAttempt(player, target, null, (err, msg) => {
+					if(err) {
+						res.status(400).json({error: err.message});
+						return;
+					} else if (msg === 'target killed' || !player.alliance) {
+						console.log("early exit")
+						res.status(200).json({message: msg});
+						return;
+					} else {
+						// Check if you can kill a target in alliance
+						// Look up alliance, if found run killTargetAttempt on every target in the alliance
+						Alliance.findById(player.alliance, (err, alliance) => {
+							if (!alliance) {
+								res.status(400).json({
+									error: "alliance not found",
+								});
+								return;
+							}  else {
+								console.log(alliance.dictionary)
+
+								// for (let i = 0; i < alliance.dictionary.length; i++) {
+								// 	var element = alliance.dictionary[i];
+
+								// 	console.log(player);
+								// 	console.log(element.target);
+								// 	console.log(element.ally);
+
+								// 	var findTargetPromise = Player.findById(element.target).exec();
+								// 	var findAllyPromise = Player.findById(element.ally).exec();
+								// 	var allianceKillQueryPromises = [findTargetPromise, findAllyPromise];
+
+								// 	Promise.all(allianceKillQueryPromises).then(docs => {
+								// 		var targetDoc = docs[0];
+								// 		var allyDoc = docs[1];
+
+								// 		killTargetAttempt(player, targetDoc, allyDoc, (err, msg) => {
+								// 			if(err) {
+								// 				res.status(400).json({error: err.message});
+								// 				return;
+								// 			} else {
+								// 				console.log('killed alliance target!')
+								// 				res.status(200).json({
+								// 					message: msg,
+								// 				});
+								// 				return;
+								// 			}
+								// 		});
+								// 	}).catch(err => {
+								// 		res.status(400).json({error: err.message});
+								// 	});
+								// }
+								var continueExecution = true;
+								alliance.dictionary.forEach(element => {
+									if(continueExecution && player._id !=  element.ally) {
+										console.log(player)
+										console.log(element.target)
+										console.log(element.ally)
+										
+										var findTargetPromise = Player.findById(element.target).exec();
+										var findAllyPromise = Player.findById(element.ally).exec();
+										var allianceKillQueryPromises = [findTargetPromise, findAllyPromise];
+
+										Promise.all(allianceKillQueryPromises).then(docs => {
+											var targetDoc = docs[0];
+											var allyDoc = docs[1];
+
+											killTargetAttempt(player, targetDoc, allyDoc, (err, msg) => {
+												if(err) {
+													res.status(400).json({error: err.message});
+													continueExecution = false;
+													return;
+												} else if(msg === 'killed target') {
+													console.log('killed alliance target!')
+													res.status(200).json({
+														message: msg,
+													});
+													continueExecution = false;
+													return;
+												}
+											});
+										}).catch(err => {
+											res.status(400).json({error: err.message});
+											continueExecution = false;
+											return;
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
 		});
 	}
 	});
@@ -685,6 +784,7 @@ router.post('/targets', (req, res) => {
  */
 router.post('/createAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
+	var allianceId = null;
 
 	Player.findOne({ username: jsonRequestBody.username }).then(creator => {
 		if (!creator) {
@@ -693,11 +793,12 @@ router.post('/createAlliance', (req, res) => {
 
 		var allianceFields = {
 			allies: [creator._id],
-			targets: [creator.target]
+			targets: [creator.target],
+			dictionary: [{ally: creator._id, target: creator.target}]
 		};
 
 		var alliance = new Alliance(allianceFields);
-		var allianceId = alliance._id;
+		allianceId = alliance._id;
 		creator.alliance = allianceId;
 
 		// Saves new alliance and updates the creator's alliance field
@@ -705,7 +806,6 @@ router.post('/createAlliance', (req, res) => {
 		return Promise.all(promisesArray);
 	}).then(() => {
 		// Success
-		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName);
 		res.status(200).json({
 			"allianceId": allianceId,
 		});
@@ -758,7 +858,7 @@ router.post('/joinAlliance', (req, res) => {
 
 		// Target validation
 		alliance.targets.forEach(target => {
-			if (target._id.equals(player._id)) {
+			if (target.equals(player._id)) {
 				throw new Error("player is a target of someone within the alliance");
 			}
 		});
@@ -766,7 +866,8 @@ router.post('/joinAlliance', (req, res) => {
 		// Add player to alliance
 		player.alliance = allianceId;
 		alliance.allies.push(player._id);
-		alliance.targets.push(player.target)
+		alliance.targets.push(player.target);
+		alliance.dictionary.push({ally: player._id, target: player.target});
 
 		var savePlayerPromise = player.save();
 		var saveAlliancePromise = alliance.save();
@@ -826,6 +927,7 @@ router.post('/getAlliance', (req, res) => {
 			"allianceId": alliance._id,
 			"allies": alliance.allies,
 			"targets": alliance.targets,
+			"dictionary": alliance.dictionary,
 		});
 	}).catch(err => {
 		res.status(400).json({
