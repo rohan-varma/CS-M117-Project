@@ -2,14 +2,36 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button, ImageBackground, ListView }   from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import GameTextInput  from '../GameTextInput';
-import Form  from '../components/form';
-const { createGame, addUserToGame } = require('../requestors');
+//import Form  from '../src/form';
+const { createGame, addUserToGame, getAllPlayersForGame } = require('../requestors');
 const _ = require('lodash');
 
+
+//MUST BE INIT WITH GAME ID!
 class PlayerScreen extends Component {
   constructor(props) {
-    super(props);
+    //passed in game id
+    console.log('constructing this shit now')
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    super(props);
+    let obj;
+    //fetch the players
+    console.log('USING GAME ID ', this.props.gameId)
+    const requestObj = JSON.stringify({gameId: this.props.gameId, playerId: this.props.playerId})
+    getAllPlayersForGame(requestObj)
+    .then(res => {
+      console.log('hello world!')
+      console.log(JSON.stringify(_.keys(res), null, 2))
+      obj = res;
+      this.setState({
+        dataSource: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
+        playerTargets: ds.cloneWithRows(res.deadPlayers.map(p => ({name: p.username}))),
+      })
+    })
+    .catch(err => {
+      console.log('err is ', err)
+    })
+    //shitty default state
     this.state = {
       dataSource: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
       playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
