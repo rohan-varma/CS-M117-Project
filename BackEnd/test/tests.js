@@ -71,7 +71,7 @@ describe('addUser', () => {
 		});
 	});
 
-	it('adds  user', cb => {
+	it.only('adds  user', cb => {
 		// first create a game
 		const code = Math.random().toString(36).substring(15);
 		console.log('HERE')
@@ -108,7 +108,7 @@ describe('get players', () => {
 	const startRequest = () => {
 		return chai.request(server).post('/BluA/addUser')
 	}
-	it.only('can get players', cb => {
+	it('can get players', cb => {
 		let gameId;
 		//first create game and add players
 		const code = Math.random().toString(36).substring(15);
@@ -137,7 +137,7 @@ describe('get players', () => {
 			console.log(JSON.stringify(body, null, 2))
 			//find the player here
 			console.log('trying to find the player now');
-			chai.request(server).get('/BluA/players').send({gameId: gameId})
+			chai.request(server).post('/BluA/players').send({gameId: gameId})
 			.end((err, res) => {
 				const body = res.body;
 				console.log(JSON.stringify(body, null, 2))

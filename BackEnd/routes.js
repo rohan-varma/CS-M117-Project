@@ -29,8 +29,182 @@ router.get('/config', (req, res, next) => {
     res.json(config.client);
 });
 
+const validateKillRequest = request => {
+	const body = request.body
+	return _.has(body, 'username')
+}
+
+function checkTargetInSafezone(player, target, callback) {
+	console.log("checking safezone")
+	console.log(target.username)
+	console.log(target.mySafeZone)
+	Safezone.findOne({_id: target.mySafeZoneId}, (err, safezone) => {
+		if(!safezone) {
+			console.log("couldn't find safezone")
+			return false;
+		}
+		console.log('WE FOUND A SAFEZONE HELL YEA')
+		var point = { type : "Point", coordinates : safezone.location };
+		console.log(point);
+		var isInSafezone = false;
+    	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
+    	   	if(err) {
+    	 		console.log(err);
+    	   		return false;
+    	   	}
+    	   	results.filter(function(value) {
+    	   		if(value.obj.username == target.username) {
+    	   			console.log(value.obj)
+    	   			isInSafezone = true;
+    	   		}
+    	   	})
+    	   	console.log(isInSafezone)
+    	   	callback(err, isInSafezone);
+    	});
+	});
+}
+
+function checkTargetProximity(player, target, callback) {
+	console.log("checking proximity")
+	console.log(target.username)
+	var point = { type : "Point", coordinates : player.location };
+	console.log(point);
+	var isInRange = false;
+    Player.geoNear(point, { maxDistance : 5, spherical : true }, function(err, results, stats) {
+       	if(err) {
+     		console.log(err);
+       		return false;
+       	}
+       	results.filter(function(value) {
+       		if(value.obj.username == target.username) {
+       			console.log(value.obj)
+       			isInRange = true;
+       		}
+       	})
+       	console.log(isInRange)
+       	callback(err, isInRange);
+    });
+}
+
+router.post('/killTarget', (req, res) => {
+	if (!validateKillRequest(req)) {
+		console.log('failed to validate')
+		res.status(400).json({
+			error: 'Must have username specified',
+		});
+		return;
+	}
+	console.log('request validated')
+    Player.findOne({ username: req.body.username }, (err, player) => {
+	if (!player) 
+		    res.status(400).json({
+			error: 'Player does not exist',
+		});
+	else {
+		Player.findOne(player.target, (err, target) => {
+		if(!target)
+		    res.status(400).json({
+				error: 'Player\'s target does not exist',
+			});
+		else {
+			console.log("found target")
+			//check target safezones
+			checkTargetInSafezone(player, target, (err, inSafezone) => {
+				if(err) {
+							res.status(500).json({
+		    					error: 'error with computing proximity',
+		    				});
+						}
+				if(inSafezone) {
+					console.log("target in safezone");
+					res.status(200).json({
+										message: 'target in safezone',
+									});
+				}
+				else {
+					//check coordinate distance
+					checkTargetProximity(player, target, (err, inRange) => {
+						if(err) {
+							res.status(500).json({
+		    					error: 'error with computing proximity',
+		    				});
+						}
+						if(inRange) {
+							console.log("target in range")
+							//kill target (update their data), send notifications
+							//give assassin new target
+							player.target = target.target;
+							target.alive = false;
+							player.save((err) => {
+								if(err) {
+									res.status(500).json({
+				    					error: 'error with player',
+		    						});
+								}
+							}).then(target.save((err) => {
+								if(err) {
+									res.status(500).json({
+		    							error: 'error with player',
+		    						});		
+								}
+								console.log("updated player and target");
+							})).then(
+								//update game player status
+								Game.findOne({_id: player.game}, (err, game) => {
+									console.log(player.game);
+									if(!game) {
+										res.status(400).json({
+	    									error: 'Did not find game with login code ' + player.game,
+	    								})
+									}
+									console.log(game.gameCode);
+									console.log(game.alivePlayers);
+									var updatedPlayers = game.alivePlayers.filter(function(value) {
+										console.log(value+" target: "+target._id);
+										if(value.toString() == target._id.toString()) {
+       										console.log("found value: "+value);
+       										game.deadPlayers.push(value)
+    	   								}
+       									return value.toString() != target._id.toString()
+       								});
+   									console.log("filtered alivePlayers array")
+   									console.log(updatedPlayers)
+   									game.alivePlayers = updatedPlayers
+   									console.log(game.alivePlayers)
+   									if(err)
+   										res.status(500).json({
+	   										error: 'error with updating game state',
+			   							});
+    								game.save((err) => {
+       								if(err)
+       									res.status(500).json({
+		    								error: 'error with saving game',
+		    							});
+       								else {
+       									console.log("updated game");
+       									res.status(200).json({
+											message: 'killed target',
+										})
+       								}
+       							})
+							}));					
+						} else {
+							res.status(200).json({
+								message: 'target not in range',
+							})
+						}
+					})
+				}
+			//TODO: alliance checks
+			});
+	    }
+		})
+    }
+	});
+});
+
 const validateGameExists = request => {
-    return _.has(request.body, 'loginCode');
+  return _.has(request.body, 'loginCode');
 }
 
 router.get('/gameExists', (req, res) => {
@@ -147,44 +321,51 @@ router.post('/addUser', (req, res) => {
 	    			})
 	    		}
 			else {
-				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCord],
-				radius: 5});
-		    	var newPlayer = new Player({ username: req.body.username,
+				req.body.xCoord = req.body.xCoord || 2;
+				req.body.yCoord = req.body.yCoord || 2;
+				var newSafezone = new Safezone({location: [req.body.xCoord, req.body.yCoord],
+				radius: req.body.radius});
+
+        var newPlayer = new Player({ username: req.body.username,
 						 alive: true,
 						 macAddress: req.body.mac,
 						 game: game._id, //not sure how to use this
 						 gameId: game._id,
 						 mySafeZone: newSafezone._id,
+						 mySafeZoneId: newSafezone._id,
 						 location: [req.body.x, req.body.y] });
 		    	newSafezone.game = game._id;
 		    	let playerId;
 		    	console.log('calling new player.save');
 		    	//this code is wrong, but seems to work.
 		    	newPlayer.save((err, player) => {
-		    		playerId = player._id;
 		    		if (err) {
-		    			res.status(500).json({
-		    				error: 'error with player',
+		    			console.log('some error with player')
+		    			res.status(400).json({
+		    				error: 'error with saving player',
 		    			});
 		    		}
-		    		console.log('had no error')
-		    	}).then(player => {
-		    		console.log(player)
-		    		console.log('in this thingy')
-		    		game.alivePlayers.push(player._id);
+		    		console.log('the player')
+		    		console.log(JSON.stringify(player, null, 2))
+		    		playerId = player._id;
+		    		game.alivePlayers.push(player)
 		    		game.save(err => {
 		    			if (err) {
-		    				res.status(500).json({
-		    					error: 'error saving game',
-		    				});
+		    				console.log('err saving game')
+		    				res.status(400).json({error: 'error saving game'})
+		    			} else {
+		    				newSafezone.save(err => {
+		    					if (err) {
+		    						console.log(err)
+		    						console.log('error saving safezone')
+		    						res.status(400).json({error: 'saving savezone'})
+		    					} else {
+		    						res.status(200).json({message: 'success', id: playerId})
+		    					}
+		    				})
 		    			}
-		    			else {
-		    				res.status(200).json({
-		    					id: player._id,
-		    				});
-		    			}
-		    		});
-		    	});
+		    		})
+		    	})
 			}
 	    });
 		}
@@ -329,19 +510,19 @@ router.get('/getTargets', (req, res) => {
 /**
  * @api {post} /createAlliance Create Alliance
  *
- * @apiParam {String} username		            The id of the invitation
- * @apiParam {String} allianceName            The email address of the invitee
+ * @apiParam {String} username                The username of the creator
+ * @apiParam {String} allianceName            The name of the alliance
  *
  * @apiExample {json} Example json input:
  *    {
  *      "username": "joebruin",
- *      "allianceName": "UCLA Alliance",
+ *      "allianceName": "UCLA Alliance"
  *    }
  *
  * @apiUse Response200
  * @apiSuccessExample {json} Success example
  *    {
- *      "allianceID": allianceID,
+ *      "allianceId": "41224d776a326fb40f000001"
  *    }
  *
  * @apiUse Error400
@@ -351,17 +532,16 @@ router.get('/getTargets', (req, res) => {
 router.post('/createAlliance', (req, res) => {
 	var jsonRequestBody = req.body;
 
-	var findCreatorPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
-
-	var createAlliancePromise = findCreatorPromise.then((creator) => {
+	Player.findOne({ username: jsonRequestBody.username }).exec().then(creator => {
 		if (!creator) {
 			throw new Error("creator not found");
 		}
 
-		var allianceFields = {};
-		allianceFields.name = jsonRequestBody.allianceName;
-		allianceFields.allies = [creator._id];
-		allianceFields.targets = [creator.target];
+		var allianceFields = {
+			name: jsonRequestBody.allianceName,
+			allies: [creator._id],
+			targets: [creator.target]
+		};
 
 		var alliance = new Alliance(allianceFields);
 		var allianceId = alliance._id;
@@ -369,17 +549,14 @@ router.post('/createAlliance', (req, res) => {
 
 		// Saves new alliance and updates the creator's alliance field
 		var promisesArray = [alliance.save(), creator.save()];
-
 		return Promise.all(promisesArray);
-	});
-
-	createAlliancePromise.then(() => {
+	}).then(() => {
 		// Success
-		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName)
+		console.log(jsonRequestBody.username + " successfully created the alliance: " + jsonRequestBody.allianceName);
 		res.status(200).json({
-			"allianceID": allianceID,
+			"allianceId": allianceId,
 		});
-	}).catch((err) => {
+	}).catch(err => {
 		// Failed to create alliance
 		console.log("Failed to add users to a new alliance - Error: " + err.message);
 		res.status(400).json({
@@ -388,7 +565,81 @@ router.post('/createAlliance', (req, res) => {
 	});
 });
 
-router.get('/players', (req, res) => {
+/**
+ * @api {post} /joinAlliance Join Alliance
+ *
+ * @apiParam {String} username                The username of the player
+ * @apiParam {String} allianceId              The ID of the alliance to join
+ *
+ * @apiExample {json} Example json input:
+ *    {
+ *      "username": "joebruin",
+ *      "allianceId": "41224d776a326fb40f000001"
+ *    }
+ *
+ * @apiUse Response200
+ * @apiSuccessExample {json} Success example
+ *    {
+ *      "allianceName": allianceName
+ *    }
+ *
+ * @apiUse Error400
+ * @apiError (Error400) 400 Failed to create alliance
+ *
+ */
+router.post('/joinAlliance', (req, res) => {
+	var jsonRequestBody = req.body;
+	var allianceId = jsonRequestBody.allianceId;
+
+	// Get player and alliance
+	var findPlayerPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
+	var findAlliancePromise = Alliance.findById(allianceId).exec();
+	var promisesArray = [findPlayerPromise, findAlliancePromise];
+
+	Promise.all(promisesArray).then(docs => {
+		var player = docs[0];
+		var alliance = docs[1];
+
+		if (!player) {
+			throw new Error("player not found");
+		}
+		else if (!alliance) {
+			throw new Error("alliance not found");
+		}
+
+		// Target validation
+		alliance.targets.forEach(target => {
+			if (target._id.equals(player._id)) {
+				throw new Error("player is a target of someone within the alliance");
+			}
+		});
+
+		// Add player to alliance
+		player.alliance = allianceId;
+		alliance.allies.push(player._id);
+		alliance.targets.push(player.target)
+
+		var savePlayerPromise = player.save();
+		var saveAlliancePromise = alliance.save();
+		var saveDocsPromisesArray = [savePlayerPromise, saveAlliancePromise];
+
+		return Promise.all(saveDocsPromisesArray);
+	}).then(() => {
+		// Success
+		console.log(jsonRequestBody.username + " successfully joined the alliance: " + jsonRequestBody.allianceName);
+		res.status(200).json({
+			"allianceName": alliance.name,
+		});
+	}).catch(err => {
+		// Failed to join alliance
+		console.log(jsonRequestBody.username + " failed to join an alliance - Error: " + err.message);
+		res.status(400).json({
+			error: "Failed to join alliance - Error: " + err.message,
+		});
+	});
+});
+
+router.post('/players', (req, res) => {
 	const body = req.body
 	const gameId = body.gameId
 	Player.find({}, (err, players) => {
