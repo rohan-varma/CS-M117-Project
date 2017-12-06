@@ -58,22 +58,6 @@ export default class GamePage extends Component {
             }}
           /> 
         </View>
-      {/*
-          <Content >
-            <View syle= {styles.playerWrapper}>
-            
-            <List dataArray={items}
-              renderRow={(item) =>
-                <ListItem>
-                  <Text>{item}</Text>
-                </ListItem>
-              }>
-            </List>
-            </View>
-         
-            </Content>
-
-      */}
         <View style={{flexDirection: 'column', flex:1}}>
          <Text style={styles.text}>This is your safe zone and the shared safe zone</Text>
                 <MapView

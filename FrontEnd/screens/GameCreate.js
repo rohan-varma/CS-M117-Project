@@ -54,6 +54,7 @@ class GameCreate extends Component {
     render() {
         return (
             <View style={ styles.formContainer }>
+              <View style={styles.formwrapper}>
                 <Text style={styles.text}>Select game size</Text>
                 <Form>
                     <Picker
@@ -69,6 +70,7 @@ class GameCreate extends Component {
                         <Item label="Giant: max 100 players" value={100} />
                     </Picker>
                 </Form>
+               
 
                 <View>
                     <Text style={styles.text}>Allow Alliances</Text>
@@ -85,12 +87,14 @@ class GameCreate extends Component {
                     </Form>
                 </View>
 
-                <View>
+            </View>
+
+                <View style={{flex:0.15}}>
                     <Text style={styles.text}>Select the shared game Safe Zone</Text>
                 </View>
-            
+                <View style={{flexDirection: 'column', flex:1}}>
                 <MapView
-                    style={{ alignSelf: 'stretch', height: 250 }}
+                    style={{ alignSelf: 'stretch', flex:1 }}
                     region={this.state.mapRegion}
                     onRegionChange={this._handleMapRegionChange}>
 
@@ -101,7 +105,8 @@ class GameCreate extends Component {
                         strokeColor="rgba(255, 0, 0, 0.3)" />
 
                 </MapView>
-                
+                </View>
+                <View style={{flex:0.3}}>
                 <Button
                     backgroundColor='rgba(201, 29, 77, 0.6)'
                     title="Create Game"
@@ -112,6 +117,7 @@ class GameCreate extends Component {
                 >
                     <Text style={styles.buttonText}>Create game and login</Text>
                 </Button>
+                </View>
             </View>
         );
     }
@@ -121,9 +127,12 @@ const styles = StyleSheet.create({
     formContainer: {
         flex: 1,
         alignSelf:'stretch',
-        paddingLeft:20,
-        paddingRight:20,
-        paddingTop: 50,
+
+        flexDirection: 'column',
+        padding:20,
+    },
+    formwrapper: {
+      flex: 0.5,
     },
     text: {
       color: 'black',
