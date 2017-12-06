@@ -118,9 +118,6 @@ def testBasicCase():
 	testUpdateLocation(user2_data)
 	testUpdateLocation(user3_data)
 	testUpdateLocation(user4_data)
-	#alliance
-	testCreateAlliance(user1_data)
-	testJoinAlliance(user2_data)
 	#attempt to kill the target
 	testKillTarget(user1_data)
 
@@ -208,6 +205,10 @@ def testTargetInAlliance():
 	testUpdateLocation(user2_data)
 	testUpdateLocation(user3_data)
 	testUpdateLocation(user4_data)
+	#alliance
+	allId = testCreateAlliance(user1_data)
+	user2_data['allianceId'] = allId
+	testJoinAlliance(user2_data)
 	#attempt to kill the target
 	testKillTarget(user1_data)
 
