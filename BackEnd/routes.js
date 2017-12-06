@@ -624,17 +624,29 @@ router.post('/targets', (req, res) => {
 		res.status(400).json({message: 'error when trying to find player'});
 	}
 	else {
-		console.log('FOUND THIS PLAYER')
-		console.log(JSON.stringify(player, null, 2))
+	    console.log('FOUND THIS PLAYER')
+	    console.log(JSON.stringify(player, null, 2))
+	    const pIdToUsername = playerId => {
+		return Player.findById(playerId);
+	    }
 	    if (player.alliance == null)
-		res.status(200).json({ targets: [player.target] });
+		Promise.all(_.map([player.target], pIdToUsername)).then(result => {
+		    res.status(200).json({
+			message: 'success',
+			targets: result
+		    });
+		});
 	    else {
 		Alliance.findOne({ _id: player.alliance }, (err, a) => {
 			if (err) {
 				res.status(400).json({error: err});
 			} else {
-				res.status(200).json({ message: 'success',
-					       targets: a.targets });
+			    Promise.all(_.map(a.targets, pIdToUsername)).then(result => {
+				res.status(200).json({
+				    message: 'success',
+				    targets: result
+				});
+			    });
 			}
 		});
 	    }
