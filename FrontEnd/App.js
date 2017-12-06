@@ -6,12 +6,14 @@ import { StyleSheet, Text, View,
   ImageBackground,
   KeyboardAvoidingView
  } from 'react-native';
+
 import Lobby from './screens/GameLobby';
-import Home from './screens/Home';
+import Home from './screens/home';
+import Form from './components/form';
+import PlayerScreen from './screens/PlayerScreen';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn'
 import {Scene, Router} from 'react-native-router-flux';
-import PlayerScreen from './screens/PlayerScreen';
 const _ = require('lodash');
 
 export default class App extends React.Component {
@@ -22,7 +24,7 @@ export default class App extends React.Component {
               <Scene key="Home" component={Home} initial={true}/>
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
-              <Scene key='PlayerScreen' component={PlayerScreen} title = "Player Screen" />
+              <Scene key="Lobby" component={Lobby} title = "game"/>
             </Scene>
           </Router>
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, AppRegistry} from 'react-native';
 import { Container, Header, Content, Footer, FooterTab, Button, Text } from 'native-base';
-export default class gamePage extends Component {
+export default class GamePage extends Component {
   constructor(props){
     super(props)
   }

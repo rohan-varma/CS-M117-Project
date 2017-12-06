@@ -3,8 +3,9 @@ import {
   StyleSheet, 
   Text, View, 
   TouchableOpacity,
-  Image,
+  ImageBackground,
   KeyboardAvoidingView
+
  } from 'react-native';
 import { Button } from 'react-native-elements';
 import GameTextInput  from '../components/GameTextInput';
@@ -13,61 +14,86 @@ import GameLogIn from './GameLogIn'
 import { Actions } from 'react-native-router-flux';
 
 
-class Home extends Component {
-    static navigationOptions = { header: null };
-    render() {
+export default class Form extends Component {
+  static navigationOptions = { header: null };
+  render() {
     return (
-    <View style={styles.container}>
-        <View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-            <Image source={require('../img/ninja.jpg')} style={styles.backgroundImage} />
-        </View>
-        <View style={styles.container}>
-            <View style={styles.container}> 
-                <Text style={styles.header}> Bluetooth </Text> 
-                <Text style={styles.header}> Assassin </Text> 
-            </View>
-            <View style={styles.container}>
+      <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
+        <ImageBackground style={styles.container} source={require('../img/ninja.jpg')}>
+          <View style={styles.filler}/>
+          <View style={styles.headercontainer}>
+            <Text style={styles.header}> Bluetooth </Text> 
+            <Text style={styles.header}> Assassin </Text> 
+          </View>
+          <View style={{flex:0.5}}/>
+          <View style={styles.formContainer}> 
+              <View style={{ flex: 1 }} >
                 <Button
-                    onPress={Actions.GameLogIn} 
-                    style={styles.button}
-                    title="Join Game"
+                    backgroundColor='rgba(201, 29, 77, 0.6)'
+                    title="Log In to Existing Game"
+                    onPress= {Actions.GameLogIn}
+                    fontWeight='bold'
+                    borderRadius={10}
+                />
+              </View>
+              <View style={{ flex: 1 }} >
+                <Button
+                    backgroundColor='rgba(154, 196, 248, 0.75)'
+                    title="Create a New Game"
+                    onPress= {Actions.GameCreate}
+                    fontWeight='bold'
+                    borderRadius={10}
                 />
             </View>
-        </View>
-    </View>
+
+          </View>
+         <View style={styles.filler}/>
+        </ImageBackground>
+      </KeyboardAvoidingView>
+
     );
+
   }
+
 }
 
 const styles = StyleSheet.create({
+  headercontainer: {
+      flex:1,
+    },
+    wrapper: {
+      flex:1,
+      
+    },
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+      flexDirection: 'column',
+      flex: 1,
+      alignSelf: 'stretch',
+      width: null,
+      justifyContent: 'space-around',
+      alignItems: 'center',
     },
     header: {
-        fontSize: 38,
-        color: 'white',
-        fontWeight: 'bold',
-        backgroundColor: 'transparent',
-        marginBottom: 10,
+      fontSize: 45,
+      color: 'white',
+      fontWeight: 'bold',
+      backgroundColor: 'transparent',
+      marginBottom: 10,
     },
-    button: {
-        alignSelf: 'center',
-        paddingRight:30,
-        paddingLeft:30,
-        marginTop:20,
-        padding:20,
-        backgroundColor: 'rgba(159, 20, 169, 0.6)',
-        borderRadius: 10,
-    },
-    buttonText: {
-        
-    },
-    backgroundImage: {
-        flex: 1,
-        resizeMode: 'cover', // or 'stretch'
-    }
-});
 
-export default Home;
+    formContainer: {
+      alignSelf:'stretch',
+      paddingLeft:20,
+      paddingRight:20,  
+      flexDirection: 'column',
+      justifyContent: 'center',
+       flex:1
+
+    },
+    filler: {
+      flex: 1,
+    },
+
+    
+
+});

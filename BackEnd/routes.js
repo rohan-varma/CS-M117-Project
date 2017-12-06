@@ -387,7 +387,8 @@ router.post('/createAlliance', (req, res) => {
 	});
 });
 
-router.get('/players', (req, res) => {
+router.post('/players', (req, res) => {
+	console.log('HERE IN POST')
 	const body = req.body
 	const gameId = body.gameId
 	Player.find({}, (err, players) => {
