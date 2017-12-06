@@ -217,6 +217,27 @@ const validateSafezoneRequest = request => {
 	&& _.has(request.body, 'loginCode');
 }
 
+router.post('/organizerName', (req, res) => {
+    if(!_has.(req.body, 'loginCode')) {
+	res.status(400).json({
+	    error: 'Must have loginCode specified'
+	});
+	return;
+    }
+    Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
+	if(!game)
+	    res.status(400).json({
+		error: 'Game does not exist'
+	    });
+	else {
+	    res.status(200).json({
+		message: 'success',
+		organizerName: game.organizerGame
+	    });
+	}
+    });
+});
+
 router.post('/safezoneInfo', (req, res) => {
     if (!validateSafezoneRequest(req)) {
 	res.status(400).json({
