@@ -22,7 +22,7 @@ export default class Form extends Component {
         <ImageBackground style={styles.container} source={require('../img/ninja.jpg')}>
           <View style={styles.filler}/>
           <View style={styles.headercontainer}>
-            <Text style={styles.header}> WhiteTooth </Text> 
+            <Text style={styles.header}> BlueTooth </Text> 
             <Text style={styles.header}> Assassin </Text> 
           </View>
           <View style={{flex:0.5}}/>

@@ -531,7 +531,6 @@ const validateGetTargets = request => {
 
 router.post('/targets', (req, res) => {
     if (!validateGetTargets(req)) {
-    	console.log('your shitty request object')
     	console.log(JSON.stringify(req.body, null, 2))
 	res.status(400).json({
 	    error: 'Request object must contain username or playerId'
@@ -541,9 +540,7 @@ router.post('/targets', (req, res) => {
     const body = req.body;
     const search = req.body.username ? {username: req.body.username } : {_id: req.body.playerId };
     Player.findOne(search, (err, player) => {
-    	console.log('HFEUHOEUHFREOUHORUWHN')
 	if (err) {
-		console.log('SOMETHING GOT FUCKED UP')
 		res.status(400).json({message: 'error when trying to find player'});
 	}
 	else {
@@ -552,7 +549,6 @@ router.post('/targets', (req, res) => {
 	    else {
 		Alliance.findOne({ _id: player.alliance }, (err, a) => {
 			if (err) {
-				console.log('SOME ALLIANCE SHIT GOT FUCKED UP')
 				res.status(400).json({error: err});
 			} else {
 				res.status(200).json({ message: 'success',
