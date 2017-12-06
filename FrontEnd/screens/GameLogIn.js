@@ -113,15 +113,13 @@ class GameInput extends Component {
         });
     }
 
-    gotoGamePage = () => { 
-        Actions.Lobby({username: this.state.username});
-    };
-
     _handleMapRegionChange = mapRegion => {
         this.setState({ mapRegion });
     };
 
+    goToLobby = () => Actions.Lobby({username: this.state.username, gameCode:this.state.gameCode}); 
     render() {
+    
         return (
             <View style={styles.formContainer} >
                 <Text style={styles.text}>Enter Username and unique Game ID</Text>
@@ -153,7 +151,7 @@ class GameInput extends Component {
                 <Button
                     backgroundColor='rgba(201, 29, 77, 0.6)'
                     title="Enter Game"
-                    onPress={ this.enterGame }
+                    onPress={this.goToLobby}
                     fontWeight='bold'
                     borderRadius={10}
                 />

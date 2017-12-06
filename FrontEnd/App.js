@@ -24,8 +24,9 @@ export default class App extends React.Component {
               <Scene key="Home" component={Home} initial={true}/>
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
-              <Scene key="Lobby" component={Lobby} title = "game"/>
+              <Scene key="Lobby" component={Lobby} title = "Lobby"/>
               <Scene key="PlayerScreen" component={PlayerScreen} title = "Players" />
+
             </Scene>
           </Router>
 
