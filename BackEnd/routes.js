@@ -52,7 +52,7 @@ const disbandAlliance = (allianceId, callback) => {
 		// Failed -> pass error to callback
 		callback(err);
 	});
-};
+}
 
 const validateKillRequest = request => {
 	const body = request.body
