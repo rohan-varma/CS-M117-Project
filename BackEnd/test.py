@@ -162,8 +162,8 @@ def testTargetInCentralSafezone():
 	testKillTargetWithSafezone(user1_data)
 
 def main():
-	# testBasicCase()
-	# testTargetInIndividualSafezone()
+	testBasicCase()
+	testTargetInIndividualSafezone()
 	testTargetInCentralSafezone()
 	
 if __name__ == "__main__":

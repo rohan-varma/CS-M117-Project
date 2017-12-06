@@ -85,14 +85,18 @@ function checkTargetInSafezone(player, target, callback) {
     	   					isInSafezone = true;
     	  		 		}
     	   			})
+    	   			console.log("inSafezone before return: "+isInSafezone)
+    				callback(err, isInSafezone);
 					});
 					});
     	   		}
-    	   		console.log("inSafezone before return: "+isInSafezone)
-    	   		callback(err, isInSafezone);
-    			});
+    	   		});
     	   	}
-    	});
+    	   	else {
+    	   		console.log("inSafezone before return: "+isInSafezone)
+    			callback(err, isInSafezone);
+    	   	}
+    	});		
 	});
 }
 
