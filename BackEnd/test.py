@@ -8,7 +8,7 @@ def createGameData():
 	login_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
 	data = {'loginCode': login_code,
  			'orgName': "person",
-			'xCoord' : 2, 'yCoord': 2, 'radius': 2}
+			'xCoord' : 7, 'yCoord': 7, 'radius': 2}
 	return login_code,data
 
 def createUserData(login_code):
@@ -107,7 +107,7 @@ def testBasicCase():
 	#attempt to kill the target
 	testKillTarget(user1_data)
 
-def testTargetInSafezone():
+def testTargetInIndividualSafezone():
 	#create game data
 	test_data = createGameData()
 	#create four test users
@@ -127,10 +127,44 @@ def testTargetInSafezone():
 	#attempt to kill the target
 	testKillTargetWithSafezone(user1_data)
 
+def testTargetInCentralSafezone():
+	#create game data
+	test_data = createGameData()
+	#create four test users
+	user1_data = createUserData(test_data[0])
+	user2_data = createUserData(test_data[0])
+	user3_data = createUserData(test_data[0])
+	user4_data = createUserData(test_data[0])
+	#create a game with the above data
+	testCreateGame(test_data[1])
+	#add users with the above data
+	testAddUser(user1_data)
+	testAddUser(user2_data)
+	testAddUser(user3_data)
+	testAddUser(user4_data)
+	#start game
+	testStartGame(test_data[1])
+	#update the player's locations to outside the individual safezone
+	#but inside the game safezone
+	user1_data['x'] = 7
+	user1_data['y'] = 7
+	user2_data['x'] = 7
+	user2_data['y'] = 7
+	user3_data['x'] = 7
+	user3_data['y'] = 7
+	user4_data['x'] = 7
+	user4_data['y'] = 7
+	testUpdateLocation(user1_data)
+	testUpdateLocation(user2_data)
+	testUpdateLocation(user3_data)
+	testUpdateLocation(user4_data)
+	#attempt to kill the target
+	testKillTargetWithSafezone(user1_data)
 
 def main():
-	# testBasicCase()
-	testTargetInSafezone()
+	testBasicCase()
+	testTargetInIndividualSafezone()
+	testTargetInCentralSafezone()
 	
 if __name__ == "__main__":
 	main()

@@ -39,10 +39,6 @@ function checkTargetInSafezone(player, target, callback) {
 	console.log(target.username)
 	console.log(target.mySafeZone)
 	Safezone.findOne({_id: target.mySafeZoneId}, (err, safezone) => {
-		if(!safezone) {
-			console.log("couldn't find safezone")
-			return false;
-		}
 		console.log('WE FOUND A SAFEZONE HELL YEA')
 		var point = { type : "Point", coordinates : safezone.location };
 		console.log(point);
@@ -50,7 +46,7 @@ function checkTargetInSafezone(player, target, callback) {
     	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
     	   	if(err) {
     	 		console.log(err);
-    	   		return false;
+    	   		return;
     	   	}
     	   	results.filter(function(value) {
     	   		if(value.obj.username == target.username) {
@@ -59,8 +55,44 @@ function checkTargetInSafezone(player, target, callback) {
     	   		}
     	   	})
     	   	console.log(isInSafezone)
-    	   	callback(err, isInSafezone);
-    	});
+    	   	if(!isInSafezone) {
+    	   		Game.findOne({_id: player.game}, (err, game) => {
+				console.log(player.game);
+				if(!game) {
+					return;
+				}
+				else {
+					Safezone.findOne({_id: game.centralSafeZone}, (err, safezone) => {
+					if(!safezone) {
+						console.log("couldn't find safezone")
+						return;
+					}
+					console.log('WE FOUND A SAFEZONE HELL YEA')
+					var point = { type : "Point", coordinates : safezone.location };
+					console.log(point);
+			    	Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
+			    	   	if(err) {
+    				 		console.log(err);
+    				   		return;
+  				  	   	}
+    			   	results.filter(function(value) {
+    	   				if(value.obj.username == target.username) {
+   			 	   			console.log("found match "+value.obj)
+    	   					isInSafezone = true;
+    	  		 		}
+    	   			})
+    	   			console.log("inSafezone before return: "+isInSafezone)
+    				callback(err, isInSafezone);
+					});
+					});
+    	   		}
+    	   		});
+    	   	}
+    	   	else {
+    	   		console.log("inSafezone before return: "+isInSafezone)
+    			callback(err, isInSafezone);
+    	   	}
+    	});		
 	});
 }
 
