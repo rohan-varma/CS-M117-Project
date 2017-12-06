@@ -228,6 +228,59 @@ function killTargetAttempt(req, res) {
 	});
 }
 
+const validateSafezoneRequest = request => {
+    return _.has(request.body, 'username')
+	&& _.has(request.body, 'loginCode');
+}
+
+router.post('/safezoneInfo', (req, res) => {
+    if (!validateSafezoneRequest(req)) {
+	res.status(400).json({
+	    error: 'Must have player username and game loginCode specified'
+	});
+	return;
+    }
+    Player.findOne({ username: req.body.username }, (err, player) => {
+	if (!player)
+	    res.status(400).json({
+		error: 'Username does not exist'
+	    });
+	else {
+	    Safezone.findOne({ _id: player.mySafeZone }, (err, psz) => {
+		if (!psz)
+		    res.status(400).json({
+			error: 'Player does not have safezone'
+		    });
+		else {
+		    Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
+			if (!game)
+			    res.status(400).json({
+				error: 'Game does not exist'
+			    });
+			else {
+			    Safezone.findOne({ _id: game.centralSafeZone }, (err, gsz) => {
+				if (!gsz)
+				    res.status(400).json({
+					error: 'Central safezone does not exist'
+				    });
+				else {
+				    res.status(200).json({
+					message: 'success',
+					psz_loc: psz.location,
+					psz_radius: psz.radius,
+					gsz_loc: gsz.location,
+					gsz_radius: gsz.radius
+				    });
+				}
+			    });
+			}
+		    });
+		}
+	    });
+	}
+    });
+});
+
 router.post('/killTarget', (req, res) => {
 	if (!validateKillRequest(req)) {
 		console.log('failed to validate')
