@@ -94,7 +94,6 @@ const joinAlliance = body => fetch(joinAllianceURL, {
 }).then(res => res.json())
 
 const getAlliance = body => {
-  console.log('what the fuck is going on')
   console.log(getAllianceURL)
   return fetch(getAllianceURL, {
   method: 'POST',

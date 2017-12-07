@@ -21,7 +21,6 @@ export default class AllianceScreen extends Component {
 	reload = () => {
 		//check if alliance exists for this player
 		//if so go to the other alliance screen
-		//somet more bullshit
 		const gameCode = this.props.gameCode || '17WCBXGKMVBA5WLP16VK29PJUVDPSX3K4PU8L4GIGI0L0O';
     	const username = this.props.username || 'UA8FSACQKCV37RGDWE6R';
     	const requestObj = {loginCode: gameCode, username: username}
