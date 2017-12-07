@@ -7,6 +7,9 @@ const updateLocationURL = ServerURL + '/updateLocation';
 const playerURL = ServerURL + '/players';
 const targetURL = ServerURL + '/targets';
 const organizerNameURL = ServerURL + '/organizerName';
+const createAllianceURL = ServerURL + '/createAlliance';
+const joinAllianceURL = ServerURL + '/joinAlliance';
+const getAllianceURL = ServerURL + '/getAlliance';
 
 //these are the functions that interface with the backend. Import and use them wherever in the fronted its needed.
 const gameExists = body => fetch(gameExistsURL, {
@@ -72,6 +75,36 @@ const getTargetsForPlayer = body => fetch(targetURL, {
     body: body,
 }).then(res => res.json())
 
+const createAlliance = body => fetch(createAllianceURL, {
+  method: 'POST',
+  headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+}).then(res => res.json())
+
+const joinAlliance = body => fetch(joinAllianceURL, {
+  method: 'POST',
+  headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+}).then(res => res.json())
+
+const getAlliance = body => {
+  console.log(getAllianceURL)
+  return fetch(getAllianceURL, {
+  method: 'POST',
+  headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+}).then(res => res.json())  }
+
+
 
 module.exports = {
   getTargetsForPlayer,
@@ -81,4 +114,7 @@ module.exports = {
   getAllPlayersForGame,
   startGame,
   organizerName,
+  createAlliance,
+  getAlliance,
+  joinAlliance,
 };

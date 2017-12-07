@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Navigator, AppRegistry, TextInput, Button, ImageBackground, ListView }   from 'react-native';
+import { StyleSheet, View, Navigator, AppRegistry, TextInput, ImageBackground, ListView }   from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
 import { Actions } from 'react-native-router-flux';
 import GameTextInput  from '../GameTextInput';
 //import Form  from '../src/form';
@@ -54,6 +55,10 @@ class PlayerScreen extends Component {
 
   }
 
+  goToAlliance = () => {
+    console.log('go there')
+    {Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})}
+  }
   render() {
     return (
       <View style={styles.formContainer}>
@@ -80,6 +85,12 @@ class PlayerScreen extends Component {
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
       />
+      <Footer> 
+      <Button info
+              onPress={this.goToAlliance}>
+              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Manage & Create Alliances</Text>
+            </Button>
+      </Footer>
       </View>
     );
   }

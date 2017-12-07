@@ -11,6 +11,8 @@ import Lobby_Master from './screens/GameLobby_master';
 import Lobby from './screens/GameLobby';
 import Home from './screens/home';
 import Form from './components/form';
+import AllianceScreen from './screens/AllianceScreen';
+import InAlliance from './screens/InAlliance';
 import PlayerScreen from './screens/PlayerScreen';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn'
@@ -28,6 +30,8 @@ export default class App extends React.Component {
               <Scene key="Lobby" component={Lobby} title="Game Lobby"/>
               <Scene key="PlayerScreen" component={PlayerScreen} title = "Players" />
               <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby"/>
+              <Scene key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" />
+              <Scene key="InAlliance" component={InAlliance} title="In Alliance" />
             </Scene>
           </Router>
 
