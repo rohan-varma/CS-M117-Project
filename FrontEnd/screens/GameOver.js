@@ -12,7 +12,7 @@ import Home from './home';
 import { Actions } from 'react-native-router-flux';
 
 
-export default class Form extends Component {
+export default class GameOverScreen extends Component {
   static navigationOptions = { header: null };
   render() {
     return (
