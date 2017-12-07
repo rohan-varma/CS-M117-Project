@@ -17,7 +17,7 @@ class PlayerScreen extends Component {
     this.state = {
       playerTargets: ds.cloneWithRows([{name: 'Target 2'}, {name: 'Target 1'}]),
       alivePlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-      deadPlayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+      deadPlayers: ds.cloneWithRows([{name: 'Player 3'}, {name: 'Player 4'}]),
   };
     //need a loginCode and username
     const gameCode = this.props.gameCode || 'axxw4vi8jjor';
@@ -85,7 +85,7 @@ class PlayerScreen extends Component {
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
       />
-      <Footer> 
+      <Footer style={{paddingTop: 8}}> 
       <Button info
               onPress={this.goToAlliance}>
               <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Manage & Create Alliances</Text>
