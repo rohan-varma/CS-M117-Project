@@ -34,7 +34,7 @@ export default class App extends React.Component {
               <Scene key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" />
               <Scene key="InAlliance" component={InAlliance} title="In Alliance" />
               <Scene hideNavBar key='GamePage' 
-              initial={true}  
+              
               rightTitle="Log Out" 
               onRight={() =>{Actions.Home()}}
 
