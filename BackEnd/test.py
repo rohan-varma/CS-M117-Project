@@ -88,6 +88,19 @@ def testKillTargetWithSafezone(data):
 	print json.loads(res.text)["message"]
 	assert json.loads(res.text)["message"] == "target in safezone"
 
+def testCreateAlliance(data):
+	allianceName = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	data.append(allianceName)
+	res = requests.post("http://localhost:3000/BluA/createAlliance",
+		data = data)
+	return allianceName
+
+def testJoinAlliance(data):
+	# allianceName = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	# data.append(allianceName)
+	res = requests.post("http://localhost:3000/BluA/joinAlliance",
+		data = data)
+
 def testBasicCase():
 	#create game data
 	test_data = createGameData()
