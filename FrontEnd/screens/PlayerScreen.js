@@ -54,13 +54,45 @@ class PlayerScreen extends Component {
     })
 
   }
+  reload = () => {
+    var requestObj = {loginCode: this.props.gameCode, username: this.props.username}
+    getAllPlayersForGame(JSON.stringify(requestObj))
+    .then(res => {
+      getTargetsForPlayer(JSON.stringify(requestObj))
+      .then(res => {
+        //handle res
+        console.log('result for get player targets')
+        console.log(res);
+        const playerTargets = res.targets || [];
+        this.setState({
+          playerTargets: ds.cloneWithRows(playerTargets.map(t => ({name: t.username}))),
+        })
+      })
+      .catch(err => {
+        //handle err
+        console.log('had error get player targets')
+        console.log(err)
+      })
+      //continue here? 
+      console.log('this object has the player data')
+      console.log(JSON.stringify(res, null, 2))
+      this.setState({
+        alivePlayers: ds.cloneWithRows(res.alivePlayers.map(p => ({name: p.username}))),
+        deadPlayers: ds.cloneWithRows(res.deadPlayers.map(p => ({name: p.username}))),
+      })
+    })
+    .catch(err => {
+      console.log('err is ', err)
+    })
 
+  }
   goToAlliance = () => {
     console.log('go there')
     {Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})}
   }
   render() {
     return (
+      <Container>
       <View style={styles.formContainer}>
       <Text> Players in Game </Text>
       <ListView
@@ -85,22 +117,29 @@ class PlayerScreen extends Component {
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
       />
-      <Footer style={{paddingTop: 8}}> 
-      <Button info
-              onPress={this.goToAlliance}>
-              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Manage & Create Alliances</Text>
-            </Button>
-      </Footer>
       </View>
+        <Footer>
+          <FooterTab>
+            <Button info
+              onPress={this.reload}>
+              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Refresh</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+        </Container>
+      
+
     );
   }
 }
 const styles = StyleSheet.create({
+
     formContainer: {
       alignSelf:'stretch',
       paddingLeft:20,
       paddingRight:20,  
       paddingTop: 50
+
     },
     textInput: {
       alignSelf: 'stretch',
@@ -122,8 +161,8 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontWeight: 'bold',
     },
-    text:{
-    padding: 10,
+  text:{
+    padding: 15,
     alignSelf:'center'
 
   },
