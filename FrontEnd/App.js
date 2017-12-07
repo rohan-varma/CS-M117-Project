@@ -16,6 +16,7 @@ import InAlliance from './screens/InAlliance';
 import PlayerScreen from './screens/PlayerScreen';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn'
+import GameOver from './screens/GameOver'
 import {Scene, Router} from 'react-native-router-flux';
 const _ = require('lodash');
 
@@ -32,6 +33,7 @@ export default class App extends React.Component {
               <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby"/>
               <Scene key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" />
               <Scene key="InAlliance" component={InAlliance} title="In Alliance" />
+              <Scene key="GameOver" component={GameOver} title="Game Over" />
             </Scene>
           </Router>
 
