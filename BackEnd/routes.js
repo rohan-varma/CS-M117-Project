@@ -676,13 +676,26 @@ router.post('/updateLocation', (req, res) => {
 				});
 });
 
+
+const validateGetTargets = request => {
+	const body = request.body;
+	return _.has(body, 'username');
+}
+
 router.post('/getTargetLocation', (req, res) => {
+	if(!validateGetTargets(req)) {
+		console.log('invalid request body')
+		console.log(JSON.stringify(req, null, 2))
+		res.status(400).json({
+			error: 'body must have username',
+		})
+	}
 	Player.findOne({ username: req.body.username }, (err, obj) => {
 	if (err)
 		res.send(err);
 	else {
 		res.status(200).json({ message: 'success',
-				   location: obj.location });
+				   location: obj ? obj.location : null});
 	}
 	});
 });
@@ -709,11 +722,6 @@ router.post('/getUsername', (req, res) => {
 	}
 	});
 });
-
-const validateGetTargets = request => {
-	const body = request.body;
-	return _.has(body, 'username');
-}
 
 router.post('/targets', (req, res) => {
 	if (!validateGetTargets(req)) {
