@@ -5,7 +5,7 @@ import string
 
 def createGameData():
 	# random login code
-	login_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(46))
+	login_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(50))
 	data = {'loginCode': login_code,
  			'orgName': "person",
 			'xCoord' : 7, 'yCoord': 7, 'radius': 2}
@@ -13,8 +13,8 @@ def createGameData():
 
 def createUserData(login_code):
 	# random login code
-	username = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
-	mac = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	username = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
+	mac = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(30))
 	data = {'loginCode': login_code,
 			'username': username,
  			'mac': mac,
@@ -52,6 +52,11 @@ def testAddUser(data):
 	res = requests.post("http://localhost:3000/BluA/addUser",
 		data = data)
 	assert res.status_code == 200
+
+def testAddUserFail(data):
+	res = requests.post("http://localhost:3000/BluA/addUser",
+		data = data)
+	assert res.status_code != 200
 
 def testStartGame(data):
 	res = requests.post("http://localhost:3000/BluA/startGame",
@@ -212,11 +217,23 @@ def testTargetInAlliance():
 	#attempt to kill the target
 	testKillTarget(user1_data)
 
+def testMultipleAddUsers():
+	#create game data
+	test_data = createGameData()
+	#create four test users
+	user1_data = createUserData(test_data[0])
+	#create a game with the above data
+	testCreateGame(test_data[1])
+	#add users with the above data
+	testAddUser(user1_data)
+	testAddUserFail(user1_data)
+
 def main():
 	# testBasicCase()
 	# testTargetInIndividualSafezone()
 	# testTargetInCentralSafezone()
 	testTargetInAlliance()
+	# testMultipleAddUsers()
 	
 if __name__ == "__main__":
 	main()
