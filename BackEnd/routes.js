@@ -700,12 +700,47 @@ router.post('/getTargetLocation', (req, res) => {
 		})
 	}
 	Player.findOne({ username: req.body.username }, (err, obj) => {
-	if (err)
-		res.send(err);
-	else {
-		res.status(200).json({ message: 'success',
-				   location: obj ? obj.location : null});
-	}
+		if (err || !player) {
+			res.status(400).json({message: 'error when trying to find player'});
+		}
+		else {
+		    console.log('FOUND THIS PLAYER')
+		    console.log(JSON.stringify(player, null, 2))
+		    const pIdToUsername = playerId => {
+			return Player.findById(playerId);
+		    }
+		    if (player.alliance == null)
+			Promise.all(_.map([player.target], pIdToUsername)).then(result => {
+				var array = [];
+	    		var tuple = [result[i].username, reuslt[i].location];
+	    		array.push(tuple);
+		    	var jsonArray = JSON.stringify(array);
+			    res.status(200).json({
+					message: 'success',
+					targets: array
+			    });
+			});
+		    else {
+			Alliance.findOne({ _id: player.alliance }, (err, a) => {
+				if (err) {
+					res.status(400).json({error: err});
+				} else {
+				    Promise.all(_.map(a.targets, pIdToUsername)).then(result => {
+				    	var array = [];
+				    	for(let i=0; i < result.length; i++) {
+				    		var tuple = [result[i].username, reuslt[i].location];
+				    		array.push(tuple);
+				    	}
+				    	var jsonArray = JSON.stringify(array);
+						res.status(200).json({
+						    message: 'success',
+						    targets: jsonArray
+						});
+				    });
+				}
+			});
+			}
+		}
 	});
 });
 
