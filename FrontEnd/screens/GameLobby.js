@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, AppRegistry,ListView, Text} from 'react-native';
+import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
 import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';

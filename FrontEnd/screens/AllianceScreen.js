@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, AppRegistry,ListView} from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem,Icon } from 'native-base';
+import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem, Icon } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
 const { createGame, addUserToGame, getAllPlayersForGame,gameExists, createAlliance, getAlliance, joinAlliance } 
