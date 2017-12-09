@@ -69,6 +69,7 @@ class GameInput extends Component {
             mac: 'address',
             x: this.state.mapRegion.longitude,
             y: this.state.mapRegion.latitude,
+            radius: this.state.safezoneRadius,
         });
 
         gameExists(gameRequestBody).then(res => {
