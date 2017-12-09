@@ -251,6 +251,38 @@ router.post('/organizerName', (req, res) => {
     });
 });
 
+function shrinkSafezone (req, res, cb) {
+	if(!_.has(req.body, 'loginCode')) {
+		cb(err,'Must have loginCode specified')
+    }
+    Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
+		if(!game)
+		    cb(err,'Game does not exist')
+		else {
+			Safezone.findOne({ _id: game.centralSafeZone }, (err, safezone) => {
+				var numAlive = safezone.alivePlayers.length + 1;
+				var gameSize = numAlive + safezone.deadPlayers.length - 1;
+				if(numAlive/gameSize <= .15) {
+					console.log('safezone should be empty now');
+					safezone.radius = 0;
+				}
+				else {
+					safezone.radius -= (safezone.radius/numAlive);
+				}
+			}).then(
+				safezone.save((err) => {
+					if(err)
+						callback(err, null)
+					else {
+						console.log("updated safezone");
+						cb(null, 'updated safezone')
+					}
+				})
+			);
+		}
+    });
+}
+
 router.post('/safezoneInfo', (req, res) => {
     if (!validateSafezoneRequest(req)) {
 	res.status(400).json({
@@ -327,6 +359,11 @@ router.post('/killTarget', (req, res) => {
 						res.status(400).json({error: err.message});
 						return;
 					} else if (msg === 'target killed' || !player.alliance) {
+						shrinkSafezone(req, res, (err, msg) => {
+							if(err)
+								res.status(400).json({error: err.message});
+								return;
+						});
 						console.log("early exit")
 						res.status(200).json({message: msg});
 						return;
@@ -341,38 +378,6 @@ router.post('/killTarget', (req, res) => {
 								return;
 							}  else {
 								console.log(alliance.dictionary)
-
-								// for (let i = 0; i < alliance.dictionary.length; i++) {
-								// 	var element = alliance.dictionary[i];
-
-								// 	console.log(player);
-								// 	console.log(element.target);
-								// 	console.log(element.ally);
-
-								// 	var findTargetPromise = Player.findById(element.target).exec();
-								// 	var findAllyPromise = Player.findById(element.ally).exec();
-								// 	var allianceKillQueryPromises = [findTargetPromise, findAllyPromise];
-
-								// 	Promise.all(allianceKillQueryPromises).then(docs => {
-								// 		var targetDoc = docs[0];
-								// 		var allyDoc = docs[1];
-
-								// 		killTargetAttempt(player, targetDoc, allyDoc, (err, msg) => {
-								// 			if(err) {
-								// 				res.status(400).json({error: err.message});
-								// 				return;
-								// 			} else {
-								// 				console.log('killed alliance target!')
-								// 				res.status(200).json({
-								// 					message: msg,
-								// 				});
-								// 				return;
-								// 			}
-								// 		});
-								// 	}).catch(err => {
-								// 		res.status(400).json({error: err.message});
-								// 	});
-								// }
 								var continueExecution = true;
 								alliance.dictionary.forEach(element => {
 									if(continueExecution && player._id !=  element.ally) {
@@ -395,6 +400,10 @@ router.post('/killTarget', (req, res) => {
 													return;
 												} else if(msg === 'killed target') {
 													console.log('killed alliance target!')
+													shrinkSafezone(req, res, (err, msg) => {
+														if(err)
+															res.status(400).json({error: err.message});
+													});
 													res.status(200).json({
 														message: msg,
 													});
