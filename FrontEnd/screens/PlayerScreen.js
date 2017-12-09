@@ -3,6 +3,7 @@ import { StyleSheet, View, Navigator, AppRegistry, TextInput, ImageBackground, L
 import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
 import { Actions, Tab } from 'react-native-router-flux';
 import GameTextInput  from '../GameTextInput';
+
 //import Form  from '../src/form';
 const { createGame, addUserToGame, getAllPlayersForGame, getTargetsForPlayer } = require('../requestors');
 const _ = require('lodash');
@@ -86,8 +87,11 @@ class PlayerScreen extends Component {
     })
 
   }
+  goToKill = () => {
+    Actions.KillScreen({username: this.props.username, gameCode: this.props.gameCode})
+  }
   goToAlliance = () => {
-    {Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})}
+    Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
   playerReload = () => {
     Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
@@ -134,7 +138,8 @@ class PlayerScreen extends Component {
                />
               <Text style = {{color: 'rgba(154, 196, 248, 1)'}}>Player</Text>
             </Button>
-            <Button vertical>
+            <Button vertical
+              onPress= {this.goToKill}>
               <Icon name="md-flash" />
               <Text>Kill</Text>
             </Button>

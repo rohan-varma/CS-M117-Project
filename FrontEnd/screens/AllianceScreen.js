@@ -86,6 +86,9 @@ export default class AllianceScreen extends Component {
 			})
 		}
  	}
+  goToKill = () => {
+    Actions.KillScreen({username: this.props.username, gameCode: this.props.gameCode})
+  }
   goToPlayer = () => {
     Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
@@ -123,7 +126,9 @@ export default class AllianceScreen extends Component {
               <Icon name="ios-person" />
               <Text>Player</Text>
             </Button>
-            <Button vertical>
+            <Button 
+            onPress= {this.goToKill}
+            vertical>
               <Icon name="md-flash" />
               <Text>Kill</Text>
             </Button>

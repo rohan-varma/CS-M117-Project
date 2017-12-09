@@ -16,6 +16,7 @@ import InAlliance from './screens/InAlliance';
 import PlayerScreen from './screens/PlayerScreen';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn';
+import KillScreen from './screens/KillScreen';
 import {Scene, Router,Tabs, Stack,Actions} from 'react-native-router-flux';
 const _ = require('lodash');
 
@@ -34,6 +35,8 @@ export default class App extends React.Component {
               <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby" rightTitle="Log Out" 
               onRight={() =>{Actions.Home()}}/>
               <Scene key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" rightTitle="Log Out" 
+              onRight={() =>{Actions.Home()}}/>
+              <Scene key="KillScreen" component={KillScreen} title="Kill" rightTitle="Log Out" 
               onRight={() =>{Actions.Home()}}/>
               <Scene key="InAlliance" component={InAlliance} title="In Alliance" />
             
