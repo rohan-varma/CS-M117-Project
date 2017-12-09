@@ -15,9 +15,9 @@ import AllianceScreen from './screens/AllianceScreen';
 import InAlliance from './screens/InAlliance';
 import PlayerScreen from './screens/PlayerScreen';
 import GameCreate from './screens/GameCreate';
-import GameLogIn from './screens/GameLogIn'
-import GameOver from './screens/GameOver'
-import {Scene, Router} from 'react-native-router-flux';
+import GameLogIn from './screens/GameLogIn';
+import GamePage from './screens/GamePage';
+import {Scene, Router,Tabs, Stack,Actions} from 'react-native-router-flux';
 const _ = require('lodash');
 
 export default class App extends React.Component {
@@ -25,7 +25,7 @@ export default class App extends React.Component {
     return (
           <Router>
             <Scene key="root">
-              <Scene key="Home" component={Home} initial={true} />
+              <Scene key="Home" component={Home}  initial={true}/>
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
               <Scene key="Lobby" component={Lobby} title="Game Lobby"/>
@@ -33,7 +33,53 @@ export default class App extends React.Component {
               <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby"/>
               <Scene key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" />
               <Scene key="InAlliance" component={InAlliance} title="In Alliance" />
-              <Scene key="GameOver" component={GameOver} title="Game Over" />
+              <Scene hideNavBar key='GamePage' 
+              
+              rightTitle="Log Out" 
+              onRight={() =>{Actions.Home()}}
+
+              >
+                <Tabs
+                  key="tabbar"
+                  swipeEnabled
+                  showLabel={true}
+                  activeBackgroundColor="rgba(13, 114, 186, 0.76)"
+                  inactiveBackgroundColor="rgba(128, 128, 128, 0.44)"
+                  labelStyle={styles.labels}
+
+                >
+                  <Scene
+                    key="Player"
+                    title="Player"
+                    component={PlayerScreen}
+                    tabBarLabel="Player"
+                    inactiveBackgroundColor="#FFF"
+                    activeBackgroundColor="#DDD"
+                    titleStyle={{ color: 'black', alignSelf: 'center' }}
+                  />
+
+                    <Scene
+                      key="Kill"
+                      title="Kill"
+                      tabBarLabel="Kill"
+                      component={AllianceScreen}
+                      onBack={() => alert('onBack button!')}
+                      hideDrawerButton
+                      backTitle="Back!"
+                      panHandlers={null}
+                    />
+       
+                    <Scene
+                      key="Alliance"
+                      tabBarLabel="Alliance"
+                      title="Alliance"
+                      component={AllianceScreen}
+                      onRight={() => { }}
+                    />
+           
+                 
+                </Tabs>
+                </Scene>
             </Scene>
           </Router>
 
@@ -59,6 +105,15 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       backgroundColor: 'transparent',
       marginBottom: 10,
+    },
+    labels: {
+      fontSize:15,
+      padding:10,
+      color: 'white',
+      flexDirection: 'row',
+      alignSelf:'center',
+      justifyContent:'center',
+
     },
 
 });

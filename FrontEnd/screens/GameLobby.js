@@ -49,7 +49,7 @@ export default class GamePage extends Component {
         ifGameStarted: res.started,
       })
     })
-  if (this.state.ifGameStarted) {Actions.PlayerScreen({username:this.props.username,gameCode:this.props.gameCode});}
+  if (this.state.ifGameStarted) {Actions.GamePage({username:this.props.username,gameCode:this.props.gameCode});}
    getAllPlayersForGame(JSON.stringify({loginCode: this.props.gameCode}))
     .then(res => {
       console.log(JSON.stringify(res, null, 2))

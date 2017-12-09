@@ -26,13 +26,13 @@ class GameInput extends Component {
         };
     }
     enterLobby = () => {
-        console.log("HIIIIII ENTERING LOBBY");
+    
         const organizerRequest = JSON.stringify({
             loginCode: this.state.gameCode
         });
         organizerName(organizerRequest)
         .then(res => {
-            console.log("HIHIHIIIIII")
+ 
             console.log(res);
             var orgName = res.organizerName;
             console.log(orgName);
@@ -72,17 +72,48 @@ class GameInput extends Component {
         });
 
         gameExists(gameRequestBody).then(res => {
+            console.log ('This is the current game status');
+            console.log (res.started);
             if (_.has(res, 'exists')) {
+                var ifGameStarted = res.started;
                 if (res.exists) {
+                    
                     addUserToGame(userRequestBody).then(res => {
                         // success
-                        this.enterLobby();
+                   
+                        
+                        if (ifGameStarted) {
+                                // if game already started new users cant join
+                               
+                            if (res.username == this.state.username) {
+                              
+                                 Actions.GamePage({username: this.state.username, gameCode: this.state.gameCode});
+                            }
+                            else {
+                                 alert('Game already started, new player can not join an ongoing game. Please enter a new game.');
+                            }
+
+                            }
+                        else {
+                            this.enterLobby();
+                            return;
+                        }
+                        
                     }).catch(err => {
                         console.log(err);
                         if (err.status == 400 && err.username == this.state.username) {
                             // if player with username exists in current game
                             //Actions.Lobby({username: this.state.username, gameCode: this.state.gameCode});
-                            this.enterLobby();
+                           
+                            if (ifGameStarted) {
+                                // if game already started go to game page instead
+                                Actions.GamePage({username: this.state.username, gameCode: this.state.gameCode});
+                                return;
+                            } else {
+                      
+                                 this.enterLobby();
+                            }
+                           
                         }
                         alert("Failed to join game, please try again.");
                         Actions.GameLogIn();
@@ -91,13 +122,29 @@ class GameInput extends Component {
                 else if (this.props.gameCreated) {
                     createGame(gameRequestBody).then(res => {
                         addUserToGame(userRequestBody).then(res => {
-                           this.enterLobby();
+                            if (ifGameStarted) {
+                                // if game already started go to game page instead
+                                alert('game already started, can not join an ongoing game');
+                                   
+                                }
+                            else {
+                            
+                                this.enterLobby();
+                            }
+                           
                         }).catch(err => {
                             console.log(err);
                             if (err.status == 400 &&
                                 err.username == this.state.username) {
                                 // if player with username exists in current game
-                               this.enterLobby();
+                                    if (ifGameStarted) {
+                                        // if game already started go to game page instead
+                                         Actions.GamePage({username: this.state.username, gameCode: this.state.gameCode});
+                                    }  else {
+                                     
+                                     this.enterLobby();
+                                }
+                              
                             }
                             alert("Failed to join game, please try again");
                             Actions.GameLogIn({
