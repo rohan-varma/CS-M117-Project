@@ -46,7 +46,7 @@ export default class GamePage extends Component {
       const req = JSON.stringify({loginCode: this.props.gameCode});
       startGame(req)
 	  .then(res => {
-	      Actions.GamePage({username:this.props.username,gameCode:this.props.gameCode});
+	      Actions.PlayerScreen({username:this.props.username,gameCode:this.props.gameCode});
 	  });
 
   }

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Navigator, AppRegistry, TextInput, ImageBackground, ListView }   from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
-import { Actions } from 'react-native-router-flux';
+import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
+import { Actions, Tab } from 'react-native-router-flux';
 import GameTextInput  from '../GameTextInput';
+
 //import Form  from '../src/form';
 const { createGame, addUserToGame, getAllPlayersForGame, getTargetsForPlayer } = require('../requestors');
 const _ = require('lodash');
@@ -86,13 +87,19 @@ class PlayerScreen extends Component {
     })
 
   }
+  goToKill = () => {
+    Actions.KillScreen({username: this.props.username, gameCode: this.props.gameCode})
+  }
   goToAlliance = () => {
-    console.log('go there')
-    {Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})}
+    Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})
+  }
+  playerReload = () => {
+    Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
   render() {
     return (
       <Container>
+      <Content>
       <View style={styles.formContainer}>
       <Text> Players in Game </Text>
       <ListView
@@ -118,13 +125,32 @@ class PlayerScreen extends Component {
         }}
       />
       </View>
+      </Content>
         <Footer>
           <FooterTab>
-            <Button info
-              onPress={this.reload}>
-              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Refresh</Text>
+
+            <Button vertical>
+              <Icon 
+              name ='ios-person'
+              ios='ios-person'
+              style={{color:'rgba(154, 196, 248, 1)'}}
+              active 
+               />
+              <Text style = {{color: 'rgba(154, 196, 248, 1)'}}>Player</Text>
             </Button>
+            <Button vertical
+              onPress= {this.goToKill}>
+              <Icon name="md-flash" />
+              <Text>Kill</Text>
+            </Button>
+            <Button vertical 
+            onPress = {this.goToAlliance}>
+              <Icon name="ios-contacts" />
+              <Text>Alliance</Text>
+            </Button>
+   
           </FooterTab>
+
         </Footer>
         </Container>
       

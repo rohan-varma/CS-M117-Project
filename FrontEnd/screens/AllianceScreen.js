@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, AppRegistry,ListView} from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
+import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem,Icon } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
 const { createGame, addUserToGame, getAllPlayersForGame,gameExists, createAlliance, getAlliance, joinAlliance } 
@@ -19,6 +19,7 @@ export default class AllianceScreen extends Component {
 	}
 
 	reload = () => {
+
 		//check if alliance exists for this player
 		//if so go to the other alliance screen
 		const gameCode = this.props.gameCode || '17WCBXGKMVBA5WLP16VK29PJUVDPSX3K4PU8L4GIGI0L0O';
@@ -85,7 +86,12 @@ export default class AllianceScreen extends Component {
 			})
 		}
  	}
-
+  goToKill = () => {
+    Actions.KillScreen({username: this.props.username, gameCode: this.props.gameCode})
+  }
+  goToPlayer = () => {
+    Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
+  }
 	render() {
 		return (
       <Container style={{ flexDirection: 'column'}}>
@@ -95,25 +101,46 @@ export default class AllianceScreen extends Component {
           <Text style= {{fontWeight: 'bold'}}> My Username:{'rohan'} </Text>
         </Header>
         <View style={{flex:1, margin: 10}}>
-          <Button info
+          <Button 
+          info 
+          full
               onPress={this.create}>
               <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Create An Alliance</Text>
             </Button>
-            <Button style={{margin: 10}} info
+            <Button style={{margin: 10}} 
+            info 
+            full
               onPress={this.join}>
               <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Join An Alliance</Text>
+            </Button>
+            <Button full success
+            style= {{bottom: 0}}
+            onPress={this.reload}> 
+              <Text> See My Alliance </Text>
             </Button>
         </View>       
         <Footer>
           <FooterTab>
-            <Button info
-              onPress={this.reload}>
-              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Refresh</Text>
+            <Button vertical
+            onPress = {this.goToPlayer}>
+              <Icon name="ios-person" />
+              <Text>Player</Text>
+            </Button>
+            <Button 
+            onPress= {this.goToKill}
+            vertical>
+              <Icon name="md-flash" />
+              <Text>Kill</Text>
+            </Button>
+            <Button vertical >
+              <Icon active
+                style={{color:'rgba(154, 196, 248, 1)'}}
+               name="ios-contacts" />
+              <Text style={{color: 'rgba(154, 196, 248, 1)'}}>Alliance</Text>
             </Button>
           </FooterTab>
         </Footer>
       </Container>
-    
     );
 	}
 
