@@ -87,7 +87,7 @@ class GameInput extends Component {
                                
                             if (res.username == this.state.username) {
                               
-                                 Actions.GamePage({username: this.state.username, gameCode: this.state.gameCode});
+                                 Actions.PlayerScreen({username: this.state.username, gameCode: this.state.gameCode});
                             }
                             else {
                                  alert('Game already started, new player can not join an ongoing game. Please enter a new game.');
@@ -107,7 +107,7 @@ class GameInput extends Component {
                            
                             if (ifGameStarted) {
                                 // if game already started go to game page instead
-                                Actions.GamePage({username: this.state.username, gameCode: this.state.gameCode});
+                                Actions.PlayerScreen({username: this.state.username, gameCode: this.state.gameCode});
                                 return;
                             } else {
                       
