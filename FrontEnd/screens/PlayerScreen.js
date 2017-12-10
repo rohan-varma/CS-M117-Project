@@ -88,13 +88,15 @@ class PlayerScreen extends Component {
 
   }
   goToKill = () => {
-    Actions.KillScreen({username: this.props.username, gameCode: this.props.gameCode})
+    Actions.replace("KillScreen",{username: this.props.username, gameCode: this.props.gameCode})
   }
   goToAlliance = () => {
-    Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})
+    Actions.replace("AllianceScreen",{username: this.props.username, gameCode: this.props.gameCode})
+    //Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
   playerReload = () => {
-    Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
+    Actions.replace("PlayerScreen",{username: this.props.username, gameCode: this.props.gameCode})
+    //Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
   render() {
     return (

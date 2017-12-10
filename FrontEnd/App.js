@@ -30,14 +30,14 @@ export default class App extends React.Component {
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
               <Scene key="Lobby" component={Lobby} title="Game Lobby"rightTitle="Log Out" 
               onRight={() =>{Actions.Home()}}/>
-              <Scene key="PlayerScreen"  component={PlayerScreen} title = "Players" rightTitle="Log Out" 
-              onRight={() =>{Actions.Home()}}/>
-              <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby" rightTitle="Log Out" 
-              onRight={() =>{Actions.Home()}}/>
-              <Scene key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" rightTitle="Log Out" 
-              onRight={() =>{Actions.Home()}}/>
-              <Scene key="KillScreen" component={KillScreen} title="Kill" rightTitle="Log Out" 
-              onRight={() =>{Actions.Home()}}/>
+              <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby" leftTitle= "Log Out"  
+              onLeft={() =>{Actions.Home()}} />
+              <Scene tabs key="PlayerScreen"  component={PlayerScreen}  title = "Players" leftTitle= "Log Out" rightTitle="Refresh" 
+              onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({PlayerScreen})}}/>
+              <Scene tabs key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" leftTitle= "Log Out" rightTitle="Refresh" 
+              onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({AllianceScreen})}}/>
+              <Scene tabs key="KillScreen" component={KillScreen} title="Kill" leftTitle= "Log Out" rightTitle="Refresh" 
+              onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({KillScreen})}}/>
               <Scene key="InAlliance" component={InAlliance} title="In Alliance" />
             
                
