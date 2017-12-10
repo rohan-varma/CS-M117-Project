@@ -156,7 +156,7 @@ class KillScreen extends Component {
 
     startBackendCaller = () => {
         this._updateSafezone();
-        setInterval(this._updateBackend, 30000); // 30 seconds
+        setInterval(this._updateBackend, 5000); // 30 seconds // TODO:
         // (safezone will not be updated as quickly as backend)
         setInterval(this._updateSafezone, 60000); // 60 seconds 
     };

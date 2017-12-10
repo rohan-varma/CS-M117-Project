@@ -794,16 +794,16 @@ router.post('/targets', (req, res) => {
 	    console.log('FOUND THIS PLAYER')
 	    console.log(JSON.stringify(player, null, 2))
 	    const pIdToUsername = playerId => {
-		return Player.findById(playerId);
+		    return Player.findById(playerId);
 	    }
-	    if (player.alliance == null)
-		Promise.all(_.map([player.target], pIdToUsername)).then(result => {
-		    res.status(200).json({
-			message: 'success',
-			targets: result
-		    });
-		});
-	    else {
+	    if (player.alliance == null) {
+            Promise.all(_.map([player.target], pIdToUsername)).then(result => {
+                res.status(200).json({
+                message: 'success',
+                targets: result
+                });
+            });
+        } else {
 		Alliance.findOne({ _id: player.alliance }, (err, a) => {
 			if (err) {
 				res.status(400).json({error: err});
