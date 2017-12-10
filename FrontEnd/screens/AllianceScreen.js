@@ -3,7 +3,10 @@ import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
 import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem, Icon } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
-import p2pkit from 'react-native-p2pkit';
+try{
+    p2pkit = require('react-native-p2pkit');
+}
+catch (err) {}
 const { createGame, addUserToGame, getAllPlayersForGame,gameExists, createAlliance, getAlliance, joinAlliance } 
 = require('../requestors');
 const _ = require('lodash');
@@ -71,22 +74,50 @@ export default class AllianceScreen extends Component {
 		//call out to the backend here
 	}
 
-	join = () => {
-	    console.log('join alliance called')
-	    startJoinP2PKit((aId) => {
-		this.state.allianceIds.push(aId);
-		this.setState({hasJoinedAlliance: true});
-		alert(`Joined alliance with id ${aId}!`);
-	    });
+        join = () => {
+	    try {
+	        console.log('join alliance called')
+	        startJoinP2PKit((aId) => {
+		    joinAlliance(JSON.stringify({username: this.props.username, allianceId: aId}, null, 2))
+			.then(res => {
+			    this.state.allianceIds.push(aId);
+			    this.setState({hasJoinedAlliance: true});
+			    console.log('join alliance res');
+			    console.log(JSON.stringify(res, null, 2));
+			    alert(`Joined alliance with id ${aId}!`);
+			})
+			.catch(err => {
+			    console.log("join alliance err");
+			    console.log(JSON.stringify(err,null, 2));
+			})
+	        });
+	    }
+	    catch(err) {
+		joinAlliance(JSON.stringify({username: this.props.username}, null, 2))
+		    .then(res => {
+			this.state.allianceIds.push(res.allianceId);
+			this.setState({hasJoinedAlliance: true});
+			console.log('join alliance res');
+			console.log(JSON.stringify(res, null, 2));
+			alert(`Joined alliance with id ${aId}!`);
+		    })
+		    .catch(err => {
+			console.log("join alliance err");
+			console.log(JSON.stringify(err,null, 2));
+		    });
+	    }
  	}
 
         advertise = () => {
-	    if(this.state.allianceIds.length === 0) {
-	        alert('You are not in an alliance! Please create one');
+	    try {
+	        if(this.state.allianceIds.length === 0) {
+	            alert('You are not in an alliance! Please create one');
+	        }
+	        else {
+	            startAdvertiseP2PKit(this.state.allianceIds[0]);
+	        }
 	    }
-	    else {
-	        startAdvertiseP2PKit(this.state.allianceIds[0]);
-	    }
+	    catch(err) { }
         }
 
     startJoinP2PKit = (callback) => {
