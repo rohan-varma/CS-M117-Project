@@ -126,22 +126,31 @@ export default class AllianceScreen extends Component {
         </View>       
         <Footer>
           <FooterTab>
-            <Button vertical
-            onPress = {this.goToPlayer}>
-              <Icon name="ios-person" />
+          <Button vertical
+          onPress = {this.goToPlayer}>
+           
+              <Icon 
+              ios='ios-person'
+              android="md-person" 
+              
+               />
               <Text>Player</Text>
             </Button>
-            <Button 
-            onPress= {this.goToKill}
-            vertical>
-              <Icon name="md-flash" />
+            <Button vertical
+              onPress= {this.goToKill}>
+              
+              <Icon
+              ios='ios-flash'
+              android="md-flash" />
               <Text>Kill</Text>
             </Button>
-            <Button vertical >
-              <Icon active
-                style={{color:'rgba(154, 196, 248, 1)'}}
-               name="ios-contacts" />
-              <Text style={{color: 'rgba(154, 196, 248, 1)'}}>Alliance</Text>
+            <Button vertical>
+           
+              <Icon
+              style={{color:'rgba(154, 196, 248, 1)'}}
+              ios='ios-contacts'
+              android="md-contacts" />
+              <Text style={{color:'rgba(154, 196, 248, 1)'}}>Alliance</Text>
             </Button>
           </FooterTab>
         </Footer>
