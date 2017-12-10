@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Navigator, AppRegistry, TextInput, ImageBackground, ListView }   from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
+import { StyleSheet, View, Navigator, AppRegistry, TextInput, ImageBackground, ListView, Text }   from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, Icon} from 'native-base';
 import { Actions, Tab } from 'react-native-router-flux';
 import GameTextInput  from '../GameTextInput';
 
