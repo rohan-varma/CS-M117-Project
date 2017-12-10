@@ -260,8 +260,8 @@ function shrinkSafezone (req, res, cb) {
 		    cb(err,'Game does not exist')
 		else {
 			Safezone.findOne({ _id: game.centralSafeZone }, (err, safezone) => {
-				var numAlive = safezone.alivePlayers.length + 1;
-				var gameSize = numAlive + safezone.deadPlayers.length - 1;
+				var numAlive = game.alivePlayers.length + 1;
+				var gameSize = numAlive + game.deadPlayers.length - 1;
 				if(numAlive/gameSize <= .15) {
 					console.log('safezone should be empty now');
 					safezone.radius = 0;
@@ -269,7 +269,7 @@ function shrinkSafezone (req, res, cb) {
 				else {
 					safezone.radius -= (safezone.radius/numAlive);
 				}
-			}).then(
+			// }).then(
 				safezone.save((err) => {
 					if(err)
 						callback(err, null)
@@ -278,7 +278,7 @@ function shrinkSafezone (req, res, cb) {
 						cb(null, 'updated safezone')
 					}
 				})
-			);
+			});
 		}
     });
 }
