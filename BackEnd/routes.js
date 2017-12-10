@@ -75,10 +75,10 @@ function checkTargetInSafezone(player, target, callback) {
 		Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
 			if(err) {
 				console.log(err);
-				return;
+				callback(err, null)
 			}
 			results.filter(function(value) {
-				if(value.obj.username == target.username) {
+				if(value.obj.username === target.username) {
 					console.log(value.obj)
 					isInSafezone = true;
 				}
@@ -87,22 +87,21 @@ function checkTargetInSafezone(player, target, callback) {
 			if(!isInSafezone) {
 				Game.findOne({_id: player.game}, (err, game) => {
 				console.log(player.game);
-				if(!game) {
-					return;
+				if(err || !game) {
+					callback(err ? err : 'could not find game', null)
 				}
 				else {
 					Safezone.findOne({_id: game.centralSafeZone}, (err, safezone) => {
-					if(!safezone) {
-						console.log("couldn't find safezone")
-						return;
+					if(err || !safezone) {
+						callback(err ? err : 'could not find safezone', null)
 					}
 					console.log('WE FOUND A SAFEZONE HELL YEA')
 					var point = { type : "Point", coordinates : safezone.location };
 					console.log(point);
 					Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
 						if(err) {
-							console.log(err);
-							return;
+							console.log(err)
+							cb(err, null)
 						}
 					results.filter(function(value) {
 						if(value.obj.username == target.username) {
@@ -158,6 +157,7 @@ function killTargetAttempt(player, target, assassin, callback) {
 			callback(null, 'target in safezone')
 		}
 		else {
+			console.log('in safezone or not: ', inSafezone)
 			//check coordinate distance
 			checkTargetProximity(player, target, (err, inRange) => {
 				if(err) {
@@ -253,8 +253,8 @@ router.post('/organizerName', (req, res) => {
 
 function shrinkSafezone (req, res, cb) {
 	if(!_.has(req.body, 'loginCode')) {
-		let newError = new Error('Must have loginCode specified');
-		cb(newError,'Must have loginCode specified')
+		const err = {err: 'must have login code defined'}
+		cb(err,'Must have loginCode specified')
     }
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
 		if(!game)
@@ -270,7 +270,7 @@ function shrinkSafezone (req, res, cb) {
 				else {
 					safezone.radius -= (safezone.radius/numAlive);
 				}
-			// }).then(
+			}).then(
 				safezone.save((err) => {
 					if(err)
 						callback(err, null)
@@ -279,7 +279,7 @@ function shrinkSafezone (req, res, cb) {
 						cb(null, 'updated safezone')
 					}
 				})
-			});
+			);
 		}
     });
 }
@@ -338,7 +338,6 @@ router.post('/killTarget', (req, res) => {
 		res.status(400).json({
 			error: 'Must have username specified',
 		});
-		return;
 	}
 	console.log('request validated')
 	Player.findOne({ username: req.body.username }, (err, player) => {
@@ -358,18 +357,17 @@ router.post('/killTarget', (req, res) => {
 				killTargetAttempt(player, target, null, (err, msg) => {
 					if(err) {
 						res.status(400).json({error: err.message});
-						return;
 					} else if (msg === 'target killed' || !player.alliance) {
 						shrinkSafezone(req, res, (err, msg) => {
-							if(err) {
+							if (err) {
 								res.status(400).json({error: err.message});
-								return;
+							} else {
+								console.log("early exit")
+								res.status(200).json({message: msg});
 							}
 						});
-						console.log("early exit")
-						res.status(200).json({message: msg});
-						return;
 					} else {
+						console.log('in some alliance shit for some reason')
 						// Check if you can kill a target in alliance
 						// Look up alliance, if found run killTargetAttempt on every target in the alliance
 						Alliance.findById(player.alliance, (err, alliance) => {
@@ -465,9 +463,6 @@ const validateGameRequest = request => {
 	console.log(_.keys(body));
 	return _.has(body, 'loginCode') 
 		&& _.has(body, 'orgName') 
-		&& _.has(body, 'xCoord') 
-		&& _.has(body, 'yCoord') 
-		&& _.has(body, 'radius') 
 }
 
 router.post('/createGame', (req, res) => {
