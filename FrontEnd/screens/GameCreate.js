@@ -45,8 +45,9 @@ class GameCreate extends Component {
         Actions.GameLogIn({
             gameCreated: true,
             maxPlayers: this.state.gameSize,
-            gameXCoord: this.state.longitude,
-            gameYCoord: this.state.latitude,
+            gameXCoord: this.state.mapRegion.longitude,
+            gameYCoord: this.state.mapRegion.latitude,
+            radius: this.state.safezoneRadius,
             alliancesAllowed: this.state.alliancesAllowed,
         });
     };

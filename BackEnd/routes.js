@@ -253,15 +253,16 @@ router.post('/organizerName', (req, res) => {
 
 function shrinkSafezone (req, res, cb) {
 	if(!_.has(req.body, 'loginCode')) {
-		cb(err,'Must have loginCode specified')
+		let newError = new Error('Must have loginCode specified');
+		cb(newError,'Must have loginCode specified')
     }
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
 		if(!game)
 		    cb(err,'Game does not exist')
 		else {
 			Safezone.findOne({ _id: game.centralSafeZone }, (err, safezone) => {
-				var numAlive = safezone.alivePlayers.length + 1;
-				var gameSize = numAlive + safezone.deadPlayers.length - 1;
+				var numAlive = game.alivePlayers.length + 1;
+				var gameSize = numAlive + game.deadPlayers.length - 1;
 				if(numAlive/gameSize <= .15) {
 					console.log('safezone should be empty now');
 					safezone.radius = 0;
@@ -269,7 +270,7 @@ function shrinkSafezone (req, res, cb) {
 				else {
 					safezone.radius -= (safezone.radius/numAlive);
 				}
-			}).then(
+			// }).then(
 				safezone.save((err) => {
 					if(err)
 						callback(err, null)
@@ -278,7 +279,7 @@ function shrinkSafezone (req, res, cb) {
 						cb(null, 'updated safezone')
 					}
 				})
-			);
+			});
 		}
     });
 }
@@ -360,9 +361,10 @@ router.post('/killTarget', (req, res) => {
 						return;
 					} else if (msg === 'target killed' || !player.alliance) {
 						shrinkSafezone(req, res, (err, msg) => {
-							if(err)
+							if(err) {
 								res.status(400).json({error: err.message});
 								return;
+							}
 						});
 						console.log("early exit")
 						res.status(200).json({message: msg});
@@ -463,6 +465,9 @@ const validateGameRequest = request => {
 	console.log(_.keys(body));
 	return _.has(body, 'loginCode') 
 		&& _.has(body, 'orgName') 
+		&& _.has(body, 'xCoord') 
+		&& _.has(body, 'yCoord') 
+		&& _.has(body, 'radius') 
 }
 
 router.post('/createGame', (req, res) => {

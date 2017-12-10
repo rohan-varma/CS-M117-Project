@@ -10,8 +10,48 @@ const organizerNameURL = ServerURL + '/organizerName';
 const createAllianceURL = ServerURL + '/createAlliance';
 const joinAllianceURL = ServerURL + '/joinAlliance';
 const getAllianceURL = ServerURL + '/getAlliance';
+const safezoneInfoURL = ServerURL + '/safezoneInfo';
+const getTargetLocationURL = ServerURL + '/getTargetLocation';
+const killTargetURL = ServerURL + '/killTarget';
 
 //these are the functions that interface with the backend. Import and use them wherever in the fronted its needed.
+
+const killTarget = body => fetch(killTargetURL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  }).then(res => res.json())
+
+const getTargetLocation = body => fetch(getTargetLocationURL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  }).then(res => res.json())
+
+const safezoneInfo = body => fetch(safezoneInfoURL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  }).then(res => res.json())
+
+const updateLocation = body => fetch(updateLocationURL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  }).then(res => res.json())
+
 const gameExists = body => fetch(gameExistsURL, {
     method: 'POST',
     headers: {
@@ -117,4 +157,8 @@ module.exports = {
   createAlliance,
   getAlliance,
   joinAlliance,
+  safezoneInfo,
+  updateLocation,
+  getTargetLocation,
+  killTarget,
 };
