@@ -544,7 +544,7 @@ router.post('/addUser', (req, res) => {
 	Player.findOne({ username: req.body.username }, (err, obj) => {
 		if(obj) {
 			res.status(400).json({
-				error: 'Player exists',
+				error: obj.gameCode,
 				username: req.body.username,
 			});
 		}
