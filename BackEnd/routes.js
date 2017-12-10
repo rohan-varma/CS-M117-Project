@@ -898,54 +898,111 @@ router.post('/createAlliance', (req, res) => {
  */
 router.post('/joinAlliance', (req, res) => {
 	console.log('IN JOIN ALLIANCE')
-	var jsonRequestBody = req.body;
-	var allianceId = jsonRequestBody.allianceId;
-	console.log(JSON.stringify(jsonRequestBody, null, 2))
-	// Get player and alliance
-	var findPlayerPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
-	var findAlliancePromise = Alliance.findById(allianceId).exec();
-	var promisesArray = [findPlayerPromise, findAlliancePromise];
+        var jsonRequestBody = req.body;
+        if(!_.has(jsonRequestBody, 'allianceId')) {
+	    var allianceId = Alliance.findOne()
+		.then(a => {
+		    var allianceId = a._id;
+		    console.log(JSON.stringify(jsonRequestBody, null, 2))
+		    // Get player and alliance
+		    var findPlayerPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
+		    var findAlliancePromise = Alliance.findById(allianceId).exec();
+		    var promisesArray = [findPlayerPromise, findAlliancePromise];
+		    
+		    Promise.all(promisesArray).then(docs => {
+			var player = docs[0];
+			var alliance = docs[1];
+			
+			if (!player) {
+			    throw new Error("player not found");
+			}
+			else if (!alliance) {
+			    throw new Error("alliance not found");
+			}
+			
+			// Target validation
+			alliance.targets.forEach(target => {
+			    if (target.equals(player._id)) {
+				throw new Error("player is a target of someone within the alliance");
+			    }
+			});
+			
+			// Add player to alliance
+			player.alliance = allianceId;
+			alliance.allies.push(player._id);
+			alliance.targets.push(player.target);
+			alliance.dictionary.push({ally: player._id, target: player.target});
+			
+			var savePlayerPromise = player.save();
+			var saveAlliancePromise = alliance.save();
+			var saveDocsPromisesArray = [savePlayerPromise, saveAlliancePromise];
+			
+			return Promise.all(saveDocsPromisesArray);
+		    }).then(() => {
+			// Success
+			console.log(jsonRequestBody.username + " successfully joined the alliance: " + allianceId);
+			res.status(200).json({
+			    allianceId: allianceId
+			});
+		    }).catch(err => {
+			// Failed to join alliance
+			console.log(jsonRequestBody.username + " failed to join an alliance - Error: " + err.message);
+			res.status(400).json({
+			    error: "Failed to join alliance - Error: " + err.message,
+			});
+		    });
+		});
+	} else {
+	    var allianceId = jsonRequestBody.allianceId;
+	    console.log(JSON.stringify(jsonRequestBody, null, 2))
+	    // Get player and alliance
+	    var findPlayerPromise = Player.findOne({ username: jsonRequestBody.username }).exec();
+	    var findAlliancePromise = Alliance.findById(allianceId).exec();
+	    var promisesArray = [findPlayerPromise, findAlliancePromise];
 
-	Promise.all(promisesArray).then(docs => {
+	    Promise.all(promisesArray).then(docs => {
 		var player = docs[0];
 		var alliance = docs[1];
-
+		
 		if (!player) {
-			throw new Error("player not found");
+		    throw new Error("player not found");
 		}
 		else if (!alliance) {
-			throw new Error("alliance not found");
+		    throw new Error("alliance not found");
 		}
-
+		
 		// Target validation
 		alliance.targets.forEach(target => {
-			if (target.equals(player._id)) {
-				throw new Error("player is a target of someone within the alliance");
-			}
+		    if (target.equals(player._id)) {
+			throw new Error("player is a target of someone within the alliance");
+		    }
 		});
-
+		
 		// Add player to alliance
 		player.alliance = allianceId;
 		alliance.allies.push(player._id);
 		alliance.targets.push(player.target);
 		alliance.dictionary.push({ally: player._id, target: player.target});
-
+		
 		var savePlayerPromise = player.save();
 		var saveAlliancePromise = alliance.save();
 		var saveDocsPromisesArray = [savePlayerPromise, saveAlliancePromise];
-
+		
 		return Promise.all(saveDocsPromisesArray);
-	}).then(() => {
+	    }).then(() => {
 		// Success
-		console.log(jsonRequestBody.username + " successfully joined the alliance: " + jsonRequestBody.allianceName);
-		res.status(200).json("");
-	}).catch(err => {
+		console.log(jsonRequestBody.username + " successfully joined the alliance: " + allianceId);
+	        res.status(200).json({
+		    allianceId: allianceId
+		});
+	    }).catch(err => {
 		// Failed to join alliance
 		console.log(jsonRequestBody.username + " failed to join an alliance - Error: " + err.message);
 		res.status(400).json({
-			error: "Failed to join alliance - Error: " + err.message,
+		    error: "Failed to join alliance - Error: " + err.message,
 		});
-	});
+	    });
+	}
 });
 
 /**
