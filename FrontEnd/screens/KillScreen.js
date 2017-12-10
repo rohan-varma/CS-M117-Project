@@ -195,6 +195,7 @@ class KillScreen extends Component {
             alert(this.state.username);
             const killRequest = JSON.stringify({
                 username: this.state.username,
+		loginCode: this.state.gameCode
             });
 
             killTarget(killRequest).then(res => {

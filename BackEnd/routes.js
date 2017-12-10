@@ -56,7 +56,7 @@ const disbandAlliance = (allianceId, callback) => {
 
 const validateKillRequest = request => {
 	const body = request.body
-	return _.has(body, 'username')
+    return _.has(body, 'username') && _.has(body, 'loginCode')
 }
 
 function checkTargetInSafezone(player, target, callback) {
@@ -133,7 +133,7 @@ function checkTargetProximity(player, target, callback) {
 			console.log(err);
 			return false;
 		}
-		results.filter(function(value) {
+      	        results.filter(function(value) {
 			if(value.obj.username == target.username) {
 				console.log(value.obj)
 				isInRange = true;
@@ -202,8 +202,8 @@ function killTargetAttempt(player, target, assassin, callback) {
 							console.log("filtered alivePlayers array")
 							console.log(updatedPlayers)
 							game.alivePlayers = updatedPlayers
-							console.log(game.alivePlayers)
-							game.save((err) => {
+						        console.log(game.alivePlayers)
+						        game.save((err) => {
 								if(err)
 									callback(err, null)
 								else {
@@ -231,7 +231,7 @@ router.post('/organizerName', (req, res) => {
 	    error: 'Must have loginCode specified'
 	});
 	return;
-    };
+    }
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
 	if(!game)
 	    res.status(400).json({
@@ -248,9 +248,9 @@ router.post('/organizerName', (req, res) => {
 
 function shrinkSafezone (req, res, cb) {
     console.log("starting shrink safezone ...");
-	if(!_.has(req.body, 'loginCode')) {
-		const err = {err: 'must have login code defined'};
-		cb(err,'Must have loginCode specified');
+    if(!_.has(req.body, 'loginCode')) {
+	const err = {err: 'must have login code defined'};
+	cb(err,'Must have loginCode specified');
     }
     else {
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
@@ -364,15 +364,15 @@ router.post('/killTarget', (req, res) => {
 				console.log(player)
 				console.log(target)
 				killTargetAttempt(player, target, null, (err, msg) => {
-					if(err) {
+				        if(err) {
 						res.status(400).json({error: err.message});
 					} else if (msg === 'target killed' || !player.alliance) {
 						shrinkSafezone(req, res, (err, message) => {
 							if (err) {
 								res.status(400).json({error: err});
 							} else {
-								console.log("early exit");
-								res.status(200).json({message: msg});
+								console.log("early exit")
+								res.status(200).json({message: message});
 							}
 						});
 					} else {
@@ -410,14 +410,15 @@ router.post('/killTarget', (req, res) => {
 												} else if (msg === 'killed target') {
 													console.log('killed alliance target!')
 													shrinkSafezone(req, res, (err, msg) => {
-														if(err) {
-															res.status(400).json({error: err.message});
-                                                        };
+													    if(err)
+														res.status(400).json({error: err.message});
+													    else {
+														res.status(200).json({
+														    message: msg,
+														});
+													    }
 													});
-													res.status(200).json({
-														message: msg
-													});
-													continueExecution = false;
+												        continueExecution = false;
 													return;
 												};
 											});
