@@ -72,7 +72,7 @@ function checkTargetInSafezone(player, target, callback) {
 		var point = { type : "Point", coordinates : safezone.location };
 		console.log(point);
 		var isInSafezone = false;
-		Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
+		Player.geoNear(point, { distanceMultiplier: 6378.137, maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
 			if(err) {
 				console.log(err);
 				return;
@@ -99,7 +99,7 @@ function checkTargetInSafezone(player, target, callback) {
 					console.log('WE FOUND A SAFEZONE HELL YEA')
 					var point = { type : "Point", coordinates : safezone.location };
 					console.log(point);
-					Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
+					Player.geoNear(point, { distanceMultiplier: 6378.137, maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
 						if(err) {
 							console.log(err);
 							return;
@@ -131,7 +131,7 @@ function checkTargetProximity(player, target, callback) {
 	var point = { type : "Point", coordinates : player.location };
 	console.log(point);
 	var isInRange = false;
-	Player.geoNear(point, { maxDistance : 5, spherical : true }, function(err, results, stats) {
+	Player.geoNear(point, { distanceMultiplier: 6378.137, maxDistance : 5, spherical : true }, function(err, results, stats) {
 		if(err) {
 			console.log(err);
 			return false;
