@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, AppRegistry,ListView} from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
+import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
 const { createGame, addUserToGame, getAllPlayersForGame,gameExists, createAlliance, getAlliance, joinAlliance } 
@@ -33,7 +33,7 @@ export default class InAlliance extends Component {
 
         <Header style={{ flexDirection: 'column', alignItems:'center'}}> 
           <Text style= {{fontWeight: 'bold'}}> Alliance Page </Text>
-          <Text style= {{fontWeight: 'bold'}}> My Username:{'rohan'} </Text>
+          <Text style= {{fontWeight: 'bold'}}> My Username: {this.props.username} </Text>
         </Header>
       <Text> Members of your Alliance: </Text>
       <ListView

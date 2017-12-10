@@ -16,7 +16,7 @@ import InAlliance from './screens/InAlliance';
 import PlayerScreen from './screens/PlayerScreen';
 import GameCreate from './screens/GameCreate';
 import GameLogIn from './screens/GameLogIn';
-import GamePage from './screens/GamePage';
+import KillScreen from './screens/KillScreen';
 import {Scene, Router,Tabs, Stack,Actions} from 'react-native-router-flux';
 const _ = require('lodash');
 
@@ -25,61 +25,23 @@ export default class App extends React.Component {
     return (
           <Router>
             <Scene key="root">
-              <Scene key="Home" component={Home}  initial={true}/>
+              <Scene key="Home" component={Home} initial/>
               <Scene key="GameCreate" component={GameCreate} title = "Create a New game"/>
               <Scene key="GameLogIn" component={GameLogIn} title = "Log in"/>
-              <Scene key="Lobby" component={Lobby} title="Game Lobby"/>
-              <Scene key="PlayerScreen" component={PlayerScreen} title = "Players" />
-              <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby"/>
-              <Scene key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" />
+              <Scene key="Lobby" component={Lobby} title="Game Lobby"rightTitle="Log Out" 
+              onRight={() =>{Actions.Home()}}/>
+              <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby" leftTitle= "Log Out"  
+              onLeft={() =>{Actions.Home()}} />
+              <Scene tabs key="PlayerScreen"   component={PlayerScreen}  title = "Players" leftTitle= "Log Out" rightTitle="Refresh" 
+              onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({PlayerScreen})}}/>
+              <Scene tabs key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" leftTitle= "Log Out" rightTitle="Refresh" 
+              onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({AllianceScreen})}}/>
+              <Scene tabs key="KillScreen" component={KillScreen} title="Kill" leftTitle= "Log Out" rightTitle="Refresh" 
+              onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({KillScreen})}}/>
               <Scene key="InAlliance" component={InAlliance} title="In Alliance" />
-              <Scene hideNavBar key='GamePage' 
-              
-              rightTitle="Log Out" 
-              onRight={() =>{Actions.Home()}}
-
-              >
-                <Tabs
-                  key="tabbar"
-                  swipeEnabled
-                  showLabel={true}
-                  activeBackgroundColor="rgba(13, 114, 186, 0.76)"
-                  inactiveBackgroundColor="rgba(128, 128, 128, 0.44)"
-                  labelStyle={styles.labels}
-
-                >
-                  <Scene
-                    key="Player"
-                    title="Player"
-                    component={PlayerScreen}
-                    tabBarLabel="Player"
-                    inactiveBackgroundColor="#FFF"
-                    activeBackgroundColor="#DDD"
-                    titleStyle={{ color: 'black', alignSelf: 'center' }}
-                  />
-
-                    <Scene
-                      key="Kill"
-                      title="Kill"
-                      tabBarLabel="Kill"
-                      component={AllianceScreen}
-                      onBack={() => alert('onBack button!')}
-                      hideDrawerButton
-                      backTitle="Back!"
-                      panHandlers={null}
-                    />
-       
-                    <Scene
-                      key="Alliance"
-                      tabBarLabel="Alliance"
-                      title="Alliance"
-                      component={AllianceScreen}
-                      onRight={() => { }}
-                    />
-           
-                 
-                </Tabs>
-                </Scene>
+            
+               
+               
             </Scene>
           </Router>
 

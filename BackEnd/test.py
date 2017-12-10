@@ -222,8 +222,7 @@ def testTargetInAlliance():
 def main():
 	testBasicCase()
 	# testTargetInIndividualSafezone()
-	# testTargetInCentralSafezone()
+	testTargetInCentralSafezone()
 	# testTargetInAlliance()
-	
 if __name__ == "__main__":
 	main()

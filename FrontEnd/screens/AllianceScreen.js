@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, AppRegistry,ListView} from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
+import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem, Icon } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
 const { createGame, addUserToGame, getAllPlayersForGame,gameExists, createAlliance, getAlliance, joinAlliance } 
@@ -19,6 +19,7 @@ export default class AllianceScreen extends Component {
 	}
 
 	reload = () => {
+
 		//check if alliance exists for this player
 		//if so go to the other alliance screen
 		const gameCode = this.props.gameCode || '17WCBXGKMVBA5WLP16VK29PJUVDPSX3K4PU8L4GIGI0L0O';
@@ -30,12 +31,16 @@ export default class AllianceScreen extends Component {
 			console.log('get alliance res')
 			console.log(JSON.stringify(res, null, 2))
 			if (res.allies.length > 0) {
-				//this user has an alliance, so take the user to the page where they view alliances
-				alert('you have an alliance!')
+				console.log('there are alliances to join')
+        //this user has an alliance, so take the user to the page where they view alliances
 				{Actions.InAlliance({username: this.props.username, gameCode: this.props.gameCode, allianceObject: res})}
 			}
+      
 		})
 		.catch(err => {
+
+      alert('There is no alliances to join. Please create one first.')
+      
 			console.log('get alliance err')
 			console.log(JSON.stringify(err, null, 2))
 		})
@@ -85,35 +90,72 @@ export default class AllianceScreen extends Component {
 			})
 		}
  	}
-
+  goToKill = () => {
+    Actions.replace("KillScreen",{username: this.props.username, gameCode: this.props.gameCode})
+   
+  }
+  goToPlayer = () => {
+    Actions.replace("PlayerScreen",{username: this.props.username, gameCode: this.props.gameCode})
+   
+  }
 	render() {
 		return (
       <Container style={{ flexDirection: 'column'}}>
 
         <Header style={{ flexDirection: 'column', alignItems:'center'}}> 
-          <Text style= {{fontWeight: 'bold'}}> Create An Alliance </Text>
-          <Text style= {{fontWeight: 'bold'}}> My Username:{'rohan'} </Text>
+          <Text style= {{fontWeight: 'bold', marginBottom:10}}> Game:{this.props.gameCode} </Text>
+          <Text style= {{fontWeight: 'bold',marginBottom:20}}> My Username:{this.props.username} </Text>
         </Header>
         <View style={{flex:1, margin: 10}}>
-          <Button info
+          <Button 
+          info 
+          full
               onPress={this.create}>
               <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Create An Alliance</Text>
             </Button>
-            <Button style={{margin: 10}} info
+            <Button style={{margin: 10}} 
+            info 
+            full
               onPress={this.join}>
               <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Join An Alliance</Text>
+            </Button>
+            <Button full success
+            style= {{bottom: 0}}
+            onPress={this.reload}> 
+              <Text style= {{color:'white'}}> See My Alliance </Text>
             </Button>
         </View>       
         <Footer>
           <FooterTab>
-            <Button info
-              onPress={this.reload}>
-              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Refresh</Text>
+          <Button vertical
+          onPress = {this.goToPlayer}>
+           
+              <Icon 
+              ios='ios-person'
+              android="md-person" 
+              
+               />
+              <Text>Player</Text>
+            </Button>
+            <Button vertical
+              onPress= {this.goToKill}>
+              
+              <Icon
+              ios='ios-flash'
+              android="md-flash" />
+              <Text>Kill</Text>
+            </Button>
+            <Button vertical>
+           
+              <Icon
+              style={{color:'rgba(154, 196, 248, 1)'}}
+              ios='ios-contacts'
+              android="md-contacts" />
+              <Text style={{color:'rgba(154, 196, 248, 1)'}}>Alliance</Text>
             </Button>
           </FooterTab>
         </Footer>
       </Container>
-    
     );
 	}
 

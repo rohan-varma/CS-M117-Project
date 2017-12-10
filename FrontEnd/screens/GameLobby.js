@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, AppRegistry,ListView} from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
+import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
 const { createGame, addUserToGame, getAllPlayersForGame,gameExists } = require('../requestors');
@@ -49,7 +49,7 @@ export default class GamePage extends Component {
         ifGameStarted: res.started,
       })
     })
-  if (this.state.ifGameStarted) {Actions.GamePage({username:this.props.username,gameCode:this.props.gameCode});}
+  if (this.state.ifGameStarted) {Actions.PlayerScreen({username:this.props.username,gameCode:this.props.gameCode});}
    getAllPlayersForGame(JSON.stringify({loginCode: this.props.gameCode}))
     .then(res => {
       console.log(JSON.stringify(res, null, 2))

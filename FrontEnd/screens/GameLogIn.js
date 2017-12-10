@@ -55,12 +55,15 @@ class GameInput extends Component {
             return;
         };
 
+        console.log(this.props.gameXCoord);
+        console.log(this.props.gameYCoord);
 
         const gameRequestBody = JSON.stringify({
             loginCode: this.state.gameCode,
             orgName: this.state.username,
             xCoord: this.props.gameXCoord,
             yCoord: this.props.gameYCoord,
+            radius: this.props.radius,
         });
         // create user and login
         const userRequestBody = JSON.stringify({
@@ -69,6 +72,7 @@ class GameInput extends Component {
             mac: 'address',
             x: this.state.mapRegion.longitude,
             y: this.state.mapRegion.latitude,
+            radius: this.state.safezoneRadius,
         });
 
         gameExists(gameRequestBody).then(res => {
@@ -87,7 +91,7 @@ class GameInput extends Component {
                                
                             if (res.username == this.state.username) {
                               
-                                 Actions.GamePage({username: this.state.username, gameCode: this.state.gameCode});
+                                 Actions.PlayerScreen({username: this.state.username, gameCode: this.state.gameCode});
                             }
                             else {
                                  alert('Game already started, new player can not join an ongoing game. Please enter a new game.');
@@ -107,7 +111,7 @@ class GameInput extends Component {
                            
                             if (ifGameStarted) {
                                 // if game already started go to game page instead
-                                Actions.GamePage({username: this.state.username, gameCode: this.state.gameCode});
+                                Actions.PlayerScreen({username: this.state.username, gameCode: this.state.gameCode});
                                 return;
                             } else {
                       

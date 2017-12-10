@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Navigator, AppRegistry, TextInput, ImageBackground, ListView }   from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Text,List, ListItem } from 'native-base';
-import { Actions } from 'react-native-router-flux';
+import { StyleSheet, View, Navigator, AppRegistry, TextInput, ImageBackground, ListView, Text }   from 'react-native';
+import { Container, Header, Content, Footer, FooterTab, Button, Icon} from 'native-base';
+import { Actions, Tab } from 'react-native-router-flux';
 import GameTextInput  from '../GameTextInput';
+
 //import Form  from '../src/form';
 const { createGame, addUserToGame, getAllPlayersForGame, getTargetsForPlayer } = require('../requestors');
 const _ = require('lodash');
@@ -86,17 +87,26 @@ class PlayerScreen extends Component {
     })
 
   }
+  goToKill = () => {
+    Actions.replace("KillScreen",{username: this.props.username, gameCode: this.props.gameCode})
+  }
   goToAlliance = () => {
-    console.log('go there')
-    {Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})}
+    Actions.replace("AllianceScreen",{username: this.props.username, gameCode: this.props.gameCode})
+    //Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})
+  }
+  playerReload = () => {
+    Actions.replace("PlayerScreen",{username: this.props.username, gameCode: this.props.gameCode})
+    //Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
   render() {
     return (
       <Container>
+      <Content>
       <View style={styles.formContainer}>
       <Text> Players in Game </Text>
       <ListView
         dataSource={this.state.alivePlayers.length !== 0 ? this.state.alivePlayers : [{name: 'No Players'}]}
+	enableEmptySections={true}
         renderRow={player => {
           console.log(player)
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
@@ -105,6 +115,7 @@ class PlayerScreen extends Component {
       <Text style={{paddingTop: 30}}> The Noble Players Who Were Killed In Battle </Text>
       <ListView
         dataSource={this.state.deadPlayers.length !== 0 ? this.state.deadPlayers : [{name: 'No Players'}]}
+	enableEmptySections={true}
         renderRow={player => {
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
@@ -112,19 +123,46 @@ class PlayerScreen extends Component {
       <Text style={{paddingTop: 30}}> Your Targets </Text> 
       <ListView
         dataSource={this.state.playerTargets}
+	enableEmptySections={true}x
         renderRow={player => {
           console.log(player)
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
       />
       </View>
+      </Content>
         <Footer>
           <FooterTab>
-            <Button info
-              onPress={this.reload}>
-              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Refresh</Text>
+
+            <Button vertical>
+              
+              <Icon 
+              ios='ios-person'
+              android="md-person" 
+              style={{color:'rgba(154, 196, 248, 1)'}}
+              active 
+               />
+              <Text style = {{color: 'rgba(154, 196, 248, 1)'}}>Player</Text>
             </Button>
+            <Button vertical
+              onPress= {this.goToKill}>
+             
+              <Icon
+              ios='ios-flash'
+              android="md-flash" />
+              <Text>Kill</Text>
+            </Button>
+            <Button vertical 
+            onPress = {this.goToAlliance}>
+              
+              <Icon
+              ios='ios-contacts'
+              android="md-contacts" />
+              <Text>Alliance</Text>
+            </Button>
+   
           </FooterTab>
+
         </Footer>
         </Container>
       
