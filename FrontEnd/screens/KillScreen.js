@@ -105,7 +105,7 @@ class KillScreen extends Component {
         // update your targets location
         getTargetLocation(locationRequest).then((res) => {
             var cur_targets = [];
-            for (var i = 0; i < res.targets.length(); i++) {
+            for (var i = 0; i < res.targets.length; i++) {
                 cur_targets.push({
                     key: i,
                     username: res.targets[i][0],
