@@ -98,7 +98,7 @@ export default class AllianceScreen extends Component {
 
         <Header style={{ flexDirection: 'column', alignItems:'center'}}> 
           <Text style= {{fontWeight: 'bold'}}> Create An Alliance </Text>
-          <Text style= {{fontWeight: 'bold'}}> My Username:{'rohan'} </Text>
+          <Text style= {{fontWeight: 'bold'}}> My Username: {this.props.username} </Text>
         </Header>
         <View style={{flex:1, margin: 10}}>
           <Button 

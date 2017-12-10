@@ -33,7 +33,7 @@ export default class InAlliance extends Component {
 
         <Header style={{ flexDirection: 'column', alignItems:'center'}}> 
           <Text style= {{fontWeight: 'bold'}}> Alliance Page </Text>
-          <Text style= {{fontWeight: 'bold'}}> My Username:{'rohan'} </Text>
+          <Text style= {{fontWeight: 'bold'}}> My Username: {this.props.username} </Text>
         </Header>
       <Text> Members of your Alliance: </Text>
       <ListView
