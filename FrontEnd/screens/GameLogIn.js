@@ -55,12 +55,15 @@ class GameInput extends Component {
             return;
         };
 
+        console.log(this.props.gameXCoord);
+        console.log(this.props.gameYCoord);
 
         const gameRequestBody = JSON.stringify({
             loginCode: this.state.gameCode,
             orgName: this.state.username,
             xCoord: this.props.gameXCoord,
             yCoord: this.props.gameYCoord,
+            radius: this.props.radius,
         });
         // create user and login
         const userRequestBody = JSON.stringify({
