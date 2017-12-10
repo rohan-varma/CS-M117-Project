@@ -102,8 +102,8 @@ class GameCreate extends Component {
                     <MapView.Circle
                         center={{latitude: this.state.mapRegion.latitude, longitude: this.state.mapRegion.longitude}}
                         radius={this.state.safezoneRadius}
-                        fillColor="rgba(255, 0, 0, 0.3)"
-                        strokeColor="rgba(255, 0, 0, 0.3)" />
+                        fillColor="rgba(0, 0, 255, 0.3)"
+                        strokeColor="rgba(0, 0, 255, 0.3)" />
 
                 </MapView>
                 </View>

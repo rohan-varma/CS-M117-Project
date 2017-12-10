@@ -24,11 +24,13 @@ class KillScreen extends Component {
             },
             targets: [
                 {
+		    key: 0,
                     username: 'asdfas1',
                     latitude: 34.0689,
                     longitude: -118.443,
                 },
                 {
+		    key: 1,
                     username: 'asdfas2',
                     latitude: 34.068,
                     longitude: -118.443,
@@ -71,12 +73,12 @@ class KillScreen extends Component {
             this.setState({ globalSafezone: {
                 latitude: res.gsz_loc[1],
                 longitude: res.gsz_loc[0],
-                radius: res.gsz_r,
+                radius: res.gsz_radius,
             }});
             this.setState( { playerSafezone: {
                 latitude: res.psz_loc[1],
                 longitude: res.psz_loc[0],
-                radius: res.psz_r,
+                radius: res.psz_radius,
             }});
         }).catch((err) => {
             alert("please pass in username and gameCode as props");
@@ -144,7 +146,7 @@ class KillScreen extends Component {
 
     _handleLocationUpdate = (loc) => {
         this.setState({ mapRegion: 
-            { latitude: loc.coords.latitude, longitude: loc.coords.longitude }});
+			{ latitude: loc.coords.latitude, longitude: loc.coords.longitude, latitudeDelta: 0.002, longitudeDelta: 0.002 }});
     };
 
     startPositionListener = () => { Location.watchPositionAsync({
@@ -221,7 +223,9 @@ class KillScreen extends Component {
                 <MapView
                     style={{ alignSelf: 'stretch', height: 250 }}
                     region={this.state.mapRegion}
-                    onRegionChange={this._handleMapRegionChange}>
+                    onRegionChange={this._handleMapRegionChange}
+	            scrollEnabled={false}
+	            zoomEnabled={false}>
 
                     <MapView.Marker 
                         coordinate={{
@@ -230,6 +234,7 @@ class KillScreen extends Component {
 
                     {this.state.targets.map(target => (
                         <MapView.Marker
+			    key={target.key}
                             coordinate={{
                                 longitude: target.longitude,
                                 latitude: target.latitude,
@@ -250,7 +255,7 @@ class KillScreen extends Component {
                             latitude: this.state.globalSafezone.latitude,
                             longitude: this.state.globalSafezone.longitude}}
                         radius={this.state.globalSafezone.radius}
-                        fillColor="rgba(0, 0, 25ç5, 0.3)"
+                        fillColor="rgba(0, 0, 255, 0.3)"
                         strokeColor="rgba(0, 0, 255, 0.3)" />
                 </MapView>
 

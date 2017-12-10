@@ -3,7 +3,7 @@ import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
 import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
-const { createGame, addUserToGame, getAllPlayersForGame,gameExists } = require('../requestors');
+const { createGame, addUserToGame, getAllPlayersForGame,gameExists, safezoneInfo } = require('../requestors');
 const _ = require('lodash');
  //var items = ['Simon Mignolet','Nathaniel Clyne','Dejan Lovren','Mama Sakho','Emre Can']
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
@@ -29,17 +29,47 @@ export default class GamePage extends Component {
       })
     })
     this.state={
-      safezoneRadius: 40,
-            // default to Boelter Hall, UCLA
-            mapRegion: {
-                latitude: 34.0689,
-                longitude: -118.443,
-                latitudeDelta: 0.002,
-                longitudeDelta: 0.002,
-            },
-      currentplayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
-      ifGameStarted: false,
+        // default to Boelter Hall, UCLA
+        mapRegion: {
+            latitude: 34.0689,
+            longitude: -118.443,
+            latitudeDelta: 0.002,
+            longitudeDelta: 0.002,
+        },
+	globalSafezone: {
+            latitude: 34.0689,
+            longitude: -118.443,
+            radius: 50,
+        },
+        playerSafezone: {
+            latitude: 34.0689,
+            longitude: -118.442,
+            radius: 50,
+        },
+	currentplayers: ds.cloneWithRows([{name: 'Player 1'}, {name: 'Player 2'}]),
+	ifGameStarted: false,
     };
+      const safezoneRequest = JSON.stringify({
+          username: this.props.username,
+          loginCode: this.props.gameCode,
+      });
+      safezoneInfo(safezoneRequest).then((res) => {
+          // silently succeed kek
+	  console.log("SAFEZONE REQ");
+	  console.log(res);
+          this.setState({ globalSafezone: {
+              latitude: res.gsz_loc[1],
+              longitude: res.gsz_loc[0],
+              radius: res.gsz_radius,
+          }});
+          this.setState( { playerSafezone: {
+              latitude: res.psz_loc[1],
+              longitude: res.psz_loc[0],
+              radius: res.psz_radius,
+          }});
+      }).catch((err) => {
+          alert("please pass in username and gameCode as props");
+      });
   }
   reload = () => {   
   // check if game is started
@@ -84,12 +114,21 @@ export default class GamePage extends Component {
                     region={this.state.mapRegion}
                     onRegionChange={this._handleMapRegionChange}>
 
-                    <MapView.Circle
-                        center={{latitude: this.state.mapRegion.latitude, longitude: this.state.mapRegion.longitude}}
-                        radius={this.state.safezoneRadius}
-                        fillColor="rgba(255, 0, 0, 0.3)"
-                        strokeColor="rgba(255, 0, 0, 0.3)" />
+	            <MapView.Circle
+                        center={{
+                            latitude: this.state.playerSafezone.latitude,
+                            longitude: this.state.playerSafezone.longitude}}
+                        radius={this.state.playerSafezone.radius}
+                        fillColor="rgba(0, 255, 0, 0.3)"
+                        strokeColor="rgba(0, 255, 0, 0.3)" />
 
+                    <MapView.Circle
+                        center={{
+                            latitude: this.state.globalSafezone.latitude,
+                            longitude: this.state.globalSafezone.longitude}}
+                        radius={this.state.globalSafezone.radius}
+                        fillColor="rgba(0, 0, 255, 0.3)"
+                        strokeColor="rgba(0, 0, 255, 0.3)" />
                 </MapView>
         </View>
         <View style={{flex:1}}>
