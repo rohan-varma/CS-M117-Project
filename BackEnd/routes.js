@@ -260,8 +260,8 @@ function shrinkSafezone (req, res, cb) {
 		    cb(err,'Game does not exist')
 		else {
 			Safezone.findOne({ _id: game.centralSafeZone }, (err, safezone) => {
-				var numAlive = safezone.alivePlayers.length + 1;
-				var gameSize = numAlive + safezone.deadPlayers.length - 1;
+				var numAlive = game.alivePlayers.length + 1;
+				var gameSize = numAlive + game.deadPlayers.length - 1;
 				if(numAlive/gameSize <= .15) {
 					console.log('safezone should be empty now');
 					safezone.radius = 0;
@@ -269,7 +269,6 @@ function shrinkSafezone (req, res, cb) {
 				else {
 					safezone.radius -= (safezone.radius/numAlive);
 				}
-			}).then(
 				safezone.save((err) => {
 					if(err)
 						callback(err, null)
@@ -278,7 +277,7 @@ function shrinkSafezone (req, res, cb) {
 						cb(null, 'updated safezone')
 					}
 				})
-			);
+			});
 		}
     });
 }
@@ -699,7 +698,7 @@ router.post('/getTargetLocation', (req, res) => {
 			error: 'body must have username',
 		})
 	}
-	Player.findOne({ username: req.body.username }, (err, obj) => {
+	Player.findOne({ username: req.body.username }, (err, player) => {
 		if (err || !player) {
 			res.status(400).json({message: 'error when trying to find player'});
 		}
@@ -712,7 +711,7 @@ router.post('/getTargetLocation', (req, res) => {
 		    if (player.alliance == null)
 			Promise.all(_.map([player.target], pIdToUsername)).then(result => {
 				var array = [];
-	    		var tuple = [result[i].username, reuslt[i].location];
+	    		var tuple = [result.username, result.location];
 	    		array.push(tuple);
 		    	var jsonArray = JSON.stringify(array);
 			    res.status(200).json({
@@ -727,8 +726,8 @@ router.post('/getTargetLocation', (req, res) => {
 				} else {
 				    Promise.all(_.map(a.targets, pIdToUsername)).then(result => {
 				    	var array = [];
-				    	for(let i=0; i < result.length; i++) {
-				    		var tuple = [result[i].username, reuslt[i].location];
+				    	for(let i = 0; i < result.length; i++) {
+				    		var tuple = [result[i].username, result[i].location];
 				    		array.push(tuple);
 				    	}
 				    	var jsonArray = JSON.stringify(array);

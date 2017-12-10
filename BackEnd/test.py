@@ -74,6 +74,12 @@ def testUpdateLocation(data):
 		data = data)
 	assert res.status_code == 200
 
+def testGetTargetLocations(data):
+	res = requests.post("http://localhost:3000/BluA/getTargetLocation",
+		data = data)
+	print res
+	assert res.status_code == 200
+
 def testKillTarget(data):
 	res = requests.post("http://localhost:3000/BluA/killTarget",
 		data = data)
@@ -120,6 +126,7 @@ def testBasicCase():
 	testUpdateLocation(user4_data)
 	#attempt to kill the target
 	testKillTarget(user1_data)
+	testGetTargetLocations(user1_data)
 
 def testTargetInIndividualSafezone():
 	#create game data
@@ -213,10 +220,10 @@ def testTargetInAlliance():
 	testKillTarget(user1_data)
 
 def main():
-	# testBasicCase()
+	testBasicCase()
 	# testTargetInIndividualSafezone()
 	# testTargetInCentralSafezone()
-	testTargetInAlliance()
+	# testTargetInAlliance()
 	
 if __name__ == "__main__":
 	main()
