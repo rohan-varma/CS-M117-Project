@@ -463,6 +463,9 @@ const validateGameRequest = request => {
 	console.log(_.keys(body));
 	return _.has(body, 'loginCode') 
 		&& _.has(body, 'orgName') 
+		&& _.has(body, 'xCoord') 
+		&& _.has(body, 'yCoord') 
+		&& _.has(body, 'radius') 
 }
 
 router.post('/createGame', (req, res) => {
