@@ -34,21 +34,24 @@ export default class KillScreen extends Component {
             onPress = {this.goToPlayer}
             vertical>
               <Icon 
-              name ='ios-person'
               ios='ios-person'
+              android="md-person"
               />
               <Text>Player</Text>
             </Button>
             <Button vertical>
               <Icon 
               style={{color:'rgba(154, 196, 248, 1)'}}
-              name="md-flash" />
+              ios='ios-flash'
+              android="md-flash" />
               <Text style={{color:'rgba(154, 196, 248, 1)'}}>Kill</Text>
             </Button>
             <Button 
             vertical 
             onPress = {this.goToAlliance}>
-              <Icon name="ios-contacts" />
+              <Icon 
+              ios='ios-contacts'
+              android="md-contacts" />
               <Text>Alliance</Text>
             </Button>
    

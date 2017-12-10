@@ -32,7 +32,7 @@ export default class App extends React.Component {
               onRight={() =>{Actions.Home()}}/>
               <Scene key="Lobby_Master" component={Lobby_Master}  title="Game Lobby" leftTitle= "Log Out"  
               onLeft={() =>{Actions.Home()}} />
-              <Scene tabs key="PlayerScreen"  component={PlayerScreen}  title = "Players" leftTitle= "Log Out" rightTitle="Refresh" 
+              <Scene tabs key="PlayerScreen"   component={PlayerScreen}  title = "Players" leftTitle= "Log Out" rightTitle="Refresh" 
               onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({PlayerScreen})}}/>
               <Scene tabs key="AllianceScreen" component={AllianceScreen} title="Alliance Screen" leftTitle= "Log Out" rightTitle="Refresh" 
               onLeft={() =>{Actions.Home()}} onRight={() =>{Actions.refresh({AllianceScreen})}}/>

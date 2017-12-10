@@ -132,9 +132,10 @@ class PlayerScreen extends Component {
           <FooterTab>
 
             <Button vertical>
+              
               <Icon 
-              name ='ios-person'
               ios='ios-person'
+              android="md-person" 
               style={{color:'rgba(154, 196, 248, 1)'}}
               active 
                />
@@ -142,12 +143,18 @@ class PlayerScreen extends Component {
             </Button>
             <Button vertical
               onPress= {this.goToKill}>
-              <Icon name="md-flash" />
+             
+              <Icon
+              ios='ios-flash'
+              android="md-flash" />
               <Text>Kill</Text>
             </Button>
             <Button vertical 
             onPress = {this.goToAlliance}>
-              <Icon name="ios-contacts" />
+              
+              <Icon
+              ios='ios-contacts'
+              android="md-contacts" />
               <Text>Alliance</Text>
             </Button>
    
