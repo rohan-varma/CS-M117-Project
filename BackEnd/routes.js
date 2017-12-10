@@ -253,7 +253,8 @@ router.post('/organizerName', (req, res) => {
 
 function shrinkSafezone (req, res, cb) {
 	if(!_.has(req.body, 'loginCode')) {
-		cb(err,'Must have loginCode specified')
+		let newError = new Error('Must have loginCode specified');
+		cb(newError,'Must have loginCode specified')
     }
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
 		if(!game)
