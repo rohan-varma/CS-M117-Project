@@ -11,10 +11,12 @@ import { Actions } from 'react-native-router-flux';
 
 export default class KillScreen extends Component {
   goToAlliance = () => {
-    Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})
+     Actions.replace("AllianceScreen",{username: this.props.username, gameCode: this.props.gameCode})
+    //Actions.AllianceScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
   goToPlayer = () => {
-    Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
+     Actions.replace("PlayerScreen",{username: this.props.username, gameCode: this.props.gameCode})
+    //Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
   }
   render() {
     return (
@@ -29,7 +31,7 @@ export default class KillScreen extends Component {
         <Footer>
           <FooterTab>
             <Button 
-            onPress = {this.goToAlliance}
+            onPress = {this.goToPlayer}
             vertical>
               <Icon 
               name ='ios-person'

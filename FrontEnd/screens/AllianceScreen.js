@@ -32,9 +32,12 @@ export default class AllianceScreen extends Component {
 			console.log(JSON.stringify(res, null, 2))
 			if (res.allies.length > 0) {
 				//this user has an alliance, so take the user to the page where they view alliances
-				alert('you have an alliance!')
+				
 				{Actions.InAlliance({username: this.props.username, gameCode: this.props.gameCode, allianceObject: res})}
 			}
+      else {
+        alert('There is no alliances to join. Please create one first')
+      }
 		})
 		.catch(err => {
 			console.log('get alliance err')
@@ -87,18 +90,20 @@ export default class AllianceScreen extends Component {
 		}
  	}
   goToKill = () => {
-    Actions.KillScreen({username: this.props.username, gameCode: this.props.gameCode})
+    Actions.replace("KillScreen",{username: this.props.username, gameCode: this.props.gameCode})
+   
   }
   goToPlayer = () => {
-    Actions.PlayerScreen({username: this.props.username, gameCode: this.props.gameCode})
+    Actions.replace("PlayerScreen",{username: this.props.username, gameCode: this.props.gameCode})
+   
   }
 	render() {
 		return (
       <Container style={{ flexDirection: 'column'}}>
 
         <Header style={{ flexDirection: 'column', alignItems:'center'}}> 
-          <Text style= {{fontWeight: 'bold'}}> Create An Alliance </Text>
-          <Text style= {{fontWeight: 'bold'}}> My Username: {this.props.username} </Text>
+          <Text style= {{fontWeight: 'bold', marginBottom:10}}> Game:{this.props.gameCode} </Text>
+          <Text style= {{fontWeight: 'bold',marginBottom:20}}> My Username:{this.props.username} </Text>
         </Header>
         <View style={{flex:1, margin: 10}}>
           <Button 
