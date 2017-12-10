@@ -103,8 +103,10 @@ class KillScreen extends Component {
         });
 
         // update your targets location
+        console.log('doing the backend call');
         getTargetLocation(locationRequest).then((res) => {
             var cur_targets = [];
+            console.log(res);
             for (var i = 0; i < res.targets.length; i++) {
                 cur_targets.push({
                     key: i,
@@ -116,6 +118,7 @@ class KillScreen extends Component {
             this.setState({ targets: cur_targets });
         }).catch((err) => {
             // silently fail, because this will be called again on a timer too
+            console.log('failed');
             failed = true;
         });
 
