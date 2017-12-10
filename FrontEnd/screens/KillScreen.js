@@ -93,6 +93,7 @@ class KillScreen extends Component {
             username: this.state.username,
             x: this.state.mapRegion.longitude,
             y: this.state.mapRegion.latitude,
+            loginCode: this.props.gameCode,
         });
 
         // update backend with your location
@@ -194,6 +195,7 @@ class KillScreen extends Component {
             alert(this.state.username);
             const killRequest = JSON.stringify({
                 username: this.state.username,
+		loginCode: this.state.gameCode
             });
 
             killTarget(killRequest).then(res => {

@@ -56,7 +56,7 @@ const disbandAlliance = (allianceId, callback) => {
 
 const validateKillRequest = request => {
 	const body = request.body
-	return _.has(body, 'username')
+    return _.has(body, 'username') && _.has(body, 'loginCode')
 }
 
 function checkTargetInSafezone(player, target, callback) {
@@ -68,9 +68,7 @@ function checkTargetInSafezone(player, target, callback) {
 			let newError = new Error('Did not find safezone with id ' + target.mySafeZoneId);
 			callback(newError, null);
 		}
-		console.log('WE FOUND A SAFEZONE HELL YEA')
 		var point = { type : "Point", coordinates : safezone.location };
-		console.log(point);
 		var isInSafezone = false;
 		Player.geoNear(point, { maxDistance : safezone.radius, spherical : true }, function(err, results, stats) {
 			if(err) {
@@ -135,7 +133,7 @@ function checkTargetProximity(player, target, callback) {
 			console.log(err);
 			return false;
 		}
-		results.filter(function(value) {
+      	        results.filter(function(value) {
 			if(value.obj.username == target.username) {
 				console.log(value.obj)
 				isInRange = true;
@@ -149,12 +147,9 @@ function checkTargetProximity(player, target, callback) {
 function killTargetAttempt(player, target, assassin, callback) {
 	//check target safezones
 	checkTargetInSafezone(player, target, (err, inSafezone) => {
-		if(err) {
-			callback(err, null)
-		}
 		if(inSafezone) {
 			console.log("target in safezone");
-			callback(null, 'target in safezone')
+			callback(null, 'target in safezone');
 		}
 		else {
 			console.log('in safezone or not: ', inSafezone)
@@ -207,8 +202,8 @@ function killTargetAttempt(player, target, assassin, callback) {
 							console.log("filtered alivePlayers array")
 							console.log(updatedPlayers)
 							game.alivePlayers = updatedPlayers
-							console.log(game.alivePlayers)
-							game.save((err) => {
+						        console.log(game.alivePlayers)
+						        game.save((err) => {
 								if(err)
 									callback(err, null)
 								else {
@@ -252,43 +247,50 @@ router.post('/organizerName', (req, res) => {
 });
 
 function shrinkSafezone (req, res, cb) {
-	if(!_.has(req.body, 'loginCode')) {
-		const err = {err: 'must have login code defined'}
-		cb(err,'Must have loginCode specified')
+    console.log("starting shrink safezone ...");
+    if(!_.has(req.body, 'loginCode')) {
+	const err = {err: 'must have login code defined'};
+	cb(err,'Must have loginCode specified');
     }
+    else {
     Game.findOne({ gameCode: req.body.loginCode }, (err, game) => {
-		if(!game)
-		    cb(err,'Game does not exist')
-		else {
-			console.log('game before calling safezone find one')
-			console.log(JSON.stringify(game, null, 2))
+		if(!game) {
+		    cb(err,'Game does not exist');
+        } else {
+			console.log('game before calling safezone find one');
+			console.log(JSON.stringify(game, null, 2));
 			Safezone.findOne({ _id: game.centralSafeZone }, (err, safezone) => {
 				if (err || !safezone) {
-					cb(err ? err: 'safezone doesnt exist', null)
+                    console.log('safezone doesnt exist?');
+					cb(err ? err: 'safezone doesnt exist', null);
 				}
-				console.log('find one')
-				console.log(err)
-				console.log(JSON.stringify(safezone, null, 2))
-				var numAlive = game.alivePlayers.length + 1;
-				var gameSize = numAlive + game.deadPlayers.length - 1;
-				if(numAlive/gameSize <= .15) {
-					console.log('safezone should be empty now');
-					safezone.radius = 0;
-				}
-				else {
-					safezone.radius -= (safezone.radius/numAlive);
-				}
-				safezone.save((err) => {
-					if(err)
-						callback(err, null)
-					else {
-						console.log("updated safezone");
-						cb(null, 'updated safezone')
-					}
-				})
+                else {
+                    console.log('find one');
+                    console.log(err);
+                    console.log(JSON.stringify(safezone, null, 2));
+                    var numAlive = game.alivePlayers.length + 1;
+                    var gameSize = numAlive + game.deadPlayers.length - 1;
+                    if(numAlive/gameSize <= .15) {
+                        console.log('safezone should be empty now');
+                        safezone.radius = 0;
+                    }
+                    else {
+                        safezone.radius -= (safezone.radius/numAlive);
+                    }
+                    safezone.save((err) => {
+                        if(err) {
+                            cb(err, null);
+                        }
+                        else {
+                            console.log("updated safezone");
+                            cb(null, 'updated safezone');
+                        }
+                    });
+                }
 			});
-		}
+		};
     });
+    }
 }
 
 router.post('/safezoneInfo', (req, res) => {
@@ -362,7 +364,7 @@ router.post('/killTarget', (req, res) => {
 				console.log(player)
 				console.log(target)
 				killTargetAttempt(player, target, null, (err, msg) => {
-					if(err) {
+				        if(err) {
 						res.status(400).json({error: err.message});
 					} else if (msg === 'target killed' || !player.alliance) {
 						shrinkSafezone(req, res, (err, message) => {
@@ -370,7 +372,7 @@ router.post('/killTarget', (req, res) => {
 								res.status(400).json({error: err});
 							} else {
 								console.log("early exit")
-								res.status(200).json({message: msg});
+								res.status(200).json({message: message});
 							}
 						});
 					} else {
@@ -405,18 +407,20 @@ router.post('/killTarget', (req, res) => {
 													res.status(400).json({error: err.message});
 													continueExecution = false;
 													return;
-												} else if(msg === 'killed target') {
+												} else if (msg === 'killed target') {
 													console.log('killed alliance target!')
 													shrinkSafezone(req, res, (err, msg) => {
-														if(err)
-															res.status(400).json({error: err.message});
+													    if(err)
+														res.status(400).json({error: err.message});
+													    else {
+														res.status(200).json({
+														    message: msg,
+														});
+													    }
 													});
-													res.status(200).json({
-														message: msg,
-													});
-													continueExecution = false;
+												        continueExecution = false;
 													return;
-												}
+												};
 											});
 										}).catch(err => {
 											res.status(400).json({error: err.message});
@@ -685,10 +689,11 @@ router.post('/updateLocation', (req, res) => {
 	Player.findOneAndUpdate({ username: req.body.username },
 				{ $set: { location: [req.body.x, req.body.y] } },
 				(err, doc) => {
-				if (err)
-					res.send(err);
-				else
-					res.sendStatus(200);
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.sendStatus(200);
+                    }
 				});
 });
 
@@ -765,9 +770,9 @@ router.post('/getUsername', (req, res) => {
 	}
 	const body = req.body;
 	Player.findOne({ _id: body.id }, (err, player) => {
-	if (err)
+	if (err) {
 		res.send(err);
-	else {
+    } else {
 		res.status(200).json({ message: 'success',
 				   username: player.username });
 	}
