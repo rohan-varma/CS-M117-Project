@@ -361,9 +361,10 @@ router.post('/killTarget', (req, res) => {
 						return;
 					} else if (msg === 'target killed' || !player.alliance) {
 						shrinkSafezone(req, res, (err, msg) => {
-							if(err)
+							if(err) {
 								res.status(400).json({error: err.message});
 								return;
+							}
 						});
 						console.log("early exit")
 						res.status(200).json({message: msg});
