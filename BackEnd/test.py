@@ -5,34 +5,34 @@ import string
 
 def createGameData():
 	# random login code
-	login_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(46))
+	login_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(21))
 	data = {'loginCode': login_code,
  			'orgName': "person",
-			'xCoord' : 7, 'yCoord': 7, 'radius': 2}
+			'xCoord' : -118, 'yCoord': 34, 'radius': 0}
 	return login_code,data
 
-def createUserData(login_code):
+def createUserData(login_code, username = None):
 	# random login code
-	username = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+	username = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20)) if not username else username
 	mac = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
 	data = {'loginCode': login_code,
 			'username': username,
  			'mac': mac,
 			'x' : 2,
 			'y': 2,
-			'xCoord' : 2,
-			'yCoord': 2,
-			'radius': 2}
+			'xCoord' : -118,
+			'yCoord': 34,
+			'radius': 0}
 	return data
 
 # for now until we have a cleanup for games in the DB, must change loginCode before each run
 # Formula: test, test1, test2, test3, ... 
 def testCreateGame (data):
 	# if a game is created without loginCode or orgName it should error
-	res = requests.post("http://localhost:3000/BluA/createGame",
-		data = {})
-	assert res.status_code == 400
-	assert 'error' in res.json().keys()
+	# res = requests.post("http://localhost:3000/BluA/createGame",
+	# 	data = {})
+	# assert res.status_code == 400
+	# assert 'error' in res.json().keys()
 
 	# a game should successfully be created with a new login code (generate randomly)
 	res = requests.post("http://localhost:3000/BluA/createGame",
@@ -40,13 +40,13 @@ def testCreateGame (data):
 	assert res.status_code == 200
 
 	# but if we use the same login code to create a game we should get an error
-	res = requests.post("http://localhost:3000/BluA/createGame",
-		data = data)
-	body = res.json()
-	print('result body')
-	print(body)
-	assert res.status_code == 400
-	assert 'error' in res.json()
+	# res = requests.post("http://localhost:3000/BluA/createGame",
+	# 	data = data)
+	# body = res.json()
+	# print('result body')
+	# print(body)
+	# assert res.status_code == 400
+	# assert 'error' in res.json()
 
 def testAddUser(data):
 	res = requests.post("http://localhost:3000/BluA/addUser",
@@ -74,11 +74,18 @@ def testUpdateLocation(data):
 		data = data)
 	assert res.status_code == 200
 
+def testGetTargetLocations(data):
+	res = requests.post("http://localhost:3000/BluA/getTargetLocation",
+		data = data)
+	print res
+	assert res.status_code == 200
+
 def testKillTarget(data):
 	res = requests.post("http://localhost:3000/BluA/killTarget",
 		data = data)
 	assert res.status_code == 200
 	print json.loads(res.text)["message"]
+	print(json.loads(res.text))
 	assert json.loads(res.text)["message"] == "killed target"
 
 def testKillTargetWithSafezone(data):
@@ -120,6 +127,7 @@ def testBasicCase():
 	testUpdateLocation(user4_data)
 	#attempt to kill the target
 	testKillTarget(user1_data)
+	testGetTargetLocations(user1_data)
 
 def testTargetInIndividualSafezone():
 	#create game data
@@ -213,10 +221,22 @@ def testTargetInAlliance():
 	testKillTarget(user1_data)
 
 def main():
-	# testBasicCase()
+	testBasicCase()
 	# testTargetInIndividualSafezone()
 	testTargetInCentralSafezone()
 	# testTargetInAlliance()
-	
 if __name__ == "__main__":
-	main()
+	#create game data
+	test_data = createGameData()
+	#create four test users
+	user1_data = createUserData(test_data[0])
+	user2_data = createUserData(test_data[0])
+	#create a game with the above data
+	testCreateGame(test_data[1])
+	#add users with the above data
+	testAddUser(user1_data)
+	testAddUser(user2_data)
+	#start game
+	testStartGame(test_data[1])
+	testKillTarget(user2_data)
+#	main()

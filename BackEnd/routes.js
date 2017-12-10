@@ -260,7 +260,15 @@ function shrinkSafezone (req, res, cb) {
 		if(!game)
 		    cb(err,'Game does not exist')
 		else {
+			console.log('game before calling safezone find one')
+			console.log(JSON.stringify(game, null, 2))
 			Safezone.findOne({ _id: game.centralSafeZone }, (err, safezone) => {
+				if (err || !safezone) {
+					cb(err ? err: 'safezone doesnt exist', null)
+				}
+				console.log('find one')
+				console.log(err)
+				console.log(JSON.stringify(safezone, null, 2))
 				var numAlive = game.alivePlayers.length + 1;
 				var gameSize = numAlive + game.deadPlayers.length - 1;
 				if(numAlive/gameSize <= .15) {
@@ -270,7 +278,6 @@ function shrinkSafezone (req, res, cb) {
 				else {
 					safezone.radius -= (safezone.radius/numAlive);
 				}
-			}).then(
 				safezone.save((err) => {
 					if(err)
 						callback(err, null)
@@ -279,7 +286,7 @@ function shrinkSafezone (req, res, cb) {
 						cb(null, 'updated safezone')
 					}
 				})
-			);
+			});
 		}
     });
 }
@@ -358,9 +365,9 @@ router.post('/killTarget', (req, res) => {
 					if(err) {
 						res.status(400).json({error: err.message});
 					} else if (msg === 'target killed' || !player.alliance) {
-						shrinkSafezone(req, res, (err, msg) => {
+						shrinkSafezone(req, res, (err, message) => {
 							if (err) {
-								res.status(400).json({error: err.message});
+								res.status(400).json({error: err});
 							} else {
 								console.log("early exit")
 								res.status(200).json({message: msg});
@@ -699,13 +706,48 @@ router.post('/getTargetLocation', (req, res) => {
 			error: 'body must have username',
 		})
 	}
-	Player.findOne({ username: req.body.username }, (err, obj) => {
-	if (err)
-		res.send(err);
-	else {
-		res.status(200).json({ message: 'success',
-				   location: obj ? obj.location : null});
-	}
+	Player.findOne({ username: req.body.username }, (err, player) => {
+		if (err || !player) {
+			res.status(400).json({message: 'error when trying to find player'});
+		}
+		else {
+		    console.log('FOUND THIS PLAYER')
+		    console.log(JSON.stringify(player, null, 2))
+		    const pIdToUsername = playerId => {
+			return Player.findById(playerId);
+		    }
+		    if (player.alliance == null)
+			Promise.all(_.map([player.target], pIdToUsername)).then(result => {
+				var array = [];
+	    		var tuple = [result.username, result.location];
+	    		array.push(tuple);
+		    	var jsonArray = JSON.stringify(array);
+			    res.status(200).json({
+					message: 'success',
+					targets: array
+			    });
+			});
+		    else {
+			Alliance.findOne({ _id: player.alliance }, (err, a) => {
+				if (err) {
+					res.status(400).json({error: err});
+				} else {
+				    Promise.all(_.map(a.targets, pIdToUsername)).then(result => {
+				    	var array = [];
+				    	for(let i = 0; i < result.length; i++) {
+				    		var tuple = [result[i].username, result[i].location];
+				    		array.push(tuple);
+				    	}
+				    	var jsonArray = JSON.stringify(array);
+						res.status(200).json({
+						    message: 'success',
+						    targets: jsonArray
+						});
+				    });
+				}
+			});
+			}
+		}
 	});
 });
 
