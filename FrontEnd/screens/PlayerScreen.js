@@ -106,6 +106,7 @@ class PlayerScreen extends Component {
       <Text> Players in Game </Text>
       <ListView
         dataSource={this.state.alivePlayers.length !== 0 ? this.state.alivePlayers : [{name: 'No Players'}]}
+	enableEmptySections={true}
         renderRow={player => {
           console.log(player)
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
@@ -114,6 +115,7 @@ class PlayerScreen extends Component {
       <Text style={{paddingTop: 30}}> The Noble Players Who Were Killed In Battle </Text>
       <ListView
         dataSource={this.state.deadPlayers.length !== 0 ? this.state.deadPlayers : [{name: 'No Players'}]}
+	enableEmptySections={true}
         renderRow={player => {
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>
         }}
@@ -121,6 +123,7 @@ class PlayerScreen extends Component {
       <Text style={{paddingTop: 30}}> Your Targets </Text> 
       <ListView
         dataSource={this.state.playerTargets}
+	enableEmptySections={true}x
         renderRow={player => {
           console.log(player)
           return <View style={styles.playerlistwrapper}><Text style={styles.playerlist}>{player.name}</Text></View>

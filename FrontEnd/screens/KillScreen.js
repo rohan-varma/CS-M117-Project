@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { 
   StyleSheet, 
    View, 
-
+   Text
  } from 'react-native';
-import { Container, Header, Content, Footer, FooterTab, Button, Icon, Text } from 'native-base';
+import { Container, Header, Content, Footer, FooterTab, Button, Icon} from 'native-base';
 
 import { Actions } from 'react-native-router-flux';
 
