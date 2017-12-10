@@ -213,7 +213,7 @@ def testTargetInAlliance():
 	testKillTarget(user1_data)
 
 def main():
-	# testBasicCase()
+	testBasicCase()
 	# testTargetInIndividualSafezone()
 	testTargetInCentralSafezone()
 	# testTargetInAlliance()
