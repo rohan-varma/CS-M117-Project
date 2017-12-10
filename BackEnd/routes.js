@@ -719,7 +719,7 @@ router.post('/getTargetLocation', (req, res) => {
 		    if (player.alliance == null) {
                 Promise.all(_.map([player.target], pIdToUsername)).then(result => {
                     var array = [];
-                    var tuple = [result.username, result.location];
+                    var tuple = [result[0].username, result[0].location];
                     array.push(tuple);
                     var jsonArray = JSON.stringify(array);
                     res.status(200).json({
