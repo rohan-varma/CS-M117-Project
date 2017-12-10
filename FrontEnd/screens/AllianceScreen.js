@@ -31,15 +31,16 @@ export default class AllianceScreen extends Component {
 			console.log('get alliance res')
 			console.log(JSON.stringify(res, null, 2))
 			if (res.allies.length > 0) {
-				//this user has an alliance, so take the user to the page where they view alliances
-				
+				console.log('there are alliances to join')
+        //this user has an alliance, so take the user to the page where they view alliances
 				{Actions.InAlliance({username: this.props.username, gameCode: this.props.gameCode, allianceObject: res})}
 			}
-      else {
-        alert('There is no alliances to join. Please create one first')
-      }
+      
 		})
 		.catch(err => {
+
+      alert('There is no alliances to join. Please create one first.')
+      
 			console.log('get alliance err')
 			console.log(JSON.stringify(err, null, 2))
 		})
@@ -121,7 +122,7 @@ export default class AllianceScreen extends Component {
             <Button full success
             style= {{bottom: 0}}
             onPress={this.reload}> 
-              <Text> See My Alliance </Text>
+              <Text style= {{color:'white'}}> See My Alliance </Text>
             </Button>
         </View>       
         <Footer>
