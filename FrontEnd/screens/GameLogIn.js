@@ -78,15 +78,13 @@ class GameInput extends Component {
         gameExists(gameRequestBody).then(res => {
             console.log ('This is the current game status');
             console.log (res.started);
-            console.log ('does res exist??????')
             if (_.has(res, 'exists')) {
-                console.log ('do you exist?')
                 var ifGameStarted = res.started;
                 if (res.exists) {
-                    console.log ('does res exist?')
+                    
                     addUserToGame(userRequestBody).then(res => {
                         // success
-                        
+                   
                         
                         if (ifGameStarted) {
                                 // if game already started new users cant join
@@ -99,20 +97,18 @@ class GameInput extends Component {
                                  alert('Game already started, new player can not join an ongoing game. Please enter a new game.');
                             }
 
-                        }
+                            }
                         else {
                             this.enterLobby();
                             return;
-                        } 
+                        }
                         
-                    })
-                    .catch(err => {
-                        
+                    }).catch(err => {
+                        console.log(err);
                         if (err.status == 400 && err.username == this.state.username) {
                             // if player with username exists in current game
                             //Actions.Lobby({username: this.state.username, gameCode: this.state.gameCode});
-                            
-                            
+                           
                             if (ifGameStarted) {
                                 // if game already started go to game page instead
                                 Actions.PlayerScreen({username: this.state.username, gameCode: this.state.gameCode});
@@ -126,22 +122,10 @@ class GameInput extends Component {
                         alert("Failed to join game, please try again.");
                         Actions.GameLogIn();
                     });
-                } // end of (if res.exists)
-                // if game doesnt games 
+                }
                 else if (this.props.gameCreated) {
-                    // if game already created 
                     createGame(gameRequestBody).then(res => {
                         addUserToGame(userRequestBody).then(res => {
-
-                            // and if player exist in other game 
-                            console.log ('ERROR CREATING USER. USER EXISTS')
-                            console.log (res.error)
-                            console.log (this.state.gameCode)
-                            if (res.error != this.state.gameCode) {
-                            // if this player exist in other game
-                                alert ('User exists in other game. Please enter a different username or game')
-                                return; 
-                            }
                             if (ifGameStarted) {
                                 // if game already started go to game page instead
                                 alert('game already started, can not join an ongoing game');
