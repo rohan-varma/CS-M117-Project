@@ -3,6 +3,7 @@ import { StyleSheet, View, AppRegistry, ListView, Text} from 'react-native';
 import { Container, Header, Content, Footer, FooterTab, Button, List, ListItem, Icon } from 'native-base';
 import MapView from 'react-native-maps';
 import { Actions } from 'react-native-router-flux';
+import p2pkit from 'react-native-p2pkit';
 const { createGame, addUserToGame, getAllPlayersForGame,gameExists, createAlliance, getAlliance, joinAlliance } 
 = require('../requestors');
 const _ = require('lodash');
@@ -71,25 +72,131 @@ export default class AllianceScreen extends Component {
 	}
 
 	join = () => {
-		console.log('join alliance called')
-
-		if(this.state.allianceIds.length === 0) {
-			alert('No alliances exit right now, please create one')
-		} else {
-			//just pick an alliance for now
-			toJoin = this.state.allianceIds[0];
-			joinAlliance(JSON.stringify({allianceId: toJoin}, null, 2))
-			.then(res => {
-				console.log('join alliance res')
-				console.log(JSON.stringify(res, null, 2))
-				this.setState({hasJoinedAlliance: true})
-			})
-			.catch(err => {
-				console.log('join alliance err')
-				console.log(JSON.stringify(err,null, 2))
-			})
-		}
+	    console.log('join alliance called')
+	    startJoinP2PKit((aId) => {
+		this.state.allianceIds.push(aId);
+		this.setState({hasJoinedAlliance: true});
+		alert(`Joined alliance with id ${aId}!`);
+	    });
  	}
+
+        advertise = () => {
+	    if(this.state.allianceIds.length === 0) {
+	        alert('You are not in an alliance! Please create one');
+	    }
+	    else {
+	        startAdvertiseP2PKit(this.state.allianceIds[0]);
+	    }
+        }
+
+    startJoinP2PKit = (callback) => {
+	p2pkit.enable('APPKEY', {
+	    onException: function(exceptionMessage) {
+		console.log(exceptionMessage.message)
+	    },
+
+	    onEnabled: function() {
+		console.log('p2pkit is enabled')
+		p2pkit.enableProximityRanging()
+		p2pkit.startDiscovery('lfa', p2pkit.HIGH_PERFORMANCE) //base64 encoded Data (bytes)
+	    },
+
+	    onDisabled: function() {
+		console.log('p2pkit is disabled')
+	    },
+
+	    // Refer to platform specific API for error codes
+	    onError: function(errorObject) {
+		console.log('p2pkit failed to enable on platform ' + errorObject.platform + ' with error code ' + errorObject.errorCode)
+	    },
+
+	    onDiscoveryStateChanged: function(discoveryStateObject) {
+		console.log('discovery state updated on platform ' + discoveryStateObject.platform + ' with error code ' + discoveryStateObject.state)
+	    },
+
+	    onPeerDiscovered: function(peer) {
+		console.log('peer discovered ' + peer.peerID);
+		if(peer.discoveryInfo != 'lfa') {
+		    p2pkit.disable();
+		    callback(peer.discoveryInfo);
+		}
+	    },
+
+	    onPeerLost: function(peer) {
+		p2pkit.disable();
+		console.log('peer lost ' + peer.peerID)
+	    },
+
+	    onPeerUpdatedDiscoveryInfo: function(peer) {
+		console.log('discovery info updated for peer ' + peer.peerID + ' info ' + peer.discoveryInfo)
+	    },
+
+	    onProximityStrengthChanged: function(peer) {
+		console.log('proximity strength changed for peer ' + peer.peerID + ' proximity strength ' + peer.proximityStrength)
+	    },
+
+	    onGetMyPeerId: function(reply) {
+		console.log(reply.myPeerId)
+	    },
+
+	    onGetDiscoveryPowerMode: function(reply) {
+		console.log(reply.discoveryPowerMode)
+	    }
+	});
+    }
+    
+    startAdvertiseP2PKit = (allianceID) => {
+	p2pkit.enable('APPKEY', {
+	    onException: function(exceptionMessage) {
+		console.log(exceptionMessage.message)
+	    },
+
+	    onEnabled: function() {
+		console.log('p2pkit is enabled')
+		p2pkit.enableProximityRanging()
+		p2pkit.startDiscovery(allianceID, p2pkit.HIGH_PERFORMANCE) //base64 encoded Data (bytes)
+	    },
+
+	    onDisabled: function() {
+		console.log('p2pkit is disabled')
+	    },
+
+	    // Refer to platform specific API for error codes
+	    onError: function(errorObject) {
+		console.log('p2pkit failed to enable on platform ' + errorObject.platform + ' with error code ' + errorObject.errorCode)
+	    },
+
+	    onDiscoveryStateChanged: function(discoveryStateObject) {
+		console.log('discovery state updated on platform ' + discoveryStateObject.platform + ' with error code ' + discoveryStateObject.state)
+	    },
+
+	    onPeerDiscovered: function(peer) {
+		console.log('peer discovered ' + peer.peerID)
+	    },
+
+	    onPeerLost: function(peer) {
+		p2pkit.disable();
+		console.log('peer lost ' + peer.peerID)
+	    },
+
+	    onPeerUpdatedDiscoveryInfo: function(peer) {
+		console.log('discovery info updated for peer ' + peer.peerID + ' info ' + peer.discoveryInfo)
+	    },
+
+	    onProximityStrengthChanged: function(peer) {
+		console.log('proximity strength changed for peer ' + peer.peerID + ' proximity strength ' + peer.proximityStrength)
+	    },
+
+	    onGetMyPeerId: function(reply) {
+		console.log(reply.myPeerId)
+	    },
+
+	    onGetDiscoveryPowerMode: function(reply) {
+		console.log(reply.discoveryPowerMode)
+	    }
+	});
+    }
+
   goToKill = () => {
     Actions.replace("KillScreen",{username: this.props.username, gameCode: this.props.gameCode})
    
@@ -118,6 +225,12 @@ export default class AllianceScreen extends Component {
             full
               onPress={this.join}>
               <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Join An Alliance</Text>
+	    </Button>
+	    <Button style={{margin: 10}}
+            info
+            full
+              onPress={this.advertise}>
+              <Text style={{color:'white', fontWeight:'bold', fontSize:15}}>Advertise My Alliance</Text>
             </Button>
             <Button full success
             style= {{bottom: 0}}
