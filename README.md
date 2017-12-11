@@ -35,6 +35,9 @@ Please see README in frontend folder for frontend instructions
 
 1) Navigate into the BackEnd directory and run `npm start`. This will start the app listening on the port `localhost:3000/BluA`
 
+2) Check the file `FrontEnd/requestors.js`. If the `ServerURL` variable is not `localhost:3000/BluA`, set it to that. 
+
+
 ### Testing the BackEnd
 
 - `npm test` will test the APIs for the routes defined in `routes.js`. 
@@ -50,6 +53,10 @@ As of now the DB has the following collections:
 games
 
 players
+
+alliances
+
+safezones
 
 To drop the database, run `mongo BluA --eval "db.dropDatabase()"`
 
