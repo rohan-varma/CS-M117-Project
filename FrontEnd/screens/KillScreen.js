@@ -8,6 +8,9 @@ import MapView from 'react-native-maps';
 import { Constants, Location, Permissions } from 'expo';
 const { createGame, addUserToGame, updateLocation, safezoneInfo, getTargetLocation, killTarget } = require('../requestors');
 const _ = require('lodash');
+try {
+    p2pkit = require('react-native-p2pkit');
+} catch (err) {}
 
 class KillScreen extends Component {
 
@@ -24,13 +27,13 @@ class KillScreen extends Component {
             },
             targets: [
                 {
-		    key: 0,
+                    key: 0,
                     username: 'asdfas1',
                     latitude: 34.0689,
                     longitude: -118.443,
                 },
                 {
-		    key: 1,
+                    key: 1,
                     username: 'asdfas2',
                     latitude: 34.068,
                     longitude: -118.443,
@@ -50,6 +53,7 @@ class KillScreen extends Component {
             uc_backend: '',
             uc_location: '',
             errorMessage: '',
+            inBTRange: true,
         };
     }
 
@@ -61,7 +65,58 @@ class KillScreen extends Component {
         this.setState({ uc_backend: 0 });
         this.startPositionListener();
         this.startBackendCaller();
+        try {
+            this.startP2PKit();
+        }
+        catch (err) {
+        }
     };
+
+    startP2PKit = () => {
+        p2pkit.enable('APPKEY', this.p2pkitCallback);
+    };
+
+    p2pkitCallback = {
+        onException: (exceptionMessage) => {
+            console.log(exceptionMessage.message)
+        },
+        onEnabled: () => {
+            console.log('p2pkit is enabled')
+            p2pkit.enableProximityRanging()
+            p2pkit.startDiscovery('') //base64 encoded Data (bytes)
+        },
+        onDisabled: () => {},
+        // Refer to platform specific API for error codes
+        onError: function(errorObject) {},
+        onDiscoveryStateChanged: function(discoveryStateObject) {},
+        onPeerDiscovered: function(peer) {
+            console.log('peer discovered ' + peer.peerID)
+            for (var i = 0; i < this.state.targets.length; i++ ) {
+            // target found
+            if (peer.peerID == this.state.targets[i].key) {
+                this.setState({ inBTRange: true });
+            }
+            }
+        },
+        onPeerLost: function(peer) {
+            console.log('peer lost ' + peer.peerID)
+            for (var i = 0; i < this.state.targets.length; i++ ) {
+            // target found
+            if (peer.peerID == this.state.targets[i].key) {
+                this.setState({ inBTRange: false });
+            }
+            }
+        },
+        onPeerUpdatedDiscoveryInfo: function(peer) {
+            console.log('discovery info updated for peer ' + peer.peerID + ' info ' + peer.discoveryInfo)
+        },
+        onProximityStrengthChanged: function(peer) {
+            console.log('proximity strength changed for peer ' + peer.peerID + ' proximity strength ' + peer.proximityStrength)
+        },
+        onGetMyPeerId: function(reply) {
+            console.log(reply.myPeerId)
+        }
+    }
 
     _updateSafezone = () => {
         const safezoneRequest = JSON.stringify({
@@ -180,15 +235,14 @@ class KillScreen extends Component {
 
     tryKill = (started) => {
         // here I write some dummy code to emulate bluetooth check
-        var inBTRange = true;
         // bluetooth in range
         // here do a timer, and kill after 10 secs
-        if (inBTRange && !started) {
+        if (this.state.inBTRange && !started) {
             alert("Starting timer for 10 seconds ... stay in Bluetooth range!");
             setTimeout(() => { this.tryKill(true); }, 10000);
         }
         // bluetooth has been in range for 10 seconds
-        else if (inBTRange && started) {
+        else if (this.state.inBTRange && started) {
             // here do the kill
             alert("Trying to kill ...");
             alert(this.state.username);
