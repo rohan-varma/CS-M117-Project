@@ -181,7 +181,6 @@ class KillScreen extends Component {
     tryKill = (started) => {
         // here I write some dummy code to emulate bluetooth check
         var inBTRange = true;
-        alert("try kill is being called");
         // bluetooth in range
         // here do a timer, and kill after 10 secs
         if (inBTRange && !started) {
@@ -225,9 +224,7 @@ class KillScreen extends Component {
                 <MapView
                     style={{ alignSelf: 'stretch', height: 250 }}
                     region={this.state.mapRegion}
-                    onRegionChange={this._handleMapRegionChange}
-	            scrollEnabled={false}
-	            zoomEnabled={false}>
+                    onRegionChange={this._handleMapRegionChange}>
 
                     <MapView.Marker 
                         coordinate={{
@@ -264,13 +261,6 @@ class KillScreen extends Component {
                 <Button style={styles.button} onPress = {() => {this.tryKill(false);}}>
                     <Text style={styles.buttonText}>Attempt a Kill</Text>
                 </Button>
-
-                <Text>{this.state.mapRegion.latitude}</Text>
-                <Text>{this.state.mapRegion.longitude}</Text>
-                <Text>{this.state.uc_safezone}</Text>
-                <Text>{this.state.uc_backend}</Text>
-                <Text>{this.state.uc_location}</Text>
-                <Text>{this.state.errorMessage}</Text>
             </View>
 
             </Content>
