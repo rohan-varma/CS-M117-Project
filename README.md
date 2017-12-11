@@ -1,4 +1,6 @@
-### CS M117 Project
+### CS M117 Project: Bluetooth Assassins
+
+Our project takes the popular game Assassins played among groups, clubs, and college residential halls and gives it a modern makeover. Bluetooth Assassins is a multiplayer mobile application to play the game Assassins with a group of your friends, complete with functionality that allows you to set safezones via GPS, join Alliances through Wi-Fi direct. The goal of the game is to assassinate your target(s), which can happen when you and your target come within Bluetooth range of each others' devices. 
 
 ### How to Contribute 
 
